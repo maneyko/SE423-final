@@ -201,24 +201,6 @@ void ComWithLinux(void) {
 }
 
 
-
-long int dancount = 0;
-int toggle = 0;
-void danClock(void) {
-    dancount++;
-
-
-    if (dancount%200 == 0) {
-        if (toggle == 0) {
-            CLRLED4;
-            toggle = 1;
-        } else {
-            SETLED4;
-            toggle = 0;
-        }
-    }
-}
-
 /*
  *  ======== main ========
  */

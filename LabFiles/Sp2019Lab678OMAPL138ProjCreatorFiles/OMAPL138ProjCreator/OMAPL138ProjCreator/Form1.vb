@@ -259,6 +259,7 @@ NoError:
         PrintLine(1, "								<option id=""com.ti.ccstudio.buildDefinitions.C6000_8.2.compilerID.DEFINE.778676738"" name=""Pre-define NAME (--define, -D)"" superClass=""com.ti.ccstudio.buildDefinitions.C6000_8.2.compilerID.DEFINE"" valueType=""definedSymbols"">")
         PrintLine(1, "									<listOptionValue builtIn=""false"" value=""${BIOS_SYMBOLS}""/>")
         PrintLine(1, "									<listOptionValue builtIn=""false"" value=""RUNNING_ON_OMAPL138""/>")
+        PrintLine(1, "									<listOptionValue builtIn=""false"" value=""PHILIPSCOLORLCD""/>")
         PrintLine(1, "									<listOptionValue builtIn=""false"" value=""omapl138""/>")
         PrintLine(1, "								</option>")
         PrintLine(1, "								<option id=""com.ti.ccstudio.buildDefinitions.C6000_8.2.compilerID.SILICON_VERSION.1050068491"" name=""Target processor version (--silicon_version, -mv)"" superClass=""com.ti.ccstudio.buildDefinitions.C6000_8.2.compilerID.SILICON_VERSION"" value=""6740"" valueType=""string""/>")
