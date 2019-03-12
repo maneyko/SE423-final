@@ -360,7 +360,6 @@ int astar(int rowStart, int colStart, int rowEnd, int colEnd)
 	}  /*end while loop*/
 
 	/*if a path was found from the start to the goal, then reconstruct the path*/
-	///////////////////????????????????Double check??????????????????????
 	if(goalFound == 't') {
 		// 12.  Pass the correct varaibles to "reconstructPath" in order for it to fill in the global arrays pathRow, pathCol
 		//     and integer pathLen.  Note that the path is in reverse order in pathRow and pathCol.
