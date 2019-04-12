@@ -231,7 +231,8 @@ void ComWithLinux(void) {
                 fromLinuxstring[i] = '\0';
 
                 if (new_LV_data == 0) {
-                    sscanf(fromLinuxstring,"%f%f",&LVvalue1,&LVvalue2);
+                    //sscanf(fromLinuxstring,"%f%f",&LVvalue1,&LVvalue2);
+                    sscanf(fromLinuxstring,"%f%f",&Kg_A2,&LVvalue2);
                     new_LV_data = 1;
                 }
 
@@ -243,8 +244,9 @@ void ComWithLinux(void) {
             if (GET_LVDATA_TO_LINUX) {
 
                 // Default
-                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"1.0 1.0 1.0 1.0");
+                //ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"1.0 1.0 1.0 1.0");
                 // you would do something like this
+                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",12-x_curA2,y_curA2,v_L,v_R);
                 //ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",var1,var2,var3,var4);
 
                 for (i=0;i<ptrshrdmem->DSPSend_size;i++) {
