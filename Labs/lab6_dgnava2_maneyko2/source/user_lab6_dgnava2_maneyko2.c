@@ -513,7 +513,7 @@ void RobotControl(void) {
 //
 //
 //    }
-
+//=================================== Start Dead reckoning position tracking ===================================
     min_front = 10000000;
        for (i = 111; i < 116; i++)
            if (LADARdistance[i] < min_front)
@@ -594,7 +594,7 @@ void RobotControl(void) {
         // 3. Display this angle and X Y coordinates to the LCD every 100ms or so.
     }
 
-
+ //=============================================================Start wall following code=================================================
     switch (pval) {
     case 1:  // Driving forward checking for object in front of vehicle // Left turn
            turn = Kp_front_wall * (3000 - min_front);
@@ -631,6 +631,7 @@ void RobotControl(void) {
         turn = turn_command_saturation;
     else if (turn < -turn_command_saturation)
         turn = -turn_command_saturation;
+    //=====================================end wall following code==========================================================================================
 
     switch (ss) {  // 16 possible cases / Max line length=20
     case 0:  // Print LADAR distances
