@@ -142,7 +142,7 @@ typedef struct sharedmemstruct {
 	volatile char DSPRec_buf[LINUX_COMSIZE+2];  // +2 for possible extra Null char if large amounts of data sent
 	volatile int DSPSend_size;
 	volatile char DSPSend_buf[LINUX_COMSIZE+2];
-	volatile float Floats_to_DSP[NUM_FLOATS_FROM_LINUX_TO_DSP];
+	volatile float Floats_to_DSP[NUM_FLOATS_FROM_LINUX_TO_DSP];  // [0]->vref [1]->turn
 	volatile float Floats_from_DSP[NUM_FLOATS_TO_LINUX_FROM_DSP];
 	volatile float Optitrackdata[OPTITRACKDATASIZE];
 	volatile float scratch[500];

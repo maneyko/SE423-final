@@ -6,38 +6,38 @@ SHELL = cmd.exe
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CFG_SRCS += \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/sysbios/sysbiosLab6F28335.cfg 
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/sysbios/sysbiosLab6F28335.cfg 
 
 CMD_SRCS += \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_headers/cmd/DSP2833x_Headers_BIOS.cmd \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_headers/cmd/DSP2833x_Headers_BIOS.cmd \
 ../TMS320F28335.cmd \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/cmd/user_lnk.cmd 
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/cmd/user_lnk.cmd 
 
 ASM_SRCS += \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_ADC_cal.asm \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_CSMPasswords.asm \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_CodeStartBranch.asm \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_usDelay.asm 
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_ADC_cal.asm \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_CSMPasswords.asm \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_CodeStartBranch.asm \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_usDelay.asm 
 
 C_SRCS += \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/28335_dma.c \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/28335_eqep.c \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/28335_inits.c \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/28335_mcbsp.c \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/28335_pwm.c \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/28335_serial.c \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/28335_spi.c \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_Adc.c \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_CpuTimers.c \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_headers/source/DSP2833x_GlobalVariableDefs.c \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_Mcbsp.c \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_PieCtrl.c \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_Spi.c \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_SysCtrl.c \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/i2c.c \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/lcd.c \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/user_PIFuncs.c \
-C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/user_sysbiosLab6F28335.c 
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/28335_dma.c \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/28335_eqep.c \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/28335_inits.c \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/28335_mcbsp.c \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/28335_pwm.c \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/28335_serial.c \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/28335_spi.c \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_Adc.c \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_CpuTimers.c \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_headers/source/DSP2833x_GlobalVariableDefs.c \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_Mcbsp.c \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_PieCtrl.c \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_Spi.c \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_SysCtrl.c \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/i2c.c \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/lcd.c \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/user_PIFuncs.c \
+C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/user_sysbiosLab6F28335.c 
 
 GEN_CMDS += \
 ./configPkg/linker.cmd 
@@ -160,29 +160,29 @@ ASM_DEPS__QUOTED += \
 "DSP2833x_usDelay.d" 
 
 C_SRCS__QUOTED += \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/28335_dma.c" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/28335_eqep.c" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/28335_inits.c" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/28335_mcbsp.c" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/28335_pwm.c" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/28335_serial.c" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/28335_spi.c" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_Adc.c" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_CpuTimers.c" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_headers/source/DSP2833x_GlobalVariableDefs.c" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_Mcbsp.c" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_PieCtrl.c" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_Spi.c" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_SysCtrl.c" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/i2c.c" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/lcd.c" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/user_PIFuncs.c" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/source/user_sysbiosLab6F28335.c" 
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/28335_dma.c" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/28335_eqep.c" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/28335_inits.c" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/28335_mcbsp.c" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/28335_pwm.c" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/28335_serial.c" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/28335_spi.c" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_Adc.c" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_CpuTimers.c" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_headers/source/DSP2833x_GlobalVariableDefs.c" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_Mcbsp.c" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_PieCtrl.c" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_Spi.c" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_SysCtrl.c" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/i2c.c" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/lcd.c" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/user_PIFuncs.c" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/source/user_sysbiosLab6F28335.c" 
 
 ASM_SRCS__QUOTED += \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_ADC_cal.asm" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_CSMPasswords.asm" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_CodeStartBranch.asm" \
-"C:/dan/omapl138/SE423_Sp18/Sp19Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_usDelay.asm" 
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_ADC_cal.asm" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_CSMPasswords.asm" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_CodeStartBranch.asm" \
+"C:/dgnava2_maneyko2/SE423Repo/LabFiles/sysbiosLab6F28335/v110/DSP2833x_common/source/DSP2833x_usDelay.asm" 
 
 

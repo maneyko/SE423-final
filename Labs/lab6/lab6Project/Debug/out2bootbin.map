@@ -1,0 +1,31 @@
+********************************************************************************
+TMS320C6x Hex Converter                                                   v8.2.2
+********************************************************************************
+
+INPUT FILE NAME: <lab6.out>
+OUTPUT FORMAT:   Binary
+
+PHYSICAL MEMORY PARAMETERS
+   Default data width   :   8
+   Default memory width :   8
+   Default output width :   8
+
+BOOT LOADER PARAMETERS
+   Table Address: 0x0000, PAGE 0
+   Entry Point  : 0x11819500
+
+
+OUTPUT TRANSLATION MAP
+--------------------------------------------------------------------------------
+00000000..0003ffff  Page=0  Memory Width=8  ROM Width=8  "SPIFLASH"
+--------------------------------------------------------------------------------
+   OUTPUT FILES: lab6.hex [b0..b7]
+
+   CONTENTS: 00000000..0001fdc7   BOOT TABLE
+                            .vecs : btad=00000000  dest=1182b000 size=00000200
+                           .cinit : btad=0000020c  dest=1182b348 size=00000968
+                            .text : btad=00000b7c  dest=11800000 size=0001ca80
+                         .const.1 : btad=0001d604  dest=118257b0 size=00000050
+                         .const.2 : btad=0001d65c  dest=11825868 size=00002692
+                        .switch.1 : btad=0001fcf8  dest=1182af68 size=00000094
+                        .switch.2 : btad=0001fd94  dest=1182b320 size=00000028

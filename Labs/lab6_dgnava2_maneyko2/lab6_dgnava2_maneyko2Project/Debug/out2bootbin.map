@@ -1,0 +1,30 @@
+********************************************************************************
+TMS320C6x Hex Converter                                                   v8.2.2
+********************************************************************************
+
+INPUT FILE NAME: <lab6_dgnava2_maneyko2.out>
+OUTPUT FORMAT:   Binary
+
+PHYSICAL MEMORY PARAMETERS
+   Default data width   :   8
+   Default memory width :   8
+   Default output width :   8
+
+BOOT LOADER PARAMETERS
+   Table Address: 0x0000, PAGE 0
+   Entry Point  : 0x11819d80
+
+
+OUTPUT TRANSLATION MAP
+--------------------------------------------------------------------------------
+00000000..0003ffff  Page=0  Memory Width=8  ROM Width=8  "SPIFLASH"
+--------------------------------------------------------------------------------
+   OUTPUT FILES: lab6_dgnava2_maneyko2.hex [b0..b7]
+
+   CONTENTS: 00000000..00020677   BOOT TABLE
+                            .vecs : btad=00000000  dest=1182bc00 size=00000200
+                           .cinit : btad=0000020c  dest=1182be00 size=000009a0
+                            .text : btad=00000bb4  dest=11800000 size=0001d300
+                         .const.1 : btad=0001debc  dest=11826030 size=00000050
+                         .const.2 : btad=0001df14  dest=118260e8 size=0000268e
+                          .switch : btad=000205ac  dest=1182b9b0 size=000000c0
