@@ -116,7 +116,7 @@ int errorcheck = 1;
 
 
 // ===== BEGIN Student Variables =====
-float min_front = 0;
+//float min_front = 0;
 // These are passed from `ColorVisionLab8parts1_2_3.c`
 
 //extern int Cx;
@@ -142,8 +142,58 @@ float real_dist = 0;
 
 float kp_vision = 0.03;
 
-
 extern int prnt_flag;
+
+//====== Start Wall Following and Dead Reckoning Student Variables ========
+float min_front = 10000000;
+float min_right = 10000000;
+
+
+float ref_right_wall = 400;
+float left_turn_Start_threshold = 400;
+float left_turn_Stop_threshold = 700;
+float Kp_right_wall = -0.002;
+float Kp_front_wall = -0.002;
+float front_turn_velocity = 0.5;
+float turn_command_saturation = 2.0;
+float forward_velocity = 1.0;
+
+// COmmented out Below only needed for use of linux command updates
+//float new_ref_right_wall = 0;
+//float new_left_turn_Start_threshold = 0;
+//float new_left_turn_Stop_threshold = 0;
+//float new_Kp_right_wall = 0;
+//float new_Kp_front_wall = 0;
+//float new_front_turn_velocity = 0;
+//float new_turn_command_saturation = 0;
+int pval = 1;  // Initial state
+
+float gyro_zero = 0.0; // not set here. Found below by averaging 3s of samples
+float rate_zero_A3 = 0.0;
+float rate_zero_A2 = 0.0;
+float gyro_rate_A2 = 0.0;
+float gyro_rate_A3 = 0.0;
+float gyro_rate_A2_prev = 0.0;
+float gyro_rate_A3_prev = 0.0;
+float theta_A2 = 0.0;
+float theta_A3 = 0.0;
+float enc_old_L = 0.0;  // For calculating velocity
+float enc_old_R = 0.0;
+float enc_current_L = 0;
+float enc_current_R = 0;
+float v_L = 0;
+float v_R = 0;
+float x_curA2 = 0;  // Gyro A2
+float y_curA2 = 0;
+float x_oldA2 = 0;
+float y_oldA2 = 0;
+float x_curA3 = 0;  // Gyro A3
+float y_curA3 = 0;
+float x_oldA3 = 0;
+float y_oldA3 = 0;
+float rate_gyro_sumA2 = 0;
+float rate_gyro_sumA3 = 0;
+float Kg_A2 = 100;
 
 // ===== END Student Variables =====
 
@@ -181,7 +231,8 @@ void ComWithLinux(void) {
                 fromLinuxstring[i] = '\0';
 
                 if (new_LV_data == 0) {
-                    sscanf(fromLinuxstring,"%f%f",&LVvalue1,&LVvalue2);
+                    //sscanf(fromLinuxstring,"%f%f",&LVvalue1,&LVvalue2);
+                    sscanf(fromLinuxstring,"%f%f",&Kg_A2,&LVvalue2);
                     new_LV_data = 1;
                 }
 
@@ -193,8 +244,9 @@ void ComWithLinux(void) {
             if (GET_LVDATA_TO_LINUX) {
 
                 // Default
-                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"1.0 1.0 1.0 1.0");
+                //ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"1.0 1.0 1.0 1.0");
                 // you would do something like this
+                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",12-x_curA2,y_curA2,v_L,v_R);
                 //ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",var1,var2,var3,var4);
 
                 for (i=0;i<ptrshrdmem->DSPSend_size;i++) {
@@ -447,60 +499,178 @@ void RobotControl(void) {
         }
     }
 
-    // Get rid of these two lines when implementing wall following
-    vref = 0.0;
-    turn = 0.0;
-    //^^^^^^^^
-
-    if (new_coordata == 1) {
-        blue_x_obj_local = blue_x_obj;
-        blue_y_obj_local = blue_y_obj;
-        Nblue_local = Nblue;
-
-        new_coordata = 0;
-    }
+//=================================== Start Dead reckoning position tracking ===================================
     min_front = 10000000;
-    for (i = 111; i < 116; i++) { // finds distance from front obstacle
-        if (LADARdistance[i] < min_front) {
-            min_front = LADARdistance[i];
-        }
-    }
+       for (i = 111; i < 116; i++)
+           if (LADARdistance[i] < min_front)
+               min_front = LADARdistance[i];
 
-/*
- * if x val greater than absolute 20 then turn= kpligt* (Cx)
- *
- *
- *
- */
+    min_right = 10000000;
+    for (i = 52; i < 57; i++)  // checking right side of robot
+        if (LADARdistance[i] < min_right)
+            min_right = LADARdistance[i];
 
-//    if ((blue_x_obj_local >= 20) || (blue_x_obj_local <= -20 )) { // if there is a light follow light
-    turn = (kp_vision) * (0-blue_x_obj_local);
-    vref = .7 ;
-//    }
-    if (min_front < 305) { // object less than 1 tile away
+
+    // inside your RobotControl Swi function add
+    // for the first 3 seconds find the zero offset voltage for the rate gyro.
+    // During these first three seconds the robot should not be allowed to move.
+    // Then after 3 seconds have expired start calculating the angle measurement
+    if (timecount < 3000) {
         vref = 0;
         turn = 0;
+        rate_gyro_sumA2 += adcA2;
+        rate_gyro_sumA3 += adcA3;
+
+        enc_old_L = enc1;
+        enc_old_R = enc2;
     }
+    else {
+        enc_current_L = enc1;  // in radians
+        enc_current_R = enc2;
+
+        v_L = (enc_current_L - enc_old_L) / 0.001;  // derivative of encoder reading
+        v_R = (enc_current_R - enc_old_R) / 0.001;
+
+        v_L /= 194.0;  // convert to tiles/sec
+        v_R /= 194.0;
+
+        enc_old_L = enc_current_L;
+        enc_old_R = enc_current_R;
+
+       // finish calculating velocities
+
+
+        rate_zero_A2 = rate_gyro_sumA2 / 3000.0;
+        rate_zero_A3 = rate_gyro_sumA3 / 3000.0;
+
+        // 1. Find the angular velocity value by first subtracting the zero offset voltage from ADCA3’s
+        // reading. (or ADCA2 if trying the amplified reading) Then multiply this value by the
+        // sensor gain given above. Use rad/seconds
+
+        gyro_rate_A2 = (adcA2 - rate_zero_A2) * 3.0/4095.0 * Kg_A2 * PI/180.0;
+        gyro_rate_A3 = (adcA3 - rate_zero_A3) * 3.0/4095.0 * 400 * PI/180.0;
+
+        // 2. Calculate the integral of this signal by using the trapezoidal method of integration.
+        // This value is your angle measurement in units of Radians.
+
+        theta_A2 += (gyro_rate_A2_prev + gyro_rate_A2)/2 * 0.001;
+        theta_A3 += (gyro_rate_A3_prev + gyro_rate_A3)/2 * 0.001;
+
+        gyro_rate_A2_prev = gyro_rate_A2;
+        gyro_rate_A3_prev = gyro_rate_A3;
+
+        // 3. Calculate the X, Y position of your robot using the average of the left and right wheel
+        // velocity and your bearing
+        // enc_A2
+        x_curA2 = x_oldA2 + (((v_L + v_R) / 2 ) * ((cos(theta_A2)) * 0.001));
+        y_curA2 = y_oldA2 + (((v_L + v_R) / 2 ) * ((sin(theta_A2)) * 0.001));
+
+        x_oldA2 = x_curA2;
+        y_oldA2 = y_curA2;
+
+
+        // for enc_A3
+        x_curA3 = x_oldA3 + (((v_L + v_R) / 2 ) * (cos(theta_A3) * 0.001));
+        y_curA3 = y_oldA3 + (((v_L + v_R) / 2 ) * (sin(theta_A3) * 0.001));
+
+        x_oldA3 = x_curA3;
+        y_oldA3 = y_curA3;
+
+
+        // 3. Display this angle and X Y coordinates to the LCD every 100ms or so.
+    }
+
+ //=============================================================Start wall following code=================================================
+    switch (pval) {
+    case 1:  // Driving forward checking for object in front of vehicle // Left turn
+           turn = Kp_front_wall * (3000 - min_front);
+
+           vref = 0;
+
+           if (min_front > left_turn_Stop_threshold)
+               pval = 2;
+        break;
+
+    // Right wall following state
+    case 2:  // No objects in front of robot and a wall is to the right
+
+//         Checks for missing front wall AND rear right before right turn
+        if ((min_right >= 1000) || ((min_right<= -1000))) {
+            turn = Kp_right_wall * (ref_right_wall - LADARdistance[45]);
+            vref = forward_velocity;
+        }
+        // ADD and some value brhind to the right is greater than ref_right_wall. [45] Ladar sensor to the rear right
+        else if (min_front < left_turn_Start_threshold)
+            pval = 1;
+
+        else {
+            turn = Kp_right_wall * (ref_right_wall - min_right);
+            vref = forward_velocity;
+        }
+
+        break;
+    }
+    // Add code here to saturate the turn command so that it is not larger
+    // than turn_command_saturation or less than -turn_command_saturation
+
+    if (turn > turn_command_saturation)
+        turn = turn_command_saturation;
+    else if (turn < -turn_command_saturation)
+        turn = -turn_command_saturation;
+    //=====================================end wall following code==========================================================================================
+
+//    // Get rid of these two lines when implementing wall following
+//    vref = 0.0;
+//    turn = 0.0;
+//    //^^^^^^^^
+//============================================= start vision interfacing code ===============================================
+//    if (new_coordata == 1) {
+//        blue_x_obj_local = blue_x_obj;
+//        blue_y_obj_local = blue_y_obj;
+//        Nblue_local = Nblue;
+//
+//        new_coordata = 0;
+//    }
+//    min_front = 10000000;
+//    for (i = 111; i < 116; i++) { // finds distance from front obstacle
+//        if (LADARdistance[i] < min_front) {
+//            min_front = LADARdistance[i];
+//        }
+//    }
+//
+//
+//
+//
+////    if ((blue_x_obj_local >= 20) || (blue_x_obj_local <= -20 )) { // if there is a light follow light
+//    turn = (kp_vision) * (0-blue_x_obj_local);
+//    vref = .7 ;
+////    }
+//    if (min_front < 305) { // object less than 1 tile away
+//        vref = 0;
+//        turn = 0;
+//    }
+
 //    else {
 //        turn = 0;
 //        vref = 1;
 //    }
 
 
-
-    real_dist = 0.0003743184838 * blue_y_obj_local*blue_y_obj_local*blue_y_obj_local
-            + 0.0741693807894 * blue_y_obj_local*blue_y_obj_local
-            + 5.1755570014914 * blue_y_obj_local
-            + 147.4450726009405; //cubic poly funct
-
-
+//
+//    real_dist = 0.0003743184838 * blue_y_obj_local*blue_y_obj_local*blue_y_obj_local
+//            + 0.0741693807894 * blue_y_obj_local*blue_y_obj_local
+//            + 5.1755570014914 * blue_y_obj_local
+//            + 147.4450726009405; //cubic poly funct
+//
+//
     SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);
-
+//
     timecount++;
-    if (timecount % 100 == 0) {
-        LCDPrintfLine(1, "Bx:%.1f,By:%.1f,Nb:%.1f", blue_x_obj_local, blue_y_obj_local, Nblue_local);
-        LCDPrintfLine(2, "real_dist:%.1f", real_dist);
-    }
+//    if (timecount % 100 == 0) {
+//        LCDPrintfLine(1, "Bx:%.1f,By:%.1f,Nb:%.1f", blue_x_obj_local, blue_y_obj_local, Nblue_local);
+//        LCDPrintfLine(2, "real_dist:%.1f", real_dist);
+//    }
+    //============================================= End vision interfacing code ===============================================
 }
 
 pose UpdateOptitrackStates(pose localROBOTps, int * flag) {
