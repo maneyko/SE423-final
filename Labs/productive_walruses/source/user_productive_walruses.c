@@ -161,6 +161,31 @@ volatile int temp_trackableID = -1;
 int trackableID = -1;
 int errorcheck = 1;
 
+// ======================================================== START Student Variables ========================================================
+
+// ====== Start Wall Following and Dead Reckoning Student Variables ========
+float min_front = 10000000;
+float min_right = 10000000;
+float min_left  = 10000000;
+float left_diag = 0;
+float right_diag = 0;
+
+
+float ref_right_wall = 400;
+float left_turn_Start_threshold = 400;
+float left_turn_Stop_threshold = 700;
+float Kp_right_wall = -0.002;
+float Kp_front_wall = -0.002;
+float front_turn_velocity = 0.5;
+float turn_command_saturation = 2.0;
+float forward_velocity = 1.0;
+
+int pval = 1;  // Initial state
+int tc = 0; // Personal timechecking variable
+
+
+// ======================================================== END Student Variables ========================================================
+
 pose UpdateOptitrackStates(pose localROBOTps, int * flag);
 
 void ComWithLinux(void) {
@@ -379,17 +404,26 @@ Int main()
     x_pred[2][0] = ROBOTps.theta;
 
     // TODO: defined destinations that moves the robot around and outside the course
-    robotdest[0].x = -2; 	robotdest[0].y = 6;
-    robotdest[1].x = -4;	robotdest[1].y = 2;
-    //middle of bottom
-    robotdest[2].x = 0;		robotdest[2].y = 2;
-    //outside the course
-    robotdest[3].x = 0;		robotdest[3].y = -3;
-    //back to middle
-    robotdest[4].x = 0;		robotdest[4].y = 2;
-    robotdest[5].x = 4;		robotdest[5].y = 2;
-    robotdest[6].x = 4;		robotdest[6].y = 10;
-    robotdest[7].x = 0;		robotdest[7].y = 9;
+    //    robotdest[0].x = -2; 	robotdest[0].y = 6;
+    //    robotdest[1].x = -4;	robotdest[1].y = 2;
+    //    //middle of bottom
+    //    robotdest[2].x = 0;		robotdest[2].y = 2;
+    //    //outside the course
+    //    robotdest[3].x = 0;		robotdest[3].y = -3;
+    //    //back to middle
+    //    robotdest[4].x = 0;		robotdest[4].y = 2;
+    //    robotdest[5].x = 4;		robotdest[5].y = 2;
+    //    robotdest[6].x = 4;		robotdest[6].y = 10;
+    //    robotdest[7].x = 0;		robotdest[7].y = 9;
+
+
+    // Points for comp
+    robotdest[0].x = -5;     robotdest[0].y = -3;
+    robotdest[1].x =  3;     robotdest[1].y =  7;
+    robotdest[2].x = -3;     robotdest[2].y =  7;
+    robotdest[3].x =  5;     robotdest[3].y = -3;
+    robotdest[4].x =  0;     robotdest[4].y = 11;
+    robotdest[5].x =  0;     robotdest[5].y =  0;
 
 
     // flag pins
@@ -522,7 +556,7 @@ void RobotControl(void) {
         // Step 2: if there is a new measurement, then update the state
         if (1 == newOPTITRACKpose) {
             newOPTITRACKpose = 0;
-            z[0][0] = OPTITRACKps.x;	// take in the LADAR measurement
+            z[0][0] = OPTITRACKps.x;	// take in the LADAR measurement ?????
             z[1][0] = OPTITRACKps.y;
             // fix for OptiTrack problem at 180 degrees
             if (cosf(ROBOTps.theta) < -0.99) {
@@ -551,10 +585,144 @@ void RobotControl(void) {
         ROBOTps.y = x_pred[1][0];
         ROBOTps.theta = x_pred[2][0];
 
-        // uses xy code to step through an array of positions
-        if( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y, robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5))
-        { statePos = (statePos+1)%robotdestSize; }
+        // =========== Obstacle avoidance here? =======================================================================
+        min_front = 10000000;
+        for (i = 111; i < 116; i++)
+            if (LADARdistance[i] < min_front)
+                min_front = LADARdistance[i];
 
+        min_right = 10000000;
+        for (i = 52; i < 57; i++)  // checking right side of robot
+            if (LADARdistance[i] < min_right)
+                min_right = LADARdistance[i];
+
+        min_left = 10000000;
+        for (i = 172; i < 177; i++)  // checking left side of robot
+            if (LADARdistance[i] < min_left)
+                min_left = LADARdistance[i];
+
+
+        // Find average distances on side diagonals -> determine if right or left wall follow
+
+        left_diag = 0;
+        right_diag = 0;
+        for (i = 132; i < 137; i++)
+            left_diag += LADARdistance[i];
+        for (i = 92; i < 97; i++)
+            right_diag += LADARdistance[i];
+        left_diag /= 5.0;
+        right_diag /= 5.0;
+
+
+        // Wall following case structure
+        switch (pval) {
+        case 1:  // Driving forward checking for object in front of vehicle // Left turn
+            vref = 0;  // In-place turn
+
+
+            if (min_front > left_turn_Stop_threshold)  // Nothing in front
+                pval = 3;  // Go straight to objective
+
+            else {  // Something in front
+                // Decide left or right wall follow
+
+                if (left_diag < right_diag) {  // Closer object on left side --> turn -> left wall follow
+                    pval = 5;
+                }
+                else if (right_diag <= left_diag) {  // Closer object on right side
+                    pval = 6;
+                }
+
+            }
+
+
+
+            break;
+
+            // Right wall following state
+        case 2:  // No objects in front of robot and a wall is to the right
+
+            //         Checks for missing front wall AND rear right before right turn
+            if ((min_right >= 1000) || ((min_right<= -1000))) {
+                turn = Kp_right_wall * (ref_right_wall - LADARdistance[45]);
+                vref = forward_velocity;
+            }
+            // ADD and some value behind to the right is greater than ref_right_wall. [45] Ladar sensor to the rear right
+            else if (min_front < left_turn_Start_threshold)
+                pval = 1;
+
+            else {
+                turn = Kp_right_wall * (ref_right_wall - min_right);
+                vref = forward_velocity;
+            }
+
+            break;
+        // Point to point
+        case 3:
+            // uses xy code to step through an array of positions (telling robot to move through points)
+            if( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y, robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5))
+            { statePos = (statePos+1)%robotdestSize; }
+
+
+            if (min_front < left_turn_Start_threshold)
+                pval = 1;
+            else {
+                pval = 3;
+            }
+
+            break;
+
+
+        // Left wall following state
+        case 4:
+
+            // Checks for missing front wall AND rear right before right turn
+            if ((min_left >= 1000) || ((min_left<= -1000))) {
+                turn = -Kp_right_wall * (ref_right_wall - LADARdistance[182]);
+                vref = forward_velocity;
+            }
+            else if (min_front < left_turn_Start_threshold)
+                pval = 1;
+
+            else {
+                turn = -Kp_right_wall * (ref_right_wall - min_left);
+                vref = forward_velocity;
+            }
+
+            break;
+
+        case 5:  // In-place right-turn
+            turn = -Kp_right_wall * (ref_right_wall - min_left);
+
+            if (min_front > left_turn_Stop_threshold)
+                pval = 4;
+
+            break;
+
+
+        case 6:  // In-place right-turn
+            turn = Kp_right_wall * (ref_right_wall - min_right);
+
+            if (min_front > left_turn_Stop_threshold)
+                pval = 2;
+
+            break;
+
+
+        }
+        // Add code here to saturate the turn command so that it is not larger
+        // than turn_command_saturation or less than -turn_command_saturation
+
+        if (turn > turn_command_saturation)
+            turn = turn_command_saturation;
+        else if (turn < -turn_command_saturation)
+            turn = -turn_command_saturation;
+
+
+
+
+
+        //==================================================== end wall following/point to point====================
         if (newLADARdata == 1) {
             newLADARdata = 0;
             for (i=0;i<228;i++) {
