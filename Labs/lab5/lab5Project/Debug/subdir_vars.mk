@@ -6,37 +6,37 @@ SHELL = cmd.exe
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CFG_SRCS += \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/SYSBIOS/lab5.cfg 
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/SYSBIOS/lab5.cfg 
 
 CMD_SRCS += \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_headers/cmd/DSP2833x_Headers_BIOS.cmd \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_headers/cmd/DSP2833x_Headers_BIOS.cmd \
 ../TMS320F28335.cmd \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/cmd/user_lnk.cmd 
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/cmd/user_lnk.cmd 
 
 ASM_SRCS += \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_ADC_cal.asm \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_CSMPasswords.asm \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_CodeStartBranch.asm \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_usDelay.asm 
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_ADC_cal.asm \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_CSMPasswords.asm \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_CodeStartBranch.asm \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_usDelay.asm 
 
 C_SRCS += \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/28335_dma.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/28335_eqep.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/28335_inits.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/28335_mcbsp.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/28335_pwm.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/28335_serial.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/28335_spi.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_Adc.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_CpuTimers.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_headers/source/DSP2833x_GlobalVariableDefs.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_Mcbsp.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_PieCtrl.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_Spi.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_SysCtrl.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/i2c.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/lcd.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/user_lab5.c 
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/28335_dma.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/28335_eqep.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/28335_inits.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/28335_mcbsp.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/28335_pwm.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/28335_serial.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/28335_spi.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_Adc.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_CpuTimers.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_headers/source/DSP2833x_GlobalVariableDefs.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_Mcbsp.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_PieCtrl.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_Spi.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_SysCtrl.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/i2c.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/lcd.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/user_lab5.c 
 
 GEN_CMDS += \
 ./configPkg/linker.cmd 
@@ -155,28 +155,28 @@ ASM_DEPS__QUOTED += \
 "DSP2833x_usDelay.d" 
 
 C_SRCS__QUOTED += \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/28335_dma.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/28335_eqep.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/28335_inits.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/28335_mcbsp.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/28335_pwm.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/28335_serial.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/28335_spi.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_Adc.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_CpuTimers.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_headers/source/DSP2833x_GlobalVariableDefs.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_Mcbsp.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_PieCtrl.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_Spi.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_SysCtrl.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/i2c.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/lcd.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/source/user_lab5.c" 
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/28335_dma.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/28335_eqep.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/28335_inits.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/28335_mcbsp.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/28335_pwm.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/28335_serial.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/28335_spi.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_Adc.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_CpuTimers.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_headers/source/DSP2833x_GlobalVariableDefs.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_Mcbsp.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_PieCtrl.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_Spi.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_SysCtrl.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/i2c.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/lcd.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/source/user_lab5.c" 
 
 ASM_SRCS__QUOTED += \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_ADC_cal.asm" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_CSMPasswords.asm" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_CodeStartBranch.asm" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_usDelay.asm" 
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_ADC_cal.asm" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_CSMPasswords.asm" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_CodeStartBranch.asm" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab5/v110/DSP2833x_common/source/DSP2833x_usDelay.asm" 
 
 

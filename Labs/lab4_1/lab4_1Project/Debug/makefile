@@ -33,9 +33,9 @@ ORDERED_OBJS += \
 "./i2c.obj" \
 "./lcd.obj" \
 "./user_lab4_1.obj" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab4_1/v110/DSP2833x_headers/cmd/DSP2833x_Headers_BIOS.cmd" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab4_1/v110/DSP2833x_headers/cmd/DSP2833x_Headers_BIOS.cmd" \
 "../TMS320F28335.cmd" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab4_1/cmd/user_lnk.cmd" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab4_1/cmd/user_lnk.cmd" \
 $(GEN_CMDS__FLAG) \
 -llibc.a \
 

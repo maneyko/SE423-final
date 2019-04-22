@@ -6,22 +6,22 @@ SHELL = cmd.exe
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CFG_SRCS += \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/SYSBIOS/lab7_maneyko2_dgnava2.cfg 
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/SYSBIOS/lab7_maneyko2_dgnava2.cfg 
 
 LIB_SRCS += \
-C:/dgnava2_maneyko2/SE423Repo/LabFiles/bsl_forSYSBIOS/lib/evmomapl138_bsl.lib 
+C:/kt2_smm2_dg2_ma2/SE423Repo/LabFiles/bsl_forSYSBIOS/lib/evmomapl138_bsl.lib 
 
 C_SRCS += \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/COECSL_edma3.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/COECSL_mcbsp.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/ColorLCD.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/ColorVision.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/LCDprintf.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/Ladar.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/MatrixMath.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/pru.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/user_lab7_maneyko2_dgnava2.c \
-C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/user_xy.c 
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/COECSL_edma3.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/COECSL_mcbsp.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/ColorLCD.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/ColorVision.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/LCDprintf.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/Ladar.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/MatrixMath.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/pru.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/user_lab7_maneyko2_dgnava2.c \
+C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/user_xy.c 
 
 GEN_CMDS += \
 ./configPkg/linker.cmd 
@@ -92,15 +92,15 @@ GEN_FILES__QUOTED += \
 "configPkg\compiler.opt" 
 
 C_SRCS__QUOTED += \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/COECSL_edma3.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/COECSL_mcbsp.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/ColorLCD.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/ColorVision.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/LCDprintf.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/Ladar.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/MatrixMath.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/pru.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/user_lab7_maneyko2_dgnava2.c" \
-"C:/dgnava2_maneyko2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/user_xy.c" 
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/COECSL_edma3.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/COECSL_mcbsp.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/ColorLCD.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/ColorVision.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/LCDprintf.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/Ladar.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/MatrixMath.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/pru.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/user_lab7_maneyko2_dgnava2.c" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/lab7_maneyko2_dgnava2/source/user_xy.c" 
 
 

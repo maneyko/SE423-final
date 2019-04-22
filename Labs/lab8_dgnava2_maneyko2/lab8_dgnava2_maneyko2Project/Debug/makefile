@@ -20,7 +20,7 @@ ORDERED_OBJS += \
 "./pru.obj" \
 "./user_lab8_dgnava2_maneyko2.obj" \
 "./user_xy.obj" \
-"C:/dgnava2_maneyko2/SE423Repo/LabFiles/bsl_forSYSBIOS/lib/evmomapl138_bsl.lib" \
+"C:/kt2_smm2_dg2_ma2/SE423Repo/LabFiles/bsl_forSYSBIOS/lib/evmomapl138_bsl.lib" \
 $(GEN_CMDS__FLAG) \
 -llibc.a \
 
