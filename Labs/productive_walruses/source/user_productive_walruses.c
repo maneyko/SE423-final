@@ -601,9 +601,7 @@ void RobotControl(void) {
             if (LADARdistance[i] < min_left)
                 min_left = LADARdistance[i];
 
-
         // Find average distances on side diagonals -> determine if right or left wall follow
-
         left_diag = 0;
         right_diag = 0;
         for (i = 132; i < 137; i++)
@@ -632,35 +630,34 @@ void RobotControl(void) {
                 else if (right_diag <= left_diag) {  // Closer object on right side
                     pval = 6;
                 }
-
             }
-
-
-
             break;
 
-            // Right wall following state
+        // Right wall following state
         case 2:  // No objects in front of robot and a wall is to the right
 
             //         Checks for missing front wall AND rear right before right turn
-            if ((min_right >= 1000) || ((min_right<= -1000))) {
-                turn = Kp_right_wall * (ref_right_wall - LADARdistance[45]);
-                vref = forward_velocity;
-            }
+//            if ((min_right >= 1000) || ((min_right<= -1000))) {
+//                turn = Kp_right_wall * (ref_right_wall - LADARdistance[45]);
+//                vref = forward_velocity;
+//            }
             // ADD and some value behind to the right is greater than ref_right_wall. [45] Ladar sensor to the rear right
-            else if (min_front < left_turn_Start_threshold)
-                pval = 1;
 
-            else {
+            if (min_front >= left_turn_Start_threshold) {  // Nothing in front of robot
                 turn = Kp_right_wall * (ref_right_wall - min_right);
                 vref = forward_velocity;
             }
 
+            else {
+                pval = 1;
+            }
+
             break;
+
         // Point to point
         case 3:
             // uses xy code to step through an array of positions (telling robot to move through points)
-            if( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y, robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5))
+            if( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y, robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
             { statePos = (statePos+1)%robotdestSize; }
 
 
@@ -672,39 +669,41 @@ void RobotControl(void) {
 
             break;
 
-
         // Left wall following state
-        case 4:
+        case 4:  // No objects in front of robot and a wall is to the left
 
             // Checks for missing front wall AND rear right before right turn
-            if ((min_left >= 1000) || ((min_left<= -1000))) {
-                turn = -Kp_right_wall * (ref_right_wall - LADARdistance[182]);
-                vref = forward_velocity;
-            }
-            else if (min_front < left_turn_Start_threshold)
-                pval = 1;
+//            if ((min_left >= 1000) || ((min_left<= -1000))) {
+//                turn = -Kp_right_wall * (ref_right_wall - LADARdistance[182]);
+//                vref = forward_velocity;
+//            }
 
-            else {
+            if (min_front >= left_turn_Start_threshold) {  // Nothing in front of robot
                 turn = -Kp_right_wall * (ref_right_wall - min_left);
                 vref = forward_velocity;
             }
+            else {
+                pval = 1;
+            }
 
             break;
 
-        case 5:  // In-place right-turn
+        // In-place right turn
+        case 5:
             turn = -Kp_right_wall * (ref_right_wall - min_left);
 
             if (min_front > left_turn_Stop_threshold)
-                pval = 4;
+                pval = 4;  // Now left wall follow
 
             break;
 
 
-        case 6:  // In-place right-turn
+        // In-place left turn
+        case 6:
             turn = Kp_right_wall * (ref_right_wall - min_right);
 
             if (min_front > left_turn_Stop_threshold)
-                pval = 2;
+                pval = 2;  // Now right wall follow
 
             break;
 
