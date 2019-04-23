@@ -42,7 +42,6 @@
 #include "projectinclude.h"
 
 #define FEETINONEMETER 3.28083989501312
-
 extern EDMA3_CCRL_Regs *EDMA3_0_Regs;
 
 volatile uint32_t index;
@@ -164,12 +163,12 @@ int errorcheck = 1;
 // ======================================================== START Student Variables ========================================================
 
 // ====== Start Wall Following and Dead Reckoning Student Variables ========
-float min_front = 10000000;
-float min_right = 10000000;
-float min_left  = 10000000;
-float left_diag = 0;
-float right_diag = 0;
-
+float min_front  = 10000000;
+float min_right  = 10000000;
+float min_left   = 10000000;
+float left_side  = 10000000;
+float right_side = 10000000;
+float obstacle = 300; //set to min distance before obstacle is detedcted
 
 float ref_right_wall = 400;
 float left_turn_Start_threshold = 400;
@@ -181,7 +180,8 @@ float turn_command_saturation = 2.0;
 float forward_velocity = 1.0;
 
 int pval = 1;  // Initial state
-int tc = 0; // Personal timechecking variable
+long tc = 0;  // Personal timechecking variable
+
 
 
 // ======================================================== END Student Variables ========================================================
@@ -403,7 +403,7 @@ Int main()
     x_pred[1][0] = ROBOTps.y;
     x_pred[2][0] = ROBOTps.theta;
 
-    // TODO: defined destinations that moves the robot around and outside the course
+    // Defined destinations that moves the robot around and outside the course
     //    robotdest[0].x = -2; 	robotdest[0].y = 6;
     //    robotdest[1].x = -4;	robotdest[1].y = 2;
     //    //middle of bottom
@@ -585,136 +585,109 @@ void RobotControl(void) {
         ROBOTps.y = x_pred[1][0];
         ROBOTps.theta = x_pred[2][0];
 
-        // =========== Obstacle avoidance here? =======================================================================
+        // ================================================= BEGIN Student Code ====================================================================
         min_front = 10000000;
-        for (i = 111; i < 116; i++)
-            if (LADARdistance[i] < min_front)
-                min_front = LADARdistance[i];
+        for (i = 111; i <= 115; i++)
+            min_front = MIN(LADARdistance[i], min_front);
 
         min_right = 10000000;
-        for (i = 52; i < 57; i++)  // checking right side of robot
-            if (LADARdistance[i] < min_right)
-                min_right = LADARdistance[i];
+        for (i = 26; i <= 30; i++)  // Checking right side of robot
+            min_right = MIN(LADARdistance[i], min_right);
 
         min_left = 10000000;
-        for (i = 172; i < 177; i++)  // checking left side of robot
-            if (LADARdistance[i] < min_left)
-                min_left = LADARdistance[i];
+        for (i = 198; i <= 202; i++)  // Checking left side of robot
+            min_left = MIN(LADARdistance[i], min_left);
 
-        // Find average distances on side diagonals -> determine if right or left wall follow
-        left_diag = 0;
-        right_diag = 0;
-        for (i = 132; i < 137; i++)
-            left_diag += LADARdistance[i];
-        for (i = 92; i < 97; i++)
-            right_diag += LADARdistance[i];
-        left_diag /= 5.0;
-        right_diag /= 5.0;
 
+        // Use this to determine whether to right or left wall follow
+        left_side = 10000000;
+        for (i = 120; i <= 200; i++)
+            left_side = MIN(LADARdistance[i], left_side);
+
+        right_side = 10000000;
+        for (i = 28; i <= 110; i++)
+            right_side = MIN(LADARdistance[i], right_side);
 
         // Wall following case structure
         switch (pval) {
-        case 1:  // Driving forward checking for object in front of vehicle // Left turn
-            vref = 0;  // In-place turn
-
-
-            if (min_front > left_turn_Stop_threshold)  // Nothing in front
-                pval = 3;  // Go straight to objective
-
-            else {  // Something in front
-                // Decide left or right wall follow
-
-                if (left_diag < right_diag) {  // Closer object on left side --> turn -> left wall follow
-                    pval = 5;
-                }
-                else if (right_diag <= left_diag) {  // Closer object on right side
-                    pval = 6;
-                }
-            }
-            break;
-
-        // Right wall following state
-        case 2:  // No objects in front of robot and a wall is to the right
-
-            //         Checks for missing front wall AND rear right before right turn
-//            if ((min_right >= 1000) || ((min_right<= -1000))) {
-//                turn = Kp_right_wall * (ref_right_wall - LADARdistance[45]);
-//                vref = forward_velocity;
-//            }
-            // ADD and some value behind to the right is greater than ref_right_wall. [45] Ladar sensor to the rear right
-
-            if (min_front >= left_turn_Start_threshold) {  // Nothing in front of robot
-                turn = Kp_right_wall * (ref_right_wall - min_right);
-                vref = forward_velocity;
-            }
-
-            else {
-                pval = 1;
-            }
-
-            break;
 
         // Point to point
-        case 3:
-            // uses xy code to step through an array of positions (telling robot to move through points)
+        case 1:
+            tc = 0;
+            // Uses xy code to step through an array of positions (telling robot to move through points)
             if( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y, robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
             { statePos = (statePos+1)%robotdestSize; }
 
-
-            if (min_front < left_turn_Start_threshold)
-                pval = 1;
-            else {
+            if (left_side <= obstacle) {
+                // Go into left side wall following
                 pval = 3;
+            }
+            else if (right_side <= obstacle) {
+                // Go into right side wall follow state
+                pval = 2;
+            }
+
+            else {  // No obstacle, continue moving towards object
+                pval = 1;
+            }
+
+            break;
+
+
+        // Right wall following state
+        case 2:  // No objects in front of robot and a wall is to the right
+            tc++;
+            if (min_front <= left_turn_Start_threshold) {
+                // Check if something is directly in front and turn until it isn't there
+                turn = Kp_front_wall * (3000 - min_front);
+
+                vref = 0;
+            }
+
+            else if ( (min_front > left_turn_Start_threshold) && (right_side <= obstacle) ) {  // Nothing in front of robot ??? Do we still w
+                turn = Kp_right_wall * (ref_right_wall - right_side);
+                vref = forward_velocity;
+            }
+
+            else if (tc >= 1000) { // Figure out when to break out of right-wall follow
+                // Using timer to check if wall following works
+                pval = 1;
             }
 
             break;
 
         // Left wall following state
-        case 4:  // No objects in front of robot and a wall is to the left
+        case 3:  // No objects in front of robot and a wall is to the left
 
-            // Checks for missing front wall AND rear right before right turn
-//            if ((min_left >= 1000) || ((min_left<= -1000))) {
-//                turn = -Kp_right_wall * (ref_right_wall - LADARdistance[182]);
-//                vref = forward_velocity;
-//            }
+            tc++;
 
-            if (min_front >= left_turn_Start_threshold) {  // Nothing in front of robot
-                turn = -Kp_right_wall * (ref_right_wall - min_left);
+
+            if (min_front <= left_turn_Start_threshold) {  // Something in front
+                // Check if something is directly in front and turn until it isn't there
+                turn = -Kp_front_wall * (3000 - min_front);  // Turns right by negating KP
+
+                vref = 0;
+            }
+
+            else if ( (min_front > left_turn_Start_threshold) && (left_side <= obstacle) ) {  // Nothing in front of robot and perpendicular to wall
+                turn = -Kp_right_wall * (ref_right_wall - left_side);  // Left wall follow
                 vref = forward_velocity;
             }
-            else {
+            else if (tc >= 1000) {  // Figure out when to break out of right-wall follow
+                // Using timer to check if wall following works
                 pval = 1;
             }
 
             break;
-
-        // In-place right turn
-        case 5:
-            turn = -Kp_right_wall * (ref_right_wall - min_left);
-
-            if (min_front > left_turn_Stop_threshold)
-                pval = 4;  // Now left wall follow
-
-            break;
-
-
-        // In-place left turn
-        case 6:
-            turn = Kp_right_wall * (ref_right_wall - min_right);
-
-            if (min_front > left_turn_Stop_threshold)
-                pval = 2;  // Now right wall follow
-
-            break;
-
-
         }
+
+
         // Add code here to saturate the turn command so that it is not larger
         // than turn_command_saturation or less than -turn_command_saturation
 
         if (turn > turn_command_saturation)
             turn = turn_command_saturation;
-        else if (turn < -turn_command_saturation)
+        if (turn < -turn_command_saturation)
             turn = -turn_command_saturation;
 
 
@@ -730,6 +703,10 @@ void RobotControl(void) {
                 LADARdataX[i] = newLADARdataX[i];
                 LADARdataY[i] = newLADARdataY[i];
             }
+
+
+
+
         }
 
         if ((timecount%200)==0) {

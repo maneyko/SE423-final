@@ -562,8 +562,8 @@ void RobotControl(void) {
         // 3. Calculate the X, Y position of your robot using the average of the left and right wheel
         // velocity and your bearing
         // enc_A2
-        x_curA2 = x_oldA2 + (((v_L + v_R) / 2 ) * ((cos(theta_A2)) * 0.001));
-        y_curA2 = y_oldA2 + (((v_L + v_R) / 2 ) * ((sin(theta_A2)) * 0.001));
+        x_curA2 = x_oldA2 + (((v_L + v_R) / 2 ) * (cos(theta_A2) * 0.001));
+        y_curA2 = y_oldA2 + (((v_L + v_R) / 2 ) * (sin(theta_A2) * 0.001));
 
         x_oldA2 = x_curA2;
         y_oldA2 = y_curA2;
@@ -595,7 +595,7 @@ void RobotControl(void) {
     case 2:  // No objects in front of robot and a wall is to the right
 
 //         Checks for missing front wall AND rear right before right turn
-        if ((min_right >= 1000) || ((min_right<= -1000))) {
+        if ( (min_right >= 1000) ) {
             turn = Kp_right_wall * (ref_right_wall - LADARdistance[45]);
             vref = forward_velocity;
         }
