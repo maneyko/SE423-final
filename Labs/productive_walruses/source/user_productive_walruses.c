@@ -171,13 +171,13 @@ float right_side = 10000000;
 float obstacle = 300; //set to min distance before obstacle is detedcted
 
 float ref_right_wall = 400;
-float left_turn_Start_threshold = 400;
+float left_turn_Start_threshold = 500;
 float left_turn_Stop_threshold = 700;
-float Kp_right_wall = -0.002;
-float Kp_front_wall = -0.002;
+float Kp_right_wall = -0.003;
+float Kp_front_wall = -0.003;
 float front_turn_velocity = 0.5;
 float turn_command_saturation = 2.0;
-float forward_velocity = 1.0;
+float forward_velocity = 1.3;
 
 int pval = 1;  // Initial state
 long tc = 0;  // Personal timechecking variable
@@ -418,12 +418,14 @@ Int main()
 
 
     // Points for comp
-    robotdest[0].x = -5;     robotdest[0].y = -3;
-    robotdest[1].x =  3;     robotdest[1].y =  7;
-    robotdest[2].x = -3;     robotdest[2].y =  7;
-    robotdest[3].x =  5;     robotdest[3].y = -3;
-    robotdest[4].x =  0;     robotdest[4].y = 11;
-    robotdest[5].x =  0;     robotdest[5].y =  0;
+    robotdest[0].x = -5;     robotdest[0].y = -3;  // Point 1
+    robotdest[1].x =  3;     robotdest[1].y =  7;  // Point 2
+    robotdest[2].x = -3;     robotdest[2].y =  7;  // Point 3
+    robotdest[3].x =  0;     robotdest[3].y =  0;  // Go to (0, 0)
+    robotdest[4].x =  5;     robotdest[4].y = -3;  // Point 4
+    robotdest[5].x =  0;     robotdest[5].y = 11;  // Point 5
+    robotdest[6].x =  0;     robotdest[6].y =  -1;  // Start
+    robotdest[7].x =  0;     robotdest[7].y =  -1;  // Start
 
 
     // flag pins
@@ -587,7 +589,7 @@ void RobotControl(void) {
 
         // ================================================= BEGIN Student Code ====================================================================
         min_front = 10000000;
-        for (i = 111; i <= 115; i++)
+        for (i = 100; i <= 130; i++)
             min_front = MIN(LADARdistance[i], min_front);
 
         min_right = 10000000;
@@ -601,11 +603,11 @@ void RobotControl(void) {
 
         // Use this to determine whether to right or left wall follow
         left_side = 10000000;
-        for (i = 120; i <= 200; i++)
+        for (i = 120; i <= 180; i++) // Previously 200
             left_side = MIN(LADARdistance[i], left_side);
 
         right_side = 10000000;
-        for (i = 28; i <= 110; i++)
+        for (i = 48; i <= 110; i++) // Previously 28
             right_side = MIN(LADARdistance[i], right_side);
 
         // Wall following case structure
@@ -615,14 +617,15 @@ void RobotControl(void) {
         case 1:
             tc = 0;
             // Uses xy code to step through an array of positions (telling robot to move through points)
-            if( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y, robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
+            if( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y,
+                           robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
             { statePos = (statePos+1)%robotdestSize; }
 
-            if (left_side <= obstacle) {
+            if ( (left_side <= obstacle)  ) {
                 // Go into left side wall following
                 pval = 3;
             }
-            else if (right_side <= obstacle) {
+            else if ( (right_side <= obstacle)) {
                 // Go into right side wall follow state
                 pval = 2;
             }
@@ -646,10 +649,10 @@ void RobotControl(void) {
 
             else if ( (min_front > left_turn_Start_threshold) && (right_side <= obstacle) ) {  // Nothing in front of robot ??? Do we still w
                 turn = Kp_right_wall * (ref_right_wall - right_side);
-                vref = forward_velocity;
+                vref = forward_velocity - 0.3;
             }
 
-            else if (tc >= 1000) { // Figure out when to break out of right-wall follow
+            else if (tc >= 2000) { // Figure out when to break out of right-wall follow
                 // Using timer to check if wall following works
                 pval = 1;
             }
@@ -671,9 +674,9 @@ void RobotControl(void) {
 
             else if ( (min_front > left_turn_Start_threshold) && (left_side <= obstacle) ) {  // Nothing in front of robot and perpendicular to wall
                 turn = -Kp_right_wall * (ref_right_wall - left_side);  // Left wall follow
-                vref = forward_velocity;
+                vref = forward_velocity - 0.3;
             }
-            else if (tc >= 1000) {  // Figure out when to break out of right-wall follow
+            else if (tc >= 2000) {  // Figure out when to break out of right-wall follow
                 // Using timer to check if wall following works
                 pval = 1;
             }
@@ -685,29 +688,32 @@ void RobotControl(void) {
         // Add code here to saturate the turn command so that it is not larger
         // than turn_command_saturation or less than -turn_command_saturation
 
-        if (turn > turn_command_saturation)
-            turn = turn_command_saturation;
-        if (turn < -turn_command_saturation)
-            turn = -turn_command_saturation;
+        turn = MIN(turn, turn_command_saturation);
+        turn = MAX(turn, -turn_command_saturation)
+
+        //        if (turn > turn_command_saturation)
+        //            turn = turn_command_saturation;
+        //        if (turn < -turn_command_saturation)
+        //            turn = -turn_command_saturation;
 
 
 
 
 
-        //==================================================== end wall following/point to point====================
-        if (newLADARdata == 1) {
-            newLADARdata = 0;
-            for (i=0;i<228;i++) {
-                LADARdistance[i] = newLADARdistance[i];
-                LADARangle[i] = newLADARangle[i];
-                LADARdataX[i] = newLADARdataX[i];
-                LADARdataY[i] = newLADARdataY[i];
-            }
+                //==================================================== end wall following/point to point====================
+                if (newLADARdata == 1) {
+                    newLADARdata = 0;
+                    for (i=0;i<228;i++) {
+                        LADARdistance[i] = newLADARdistance[i];
+                        LADARangle[i] = newLADARangle[i];
+                        LADARdataX[i] = newLADARdataX[i];
+                        LADARdataY[i] = newLADARdataY[i];
+                    }
 
 
 
 
-        }
+                }
 
         if ((timecount%200)==0) {
             LCDPrintfLine(1,"x:%.2f,y:%.2f",ROBOTps.x,ROBOTps.y);
