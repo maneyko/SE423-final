@@ -168,13 +168,13 @@ float min_right  = 10000;
 float min_left   = 10000;
 float left_side  = 10000;
 float right_side = 10000;
-float obstacle = 300; //set to min distance before obstacle is detedcted
+float obstacle = 400; //set to min distance before obstacle is detedcted
 
 float ref_right_wall = 350;
 float left_turn_Start_threshold = 500;
 float left_turn_Stop_threshold = 700;
-float Kp_right_wall = -0.003;
-float Kp_front_wall = -0.003;
+float Kp_right_wall = -0.004;
+float Kp_front_wall = -0.004;
 float front_turn_velocity = 0.5;
 float turn_command_saturation = 2.0;
 float forward_velocity = 1.3;
@@ -231,8 +231,10 @@ void ComWithLinux(void) {
             if (GET_LVDATA_TO_LINUX) {
 
                 // Default
-                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"1.0 1.0 1.0 1.0");
+//                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"1.0 1.0 1.0 1.0");
                 // you would do something like this
+                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",
+                                                   ROBOTps.x, ROBOTps.y, ROBOTps.theta, (float)pval);
                 //ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",var1,var2,var3,var4);
 
                 for (i=0;i<ptrshrdmem->DSPSend_size;i++) {
@@ -660,9 +662,9 @@ void RobotControl(void) {
             break;
 
 
-        // Right wall following state
+            // Right wall following state
         case 2:
-
+            tc++;
             if ( (fabs(robotdest[statePos].x - ROBOTps.x) < 0.5)
                     && (fabs(robotdest[statePos].y - ROBOTps.y) < 0.5) )
             { pval = 1; }
@@ -676,20 +678,21 @@ void RobotControl(void) {
 
             // Nothing in front, something on right
             else if ((right_side <= obstacle) && (min_front > left_turn_Start_threshold)) {
+
                 turn = Kp_right_wall * (ref_right_wall - min_right);
                 vref = forward_velocity - 0.3;
             }
 
             // Nothing in front, nothing on right
-            else if ((right_side > obstacle) && (min_front > left_turn_Start_threshold)) {
+            else if ((right_side > obstacle) && (min_front > left_turn_Start_threshold) && (tc >= 500)) {
                 pval = 1;
             }
 
             break;
 
-        // Left wall following state
+            // Left wall following state
         case 3:
-
+            tc++;
             if ( (fabs(robotdest[statePos].x - ROBOTps.x) < 0.5)
                     && (fabs(robotdest[statePos].y - ROBOTps.y) < 0.5) )
             { pval = 1; }
@@ -708,7 +711,7 @@ void RobotControl(void) {
             }
 
             // Nothing in front, nothing on left
-            else if ((left_side > obstacle) && (min_front > left_turn_Start_threshold)) {
+            else if ((left_side > obstacle) && (min_front > left_turn_Start_threshold) && (tc >= 500)) {
                 pval = 1;
             }
 
