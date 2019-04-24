@@ -58,7 +58,7 @@ float my_atanf(float dy, float dx)
 	return ang;
 }
 
-int xy_control(float *vref_forxy, float *turn_forxy,float turn_thres, float x_pos, float y_pos,
+int xy_control(float *vref_forxy, float *turn_forxy, float turn_thres, float x_pos, float y_pos,
                float x_desired, float y_desired, float thetaabs, float target_radius, float target_radius_near)
 {
 	float dx,dy,alpha;

@@ -588,25 +588,25 @@ void RobotControl(void) {
         ROBOTps.theta = x_pred[2][0];
 
         // ================================================= BEGIN Student Code ====================================================================
-        min_front = 10000000;
+        min_front = HUGE_VAL;
         for (i = 100; i <= 130; i++)
             min_front = MIN(LADARdistance[i], min_front);
 
-        min_right = 10000000;
+        min_right = HUGE_VAL;
         for (i = 26; i <= 30; i++)  // Checking right side of robot
             min_right = MIN(LADARdistance[i], min_right);
 
-        min_left = 10000000;
+        min_left = HUGE_VAL;
         for (i = 198; i <= 202; i++)  // Checking left side of robot
             min_left = MIN(LADARdistance[i], min_left);
 
 
         // Use this to determine whether to right or left wall follow
-        left_side = 10000000;
+        left_side = HUGE_VAL;
         for (i = 120; i <= 180; i++) // Previously 200
             left_side = MIN(LADARdistance[i], left_side);
 
-        right_side = 10000000;
+        right_side = HUGE_VAL;
         for (i = 48; i <= 110; i++) // Previously 28
             right_side = MIN(LADARdistance[i], right_side);
 
@@ -617,7 +617,7 @@ void RobotControl(void) {
         case 1:
             tc = 0;
             // Uses xy code to step through an array of positions (telling robot to move through points)
-            if( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y,
+            if ( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y,
                            robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
             { statePos = (statePos+1)%robotdestSize; }
 
@@ -689,15 +689,7 @@ void RobotControl(void) {
         // than turn_command_saturation or less than -turn_command_saturation
 
         turn = MIN(turn, turn_command_saturation);
-        turn = MAX(turn, -turn_command_saturation)
-
-        //        if (turn > turn_command_saturation)
-        //            turn = turn_command_saturation;
-        //        if (turn < -turn_command_saturation)
-        //            turn = -turn_command_saturation;
-
-
-
+        turn = MAX(turn, -turn_command_saturation);
 
 
                 //==================================================== end wall following/point to point====================
@@ -710,14 +702,11 @@ void RobotControl(void) {
                         LADARdataY[i] = newLADARdataY[i];
                     }
 
-
-
-
                 }
 
-        if ((timecount%200)==0) {
-            LCDPrintfLine(1,"x:%.2f,y:%.2f",ROBOTps.x,ROBOTps.y);
-            LCDPrintfLine(2,"t:%.1f,f:%.1f",ROBOTps.theta,previous_frame);
+        if ( (timecount % 200) == 0 ) {
+            LCDPrintfLine(1,"x:%.2f,y:%.2f", ROBOTps.x, ROBOTps.y);
+            LCDPrintfLine(2,"t:%.1f,f:%.1f", ROBOTps.theta, previous_frame);
         }
 
         SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);
