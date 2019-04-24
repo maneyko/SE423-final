@@ -163,14 +163,14 @@ int errorcheck = 1;
 // ======================================================== START Student Variables ========================================================
 
 // ====== Start Wall Following and Dead Reckoning Student Variables ========
-float min_front  = 10000000;
-float min_right  = 10000000;
-float min_left   = 10000000;
-float left_side  = 10000000;
-float right_side = 10000000;
+float min_front  = 10000;
+float min_right  = 10000;
+float min_left   = 10000;
+float left_side  = 10000;
+float right_side = 10000;
 float obstacle = 300; //set to min distance before obstacle is detedcted
 
-float ref_right_wall = 400;
+float ref_right_wall = 350;
 float left_turn_Start_threshold = 500;
 float left_turn_Stop_threshold = 700;
 float Kp_right_wall = -0.003;
@@ -588,16 +588,21 @@ void RobotControl(void) {
         ROBOTps.theta = x_pred[2][0];
 
         // ================================================= BEGIN Student Code ====================================================================
+
+
+        // Check front of robot
         min_front = HUGE_VAL;
-        for (i = 100; i <= 130; i++)
+        for (i = 105; i <= 125; i++)
             min_front = MIN(LADARdistance[i], min_front);
 
+        // Checking right side of robot
         min_right = HUGE_VAL;
-        for (i = 26; i <= 30; i++)  // Checking right side of robot
+        for (i = 26; i <= 30; i++)
             min_right = MIN(LADARdistance[i], min_right);
 
+        // Checking left side of robot
         min_left = HUGE_VAL;
-        for (i = 198; i <= 202; i++)  // Checking left side of robot
+        for (i = 198; i <= 202; i++)
             min_left = MIN(LADARdistance[i], min_left);
 
 
@@ -610,6 +615,22 @@ void RobotControl(void) {
         for (i = 48; i <= 110; i++) // Previously 28
             right_side = MIN(LADARdistance[i], right_side);
 
+
+
+        /*
+         * Strategy idea:
+         *
+         * Default: go in a straight line to the objective (point-to-point)
+         * If a wall is encountered, left/right wall follow until the objective is visible again,
+         * then go straight towards the objective again.
+         *
+         * Question:
+         * How do you get the current (X,Y) position, and angle of the robot (in world coords)?
+         * Answer: ROBOTps.x, ROBOTps.y, ROBOTps.theta
+         *
+         *
+         */
+
         // Wall following case structure
         switch (pval) {
 
@@ -618,14 +639,16 @@ void RobotControl(void) {
             tc = 0;
             // Uses xy code to step through an array of positions (telling robot to move through points)
             if ( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y,
-                           robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
-            { statePos = (statePos+1)%robotdestSize; }
+                            robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
+            { statePos = (statePos + 1) % robotdestSize; }
 
-            if ( (left_side <= obstacle)  ) {
+
+
+            if ( (left_side <= obstacle) ) {
                 // Go into left side wall following
                 pval = 3;
             }
-            else if ( (right_side <= obstacle)) {
+            else if ( (right_side <= obstacle) ) {
                 // Go into right side wall follow state
                 pval = 2;
             }
@@ -639,20 +662,27 @@ void RobotControl(void) {
 
         // Right wall following state
         case 2:  // No objects in front of robot and a wall is to the right
-            tc++;
-            if (min_front <= left_turn_Start_threshold) {
+
+            if ( (fabs(robotdest[statePos].x - ROBOTps.x) < 0.5)
+                    && (fabs(robotdest[statePos].y - ROBOTps.y) < 0.5) )
+            { pval = 1; }
+
+
+            if ((min_front <= left_turn_Start_threshold)) {
                 // Check if something is directly in front and turn until it isn't there
+
                 turn = Kp_front_wall * (3000 - min_front);
 
                 vref = 0;
             }
 
-            else if ( (min_front > left_turn_Start_threshold) && (right_side <= obstacle) ) {  // Nothing in front of robot ??? Do we still w
+            else if ((min_front > left_turn_Start_threshold) && (right_side <= obstacle) ) {  // Perpendicular to wall
+                tc++;
                 turn = Kp_right_wall * (ref_right_wall - right_side);
                 vref = forward_velocity - 0.3;
             }
 
-            else if (tc >= 2000) { // Figure out when to break out of right-wall follow
+            else if (tc >= 1000) { // Figure out when to break out of right-wall follow
                 // Using timer to check if wall following works
                 pval = 1;
             }
@@ -662,21 +692,24 @@ void RobotControl(void) {
         // Left wall following state
         case 3:  // No objects in front of robot and a wall is to the left
 
-            tc++;
+
+            if ( (fabs(robotdest[statePos].x - ROBOTps.x) < 0.5)
+                    && (fabs(robotdest[statePos].y - ROBOTps.y) < 0.5) )
+            { pval = 1; }
 
 
-            if (min_front <= left_turn_Start_threshold) {  // Something in front
+            if ((min_front <= left_turn_Start_threshold)) {  // Something in front
                 // Check if something is directly in front and turn until it isn't there
                 turn = -Kp_front_wall * (3000 - min_front);  // Turns right by negating KP
-
                 vref = 0;
             }
 
-            else if ( (min_front > left_turn_Start_threshold) && (left_side <= obstacle) ) {  // Nothing in front of robot and perpendicular to wall
+            else if ((min_front > left_turn_Start_threshold) && (left_side <= obstacle)) {  // Nothing in front of robot and perpendicular to wall
+                tc++;
                 turn = -Kp_right_wall * (ref_right_wall - left_side);  // Left wall follow
                 vref = forward_velocity - 0.3;
             }
-            else if (tc >= 2000) {  // Figure out when to break out of right-wall follow
+            else if (tc >= 1000) {  // Figure out when to break out of right-wall follow
                 // Using timer to check if wall following works
                 pval = 1;
             }
@@ -692,21 +725,21 @@ void RobotControl(void) {
         turn = MAX(turn, -turn_command_saturation);
 
 
-                //==================================================== end wall following/point to point====================
-                if (newLADARdata == 1) {
-                    newLADARdata = 0;
-                    for (i=0;i<228;i++) {
-                        LADARdistance[i] = newLADARdistance[i];
-                        LADARangle[i] = newLADARangle[i];
-                        LADARdataX[i] = newLADARdataX[i];
-                        LADARdataY[i] = newLADARdataY[i];
-                    }
+        //==================================================== end wall following/point to point====================
+        if (newLADARdata == 1) {
+            newLADARdata = 0;
+            for (i=0;i<228;i++) {
+                LADARdistance[i] = newLADARdistance[i];
+                LADARangle[i] = newLADARangle[i];
+                LADARdataX[i] = newLADARdataX[i];
+                LADARdataY[i] = newLADARdataY[i];
+            }
 
-                }
+        }
 
         if ( (timecount % 200) == 0 ) {
             LCDPrintfLine(1,"x:%.2f,y:%.2f", ROBOTps.x, ROBOTps.y);
-            LCDPrintfLine(2,"t:%.1f,f:%.1f", ROBOTps.theta, previous_frame);
+            LCDPrintfLine(2,"t:%.1f,s:%d", ROBOTps.theta, statePos);
         }
 
         SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);
