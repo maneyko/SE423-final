@@ -168,22 +168,42 @@ float min_right  = 10000;
 float min_left   = 10000;
 float left_side  = 10000;
 float right_side = 10000;
-float obstacle = 400; //set to min distance before obstacle is detedcted
+float obstacle = 350; //set to min distance before obstacle is detected
 float obstacle2 = 800;
 
 float ref_right_wall = 400;
-float left_turn_Start_threshold = 500;
-float left_turn_Stop_threshold = 700;
+float left_turn_Start_threshold = 450;
+float left_turn_Stop_threshold = 450;
 float Kp_right_wall = -0.0025;
-float Kp_front_wall = -0.003;
+float Kp_front_wall = -0.005;
 float front_turn_velocity = 0.5;
-float turn_command_saturation = 2.0;
+float turn_command_saturation = 4.0;
 float forward_velocity = 1.0;
 
 int pval = 1;  // Initial state
 long tc = 0;  // Personal timechecking variable
 
 
+float v1_x = 0.0;
+float v1_y = 0.0;
+float v1_theta = 0.0;
+float v1_mag = 0.0;
+
+float hit_x = 0.0;
+float hit_y = 0.0;
+float hit_theta = 0.0;
+float hit_mag = 0.0;
+
+float rad2deg(float radval) {
+    return radval * 180.0 / PI;
+}
+
+float deg2rad(float degval) {
+    return degval * PI / 180.0;
+}
+
+
+float LeftRight = 0.0;
 
 // ======================================================== END Student Variables ========================================================
 
@@ -421,14 +441,14 @@ Int main()
 
 
     // Points for comp
-    robotdest[0].x = -5;     robotdest[0].y = -3;  // Point 1
-    robotdest[1].x =  3;     robotdest[1].y =  7;  // Point 2
-    robotdest[2].x = -3;     robotdest[2].y =  7;  // Point 3
-    robotdest[3].x =  0;     robotdest[3].y =  0;  // Go to (0, 0)
-    robotdest[4].x =  5;     robotdest[4].y = -3;  // Point 4
-    robotdest[5].x =  0;     robotdest[5].y = 11;  // Point 5
-    robotdest[6].x =  0;     robotdest[6].y =  -1;  // Start
-    robotdest[7].x =  0;     robotdest[7].y =  -1;  // Start
+    robotdest[0].x =  0;     robotdest[0].y = -1;  // Start
+    robotdest[1].x = -5;     robotdest[1].y = -3;  // Point 1
+    robotdest[2].x =  3;     robotdest[2].y =  7;  // Point 2
+    robotdest[3].x = -3;     robotdest[3].y =  7;  // Point 3
+    robotdest[4].x =  0;     robotdest[4].y =  0;  // Go to (0, 0)
+    robotdest[5].x =  5;     robotdest[5].y = -3;  // Point 4
+    robotdest[6].x =  0;     robotdest[6].y = 11;  // Point 5
+    robotdest[7].x =  0;     robotdest[7].y = -1;  // Start
 
 
     // flag pins
@@ -627,6 +647,16 @@ void RobotControl(void) {
 //            left_corner = MIN(LADARdistance[i], left_corner);
 
 
+        v1_x = robotdest[statePos].x - ROBOTps.x;
+        v1_y = robotdest[statePos].y - ROBOTps.y;
+        v1_mag = (float)sqrt(v1_x * v1_x + v1_y * v1_y);
+        v1_theta = (float)atanf(v1_y / v1_x);
+
+
+        LeftRight = -robotdest[statePos].x * sin(ROBOTps.theta)
+                   + robotdest[statePos].y * cos(ROBOTps.theta)
+                   + ROBOTps.x * sin(ROBOTps.theta)
+                   - ROBOTps.y * cos(ROBOTps.theta);
 
 
         /*
@@ -643,25 +673,42 @@ void RobotControl(void) {
          *
          */
 
+
+
+
         // Wall following case structure
         switch (pval) {
 
         // Point to point
         case 1:
+            tc++;
             // Uses xy code to step through an array of positions (telling robot to move through points)
             if ( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y,
                             robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
             { statePos = (statePos + 1) % robotdestSize; }
 
 
-
-            if (left_side <= obstacle) {
+            if (left_side <= obstacle && tc > 1000) {
                 // Go into left side wall following
+
+                // Calculate angle between robot and objective
+                hit_x = v1_x;
+                hit_y = v1_y;
+                hit_mag = v1_mag;
+                hit_theta = v1_theta;
+
                 tc = 0;
                 pval = 3;
             }
-            else if (right_side <= obstacle) {
+            else if (right_side <= obstacle && tc > 1000) {
                 // Go into right side wall follow state
+
+                // Calculate angle between robot and objective
+                hit_x = v1_x;
+                hit_y = v1_y;
+                hit_mag = v1_mag;
+                hit_theta = v1_theta;
+
                 tc = 0;
                 pval = 2;
             }
@@ -672,13 +719,10 @@ void RobotControl(void) {
 
             break;
 
-
             // Right wall following state
+            // Break out when objective is on left of robot
         case 2:
             tc++;
-            if ( (fabs(robotdest[statePos].x - ROBOTps.x) < 0.5)  // Measured in tiles (.5 tiles away)
-                    && (fabs(robotdest[statePos].y - ROBOTps.y) < 0.5) )
-            { pval = 1; }
 
 
             // Something in front
@@ -688,25 +732,27 @@ void RobotControl(void) {
             }
 
             // Nothing in front, something on right
-            else if ((right_side <= obstacle) && (min_front > left_turn_Start_threshold)) {
+            else {
 
                 turn = Kp_right_wall * (ref_right_wall - right_side);
                 vref = forward_velocity - 0.3;
             }
 
-            // Nothing in front, nothing on right
-            else if (((right_side > obstacle2) && (min_front > left_turn_Start_threshold)) || (tc>=2000)){
+            if (LeftRight > 0.5 && tc > 1000) {
                 pval = 1;
+                tc = 0;
             }
+
+            if ( (fabsf(robotdest[statePos].x - ROBOTps.x) < 0.5)  // Measured in tiles (.5 tiles away)
+                    && (fabsf(robotdest[statePos].y - ROBOTps.y) < 0.5) )
+            { pval = 1; }
 
             break;
 
             // Left wall following state
+            // Break out when objective is on right of robot
         case 3:
             tc++;
-            if ( (fabs(robotdest[statePos].x - ROBOTps.x) < 0.5)
-                    && (fabs(robotdest[statePos].y - ROBOTps.y) < 0.5) )
-            { pval = 1; }
 
 
             // Something in front
@@ -716,18 +762,21 @@ void RobotControl(void) {
             }
 
             // Nothing in front, something on left
-            else if ( (left_side <= obstacle) && (min_front > left_turn_Start_threshold))  {
+            else {
                 turn = -Kp_right_wall * (ref_right_wall - left_side);
                 vref = forward_velocity - 0.3;
             }
 
-            // Nothing in front, nothing on left
-            else if (((left_side > obstacle2) && (min_front > left_turn_Start_threshold)) || (tc >= 2000)){
+            if ( (fabsf(robotdest[statePos].x - ROBOTps.x) < 0.5)
+                    && (fabsf(robotdest[statePos].y - ROBOTps.y) < 0.5) )
+            { pval = 1; }
+
+            if (LeftRight < -0.5 && tc > 1000) {
                 pval = 1;
+                tc = 0;
             }
 
             break;
-
 
         }
 
@@ -752,8 +801,8 @@ void RobotControl(void) {
         }
 
         if ( (timecount % 200) == 0 ) {
-            LCDPrintfLine(1,"x:%.2f,y:%.2f", ROBOTps.x, ROBOTps.y);
-            LCDPrintfLine(2,"t:%.1f,val1:%.1f", ROBOTps.theta, LVvalue1);
+            LCDPrintfLine(1,"LR:%.2f,s:%d", LeftRight, statePos);
+            LCDPrintfLine(2,"t:%.1f,p:%d", ROBOTps.theta, pval);
         }
 
         SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);
