@@ -171,16 +171,17 @@ float right_side = 10000;
 float obstacle = 240; //set to min distance before obstacle is detected
 //float obstacle2 = 800;
 
-float ref_right_wall = 250;
-float left_turn_Start_threshold = 275;
+float ref_right_wall = 300;
+float left_turn_Start_threshold = 325;
 float left_turn_Stop_threshold = 250;
-float Kp_right_wall = -0.005;
-float Kp_front_wall = -0.003;
-float turn_command_saturation = 4.0;
-float forward_velocity = 1.5;
+float Kp_right_wall = -0.003;
+float Kp_front_wall = -0.0015;
+float turn_command_saturation = 7.0;
+float forward_velocity = 1.3;
 
 int pval = 1;  // Initial state
 long tc = 0;  // Personal timechecking variable.
+int ppval = 0;
 
 
 float v1_x = 0.0;
@@ -417,7 +418,7 @@ Int main()
     { LADARdistance[i] = LADAR_MAX_READING; } //initialize all readings to max value.
 
     // ROBOTps will be updated by Optitrack during gyro calibration
-    // TODO: specify the starting position of the robot
+    //
     ROBOTps.x = 0;			//the estimate in array form (useful for matrix operations)
     ROBOTps.y = 0;
     ROBOTps.theta = 0;  // was -PI: need to flip OT ground plane to fix this
@@ -625,12 +626,12 @@ void RobotControl(void) {
 
         // Checking right side of robot
         min_right = HUGE_VAL;
-        for (i = 18; i <= 38; i++)
+        for (i = 28; i <= 31; i++)
             min_right = MIN(LADARdistance[i], min_right);
 
         // Checking left side of robot
         min_left = HUGE_VAL;
-        for (i = 190; i <= 210; i++)
+        for (i = 200; i <= 203; i++)
             min_left = MIN(LADARdistance[i], min_left);
 
 
@@ -643,13 +644,13 @@ void RobotControl(void) {
         for (i = 35; i <= 105; i++) // Previously 28
             right_side = MIN(LADARdistance[i], right_side);
 
-//        right_corner = HUGE_VAL;
-//        for (i = 48; i <= 105; i++) // Previously 28
-//            right_corner = MIN(LADARdistance[i], right_corner);
-//
-//        left_corner = HUGE_VAL;
-//        for (i = 48; i <= 105; i++) // Previously 28
-//            left_corner = MIN(LADARdistance[i], left_corner);
+        //        right_corner = HUGE_VAL;
+        //        for (i = 48; i <= 105; i++) // Previously 28
+        //            right_corner = MIN(LADARdistance[i], right_corner);
+        //
+        //        left_corner = HUGE_VAL;
+        //        for (i = 48; i <= 105; i++) // Previously 28
+        //            left_corner = MIN(LADARdistance[i], left_corner);
 
 
         v1_x = robotdest[statePos].x - ROBOTps.x;
@@ -659,9 +660,9 @@ void RobotControl(void) {
 
 
         LeftRight = -robotdest[statePos].x * sin(ROBOTps.theta)
-                   + robotdest[statePos].y * cos(ROBOTps.theta)
-                   + ROBOTps.x * sin(ROBOTps.theta)
-                   - ROBOTps.y * cos(ROBOTps.theta);
+        + robotdest[statePos].y * cos(ROBOTps.theta)
+        + ROBOTps.x * sin(ROBOTps.theta)
+        - ROBOTps.y * cos(ROBOTps.theta);
 
 
         /*
@@ -685,21 +686,22 @@ void RobotControl(void) {
         switch (pval) {
 
         // Point to point
-        case 1:
+        case 2:
             tc++;
+
             // Uses xy code to step through an array of positions (telling robot to move through points)
             if ( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y,
                             robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
             { statePos = (statePos + 1) % robotdestSize; }
 
 
-            if (left_side <= obstacle && tc > 1000) {
+            if (left_side <= obstacle && tc > 750) {
                 // Go into left side wall following
 
                 tc = 0;
                 pval = 3;
             }
-            else if (right_side <= obstacle && tc > 1000) {
+            else if (right_side <= obstacle && tc > 750) {
                 // Go into right side wall follow state
                 tc = 0;
                 pval = 2;
@@ -713,31 +715,35 @@ void RobotControl(void) {
 
             // Right wall following state
             // Break out when objective is on left of robot
-        case 2:
+        case 1:
             tc++;
-
 
             // Something in front
             if (min_front <= left_turn_Start_threshold) {
+                ppval = 1;
                 turn = Kp_front_wall * (3000 - min_front);
                 vref = 0;
+            }
+            else if ((min_right >= 1000) || ((min_right<= -1000))) {
+                turn = -.015 * (ref_right_wall - LADARdistance[10]);
+                vref = 0.3;
             }
 
             // Nothing in front, something on right
             else {
-
+                ppval = 2;
                 turn = Kp_right_wall * (ref_right_wall - min_right);
-                vref = forward_velocity - 0.3;
+                vref = forward_velocity;
             }
 
-            if (LeftRight > 0.75 && tc > 1000) {
-                pval = 1;
-                tc = 0;
-            }
+            //            if (LeftRight > 1.0 && tc > 1000) {
+            //                pval = 1;
+            //                tc = 0;
+            //            }
 
-            if ( (fabsf(robotdest[statePos].x - ROBOTps.x) < 0.5)  // Measured in tiles (.5 tiles away)
-                    && (fabsf(robotdest[statePos].y - ROBOTps.y) < 0.5) )
-            { pval = 1; }
+            //            if ( (fabsf(robotdest[statePos].x - ROBOTps.x) < 0.5)  // Measured in tiles (.5 tiles away)
+            //                    && (fabsf(robotdest[statePos].y - ROBOTps.y) < 0.5) )
+            //            { pval = 1; }
 
             break;
 
@@ -752,17 +758,22 @@ void RobotControl(void) {
                 vref = 0;
             }
 
+            else if ((min_left >= 1000) || ((min_left<= -1000))) {
+                turn = Kp_right_wall * (ref_right_wall - LADARdistance[225]);
+                vref = forward_velocity;
+            }
+
             // Nothing in front, something on left
             else {
                 turn = -Kp_right_wall * (ref_right_wall - min_left);
-                vref = forward_velocity - 0.3;
+                vref = forward_velocity ;
             }
 
             if ( (fabsf(robotdest[statePos].x - ROBOTps.x) < 0.5)
                     && (fabsf(robotdest[statePos].y - ROBOTps.y) < 0.5) )
             { pval = 1; }
 
-            if (LeftRight < -0.75 && tc > 1000) {
+            if (LeftRight < -1.0 && tc > 1000) {
                 pval = 1;
                 tc = 0;
             }
@@ -792,7 +803,8 @@ void RobotControl(void) {
         }
 
         if ( (timecount % 200) == 0 ) {
-            LCDPrintfLine(1,"Lstrt:%.2f,RR:%.1f", left_turn_Start_threshold, ref_right_wall);
+            // LCDPrintfLine(1,"Lstrt:%.2f,RR:%.1f", left_turn_Start_threshold, ref_right_wall);
+            LCDPrintfLine(1,"turn:%.2f,ppv:%d", turn, ppval);
             LCDPrintfLine(2,"ML:%.1f,MR:%.1f", left_side, right_side);
         }
 

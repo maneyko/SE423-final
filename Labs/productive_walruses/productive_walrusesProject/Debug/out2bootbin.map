@@ -21,10 +21,10 @@ OUTPUT TRANSLATION MAP
 --------------------------------------------------------------------------------
    OUTPUT FILES: productive_walruses.hex [b0..b7]
 
-   CONTENTS: 00000000..00021d4f   BOOT TABLE
+   CONTENTS: 00000000..00021d4b   BOOT TABLE
                             .vecs : btad=00000000  dest=1182d400 size=00000200
                            .cinit : btad=0000020c  dest=1182d600 size=00000a38
                             .text : btad=00000c4c  dest=11800000 size=0001e9e0
                          .const.1 : btad=0001f634  dest=1181e9e0 size=00000020
-                         .const.2 : btad=0001f65c  dest=11827850 size=0000263a
-                          .switch : btad=00021ca0  dest=1182d228 size=000000a4
+                         .const.2 : btad=0001f65c  dest=11827850 size=00002636
+                          .switch : btad=00021c9c  dest=1182d228 size=000000a4
