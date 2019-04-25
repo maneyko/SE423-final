@@ -169,13 +169,13 @@ float min_left   = 10000;
 float left_side  = 10000;
 float right_side = 10000;
 float obstacle = 240; //set to min distance before obstacle is detected
-float obstacle2 = 800;
+//float obstacle2 = 800;
 
 float ref_right_wall = 250;
 float left_turn_Start_threshold = 275;
 float left_turn_Stop_threshold = 250;
-float Kp_right_wall = -0.0025;
-float Kp_front_wall = -0.005;
+float Kp_right_wall = -0.005;
+float Kp_front_wall = -0.003;
 float turn_command_saturation = 4.0;
 float forward_velocity = 1.5;
 
@@ -482,6 +482,12 @@ int whichled = 0;
 // This SWI is Posted after each set of new data from the F28335
 void RobotControl(void) {
 
+    if ( new_LV_data == 1) {
+        new_LV_data = 0;
+        left_turn_Start_threshold = LVvalue1;
+        ref_right_wall = LVvalue2;
+    }
+
     int newOPTITRACKpose = 0;
     int i = 0;
 
@@ -619,12 +625,12 @@ void RobotControl(void) {
 
         // Checking right side of robot
         min_right = HUGE_VAL;
-        for (i = 26; i <= 30; i++)
+        for (i = 18; i <= 38; i++)
             min_right = MIN(LADARdistance[i], min_right);
 
         // Checking left side of robot
         min_left = HUGE_VAL;
-        for (i = 198; i <= 202; i++)
+        for (i = 190; i <= 210; i++)
             min_left = MIN(LADARdistance[i], min_left);
 
 
@@ -690,24 +696,11 @@ void RobotControl(void) {
             if (left_side <= obstacle && tc > 1000) {
                 // Go into left side wall following
 
-                // Calculate angle between robot and objective
-                hit_x = v1_x;
-                hit_y = v1_y;
-                hit_mag = v1_mag;
-                hit_theta = v1_theta;
-
                 tc = 0;
                 pval = 3;
             }
             else if (right_side <= obstacle && tc > 1000) {
                 // Go into right side wall follow state
-
-                // Calculate angle between robot and objective
-                hit_x = v1_x;
-                hit_y = v1_y;
-                hit_mag = v1_mag;
-                hit_theta = v1_theta;
-
                 tc = 0;
                 pval = 2;
             }
@@ -733,11 +726,11 @@ void RobotControl(void) {
             // Nothing in front, something on right
             else {
 
-                turn = Kp_right_wall * (ref_right_wall - right_side);
+                turn = Kp_right_wall * (ref_right_wall - min_right);
                 vref = forward_velocity - 0.3;
             }
 
-            if (LeftRight > 0.5 && tc > 1000) {
+            if (LeftRight > 0.75 && tc > 1000) {
                 pval = 1;
                 tc = 0;
             }
@@ -761,7 +754,7 @@ void RobotControl(void) {
 
             // Nothing in front, something on left
             else {
-                turn = -Kp_right_wall * (ref_right_wall - left_side);
+                turn = -Kp_right_wall * (ref_right_wall - min_left);
                 vref = forward_velocity - 0.3;
             }
 
@@ -769,7 +762,7 @@ void RobotControl(void) {
                     && (fabsf(robotdest[statePos].y - ROBOTps.y) < 0.5) )
             { pval = 1; }
 
-            if (LeftRight < -0.5 && tc > 1000) {
+            if (LeftRight < -0.75 && tc > 1000) {
                 pval = 1;
                 tc = 0;
             }
@@ -799,7 +792,7 @@ void RobotControl(void) {
         }
 
         if ( (timecount % 200) == 0 ) {
-            LCDPrintfLine(1,"LR:%.2f,MF:%.1f", LeftRight, min_front);
+            LCDPrintfLine(1,"Lstrt:%.2f,RR:%.1f", left_turn_Start_threshold, ref_right_wall);
             LCDPrintfLine(2,"ML:%.1f,MR:%.1f", left_side, right_side);
         }
 
