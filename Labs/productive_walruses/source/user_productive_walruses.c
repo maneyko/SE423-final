@@ -87,30 +87,30 @@ float newturn = 0;
 
 extern sharedmemstruct *ptrshrdmem;
 
-float x_pred[3][1] = {{0},{0},{0}};					// predicted state
+float x_pred[3][1] = {{0},{0},{0}};                 // predicted state
 
 //more kalman vars
-float B[3][2] = {{1,0},{1,0},{0,1}};			// control input model
-float u[2][1] = {{0},{0}};			// control input in terms of velocity and angular velocity
-float Bu[3][1] = {{0},{0},{0}};	// matrix multiplication of B and u
-float z[3][1];							// state measurement
-float eye3[3][3] = {{1,0,0},{0,1,0},{0,0,1}};	// 3x3 identity matrix
-float K[3][3] = {{1,0,0},{0,1,0},{0,0,1}};		// optimal Kalman gain
+float B[3][2] = {{1,0},{1,0},{0,1}};            // control input model
+float u[2][1] = {{0},{0}};          // control input in terms of velocity and angular velocity
+float Bu[3][1] = {{0},{0},{0}}; // matrix multiplication of B and u
+float z[3][1];                          // state measurement
+float eye3[3][3] = {{1,0,0},{0,1,0},{0,0,1}};   // 3x3 identity matrix
+float K[3][3] = {{1,0,0},{0,1,0},{0,0,1}};      // optimal Kalman gain
 #define ProcUncert 0.0001
 #define CovScalar 10
 float Q[3][3] = {{ProcUncert,0,ProcUncert/CovScalar},
                  {0,ProcUncert,ProcUncert/CovScalar},
-                 {ProcUncert/CovScalar,ProcUncert/CovScalar,ProcUncert}};	// process noise (covariance of encoders and gyro)
+                 {ProcUncert/CovScalar,ProcUncert/CovScalar,ProcUncert}};   // process noise (covariance of encoders and gyro)
 #define MeasUncert 1
 float R[3][3] = {{MeasUncert,0,MeasUncert/CovScalar},
                  {0,MeasUncert,MeasUncert/CovScalar},
-                 {MeasUncert/CovScalar,MeasUncert/CovScalar,MeasUncert}};	// measurement noise (covariance of LADAR)
-float S[3][3] = {{1,0,0},{0,1,0},{0,0,1}};	// innovation covariance
-float S_inv[3][3] = {{1,0,0},{0,1,0},{0,0,1}};	// innovation covariance matrix inverse
-float P_pred[3][3] = {{1,0,0},{0,1,0},{0,0,1}};	// predicted covariance (measure of uncertainty for current position)
-float temp_3x3[3][3];				// intermediate storage
-float temp_3x1[3][1];				// intermediate storage
-float ytilde[3][1];					// difference between predictions
+                 {MeasUncert/CovScalar,MeasUncert/CovScalar,MeasUncert}};   // measurement noise (covariance of LADAR)
+float S[3][3] = {{1,0,0},{0,1,0},{0,0,1}};  // innovation covariance
+float S_inv[3][3] = {{1,0,0},{0,1,0},{0,0,1}};  // innovation covariance matrix inverse
+float P_pred[3][3] = {{1,0,0},{0,1,0},{0,0,1}}; // predicted covariance (measure of uncertainty for current position)
+float temp_3x3[3][3];               // intermediate storage
+float temp_3x1[3][1];               // intermediate storage
+float ytilde[3][1];                 // difference between predictions
 
 // deadreckoning
 float vel1 = 0,vel2 = 0;
@@ -130,12 +130,12 @@ float gyro_radians = 0.0;
 float gyro_x = 0,gyro_y = 0;
 float gyro4x_gain = 1;
 
-int statePos = 0;	// index into robotdest
-int robotdestSize = 8;	// number of positions to use out of robotdest
-pose robotdest[8];	// array of waypoints for the robot
+int statePos = 0;   // index into robotdest
+int robotdestSize = 8;  // number of positions to use out of robotdest
+pose robotdest[8];  // array of waypoints for the robot
 
 extern float newLADARdistance[LADAR_MAX_DATA_SIZE];  //in mm
-extern float newLADARangle[LADAR_MAX_DATA_SIZE];		// in degrees
+extern float newLADARangle[LADAR_MAX_DATA_SIZE];        // in degrees
 float LADARdistance[LADAR_MAX_DATA_SIZE];
 float LADARangle[LADAR_MAX_DATA_SIZE];
 extern pose ROBOTps;
@@ -168,21 +168,19 @@ float min_right  = 10000;
 float min_left   = 10000;
 float left_side  = 10000;
 float right_side = 10000;
-float obstacle = 240; //set to min distance before obstacle is detected
+float obstacle = 260; //set to min distance before obstacle is detected
 //float obstacle2 = 800;
 
-float ref_right_wall = 350;
-float left_turn_Start_threshold = 400;
-float left_turn_Stop_threshold = 250;
+float ref_right_wall = 300;
+float left_turn_Start_threshold = 320;
+float left_turn_Stop_threshold = 270;
 float Kp_right_wall = -0.003;
-float Kp_front_wall = -0.001;
-float turn_command_saturation = 2.0;
+float Kp_front_wall = -0.003;
+float turn_command_saturation = 4.0;
 float forward_velocity = 1.0;
-float front_turn_velocity = 0.2;
 
 int pval = 1;  // Initial state
 long tc = 0;  // Personal timechecking variable.
-int ppval = 0;
 
 
 float v1_x = 0.0;
@@ -419,8 +417,8 @@ Int main()
     { LADARdistance[i] = LADAR_MAX_READING; } //initialize all readings to max value.
 
     // ROBOTps will be updated by Optitrack during gyro calibration
-    //
-    ROBOTps.x = 0;			//the estimate in array form (useful for matrix operations)
+    // TODO: specify the starting position of the robot
+    ROBOTps.x = 0;          //the estimate in array form (useful for matrix operations)
     ROBOTps.y = 0;
     ROBOTps.theta = 0;  // was -PI: need to flip OT ground plane to fix this
     x_pred[0][0] = ROBOTps.x; //estimate in structure form (useful elsewhere)
@@ -428,26 +426,26 @@ Int main()
     x_pred[2][0] = ROBOTps.theta;
 
     // Defined destinations that moves the robot around and outside the course
-    //    robotdest[0].x = -2; 	robotdest[0].y = 6;
-    //    robotdest[1].x = -4;	robotdest[1].y = 2;
+    //    robotdest[0].x = -2;  robotdest[0].y = 6;
+    //    robotdest[1].x = -4;  robotdest[1].y = 2;
     //    //middle of bottom
-    //    robotdest[2].x = 0;		robotdest[2].y = 2;
+    //    robotdest[2].x = 0;       robotdest[2].y = 2;
     //    //outside the course
-    //    robotdest[3].x = 0;		robotdest[3].y = -3;
+    //    robotdest[3].x = 0;       robotdest[3].y = -3;
     //    //back to middle
-    //    robotdest[4].x = 0;		robotdest[4].y = 2;
-    //    robotdest[5].x = 4;		robotdest[5].y = 2;
-    //    robotdest[6].x = 4;		robotdest[6].y = 10;
-    //    robotdest[7].x = 0;		robotdest[7].y = 9;
+    //    robotdest[4].x = 0;       robotdest[4].y = 2;
+    //    robotdest[5].x = 4;       robotdest[5].y = 2;
+    //    robotdest[6].x = 4;       robotdest[6].y = 10;
+    //    robotdest[7].x = 0;       robotdest[7].y = 9;
 
 
     // Points for comp
-    robotdest[0].x = -5;     robotdest[0].y = -3;  // Point 1
-    robotdest[1].x =  3;     robotdest[1].y =  7;  // Point 2
-    robotdest[2].x = -3;     robotdest[2].y =  7;  // Point 3
-    robotdest[3].x =  0;     robotdest[3].y = -1;  // Go to (0, -1)
-    robotdest[4].x =  5;     robotdest[4].y = -3;  // Point 4
-    robotdest[5].x =  0;     robotdest[5].y = -1;  // Go to (0, -1)
+    robotdest[0].x =  0;     robotdest[0].y = -1;  // Start
+    robotdest[1].x = -5;     robotdest[1].y = -3;  // Point 1
+    robotdest[2].x =  3;     robotdest[2].y =  7;  // Point 2
+    robotdest[3].x = -3;     robotdest[3].y =  7;  // Point 3
+    robotdest[4].x =  0;     robotdest[4].y = -2;  // Go to (0, -2)
+    robotdest[5].x =  5;     robotdest[5].y = -3;  // Point 4
     robotdest[6].x =  0;     robotdest[6].y = 11;  // Point 5
     robotdest[7].x =  0;     robotdest[7].y = -1;  // Start
 
@@ -473,7 +471,7 @@ Int main()
     // clear all possible EDMA
     EDMA3_0_Regs->SHADOW[1].ICR = 0xFFFFFFFF;
 
-    // Add your init code here	
+    // Add your init code here
 
     BIOS_start();    /* does not return */
     return(0);
@@ -565,11 +563,11 @@ void RobotControl(void) {
         gyro_radians = (gyro_angle * (PI/180.0)*400.0*gyro4x_gain);
 
         // Kalman filtering
-        vel1 = (enc1 - enc1old)/(193.0*0.001);	// calculate actual velocities
+        vel1 = (enc1 - enc1old)/(193.0*0.001);  // calculate actual velocities
         vel2 = (enc2 - enc2old)/(193.0*0.001);
-        if (fabsf(vel1) > 10.0) vel1 = vel1old;	// check for encoder roll-over should never happen
+        if (fabsf(vel1) > 10.0) vel1 = vel1old; // check for encoder roll-over should never happen
         if (fabsf(vel2) > 10.0) vel2 = vel2old;
-        enc1old = enc1;	// save past values
+        enc1old = enc1; // save past values
         enc2old = enc2;
         vel1old = vel1;
         vel2old = vel2;
@@ -578,17 +576,17 @@ void RobotControl(void) {
         B[0][0] = cosf(ROBOTps.theta)*0.001;
         B[1][0] = sinf(ROBOTps.theta)*0.001;
         B[2][1] = 0.001;
-        u[0][0] = 0.5*(vel1 + vel2);	// linear velocity of robot
-        u[1][0] = (gyro-gyro_zero)*(PI/180.0)*400.0*gyro4x_gain;	// angular velocity in rad/s (negative for right hand angle)
+        u[0][0] = 0.5*(vel1 + vel2);    // linear velocity of robot
+        u[1][0] = (gyro-gyro_zero)*(PI/180.0)*400.0*gyro4x_gain;    // angular velocity in rad/s (negative for right hand angle)
 
         // Step 1: predict the state and estimate covariance
-        Matrix3x2_Mult(B, u, Bu);					// Bu = B*u
+        Matrix3x2_Mult(B, u, Bu);                   // Bu = B*u
         Matrix3x1_Add(x_pred, Bu, x_pred, 1.0, 1.0); // x_pred = x_pred(old) + Bu
-        Matrix3x3_Add(P_pred, Q, P_pred, 1.0, 1.0);	// P_pred = P_pred(old) + Q
+        Matrix3x3_Add(P_pred, Q, P_pred, 1.0, 1.0); // P_pred = P_pred(old) + Q
         // Step 2: if there is a new measurement, then update the state
         if (1 == newOPTITRACKpose) {
             newOPTITRACKpose = 0;
-            z[0][0] = OPTITRACKps.x;	// take in the LADAR measurement ?????
+            z[0][0] = OPTITRACKps.x;    // take in the LADAR measurement ?????
             z[1][0] = OPTITRACKps.y;
             // fix for OptiTrack problem at 180 degrees
             if (cosf(ROBOTps.theta) < -0.99) {
@@ -598,19 +596,19 @@ void RobotControl(void) {
                 z[2][0] = OPTITRACKps.theta;
             }
             // Step 2a: calculate the innovation/measurement residual, ytilde
-            Matrix3x1_Add(z, x_pred, ytilde, 1.0, -1.0);	// ytilde = z-x_pred
+            Matrix3x1_Add(z, x_pred, ytilde, 1.0, -1.0);    // ytilde = z-x_pred
             // Step 2b: calculate innovation covariance, S
-            Matrix3x3_Add(P_pred, R, S, 1.0, 1.0);							// S = P_pred + R
+            Matrix3x3_Add(P_pred, R, S, 1.0, 1.0);                          // S = P_pred + R
             // Step 2c: calculate the optimal Kalman gain, K
             Matrix3x3_Invert(S, S_inv);
-            Matrix3x3_Mult(P_pred,  S_inv, K);								// K = P_pred*(S^-1)
+            Matrix3x3_Mult(P_pred,  S_inv, K);                              // K = P_pred*(S^-1)
             // Step 2d: update the state estimate x_pred = x_pred(old) + K*ytilde
             Matrix3x1_Mult(K, ytilde, temp_3x1);
             Matrix3x1_Add(x_pred, temp_3x1, x_pred, 1.0, 1.0);
             // Step 2e: update the covariance estimate   P_pred = (I-K)*P_pred(old)
             Matrix3x3_Add(eye3, K, temp_3x3, 1.0, -1.0);
             Matrix3x3_Mult(temp_3x3, P_pred, P_pred);
-        }	// end of correction step
+        }   // end of correction step
 
         // set ROBOTps to the updated and corrected Kalman values.
         ROBOTps.x = x_pred[0][0];
@@ -627,12 +625,12 @@ void RobotControl(void) {
 
         // Checking right side of robot
         min_right = HUGE_VAL;
-        for (i = 28; i <= 31; i++)
+        for (i = 18; i <= 38; i++)
             min_right = MIN(LADARdistance[i], min_right);
 
         // Checking left side of robot
         min_left = HUGE_VAL;
-        for (i = 200; i <= 203; i++)
+        for (i = 190; i <= 210; i++)
             min_left = MIN(LADARdistance[i], min_left);
 
 
@@ -645,13 +643,13 @@ void RobotControl(void) {
         for (i = 35; i <= 105; i++) // Previously 28
             right_side = MIN(LADARdistance[i], right_side);
 
-        //        right_corner = HUGE_VAL;
-        //        for (i = 48; i <= 105; i++) // Previously 28
-        //            right_corner = MIN(LADARdistance[i], right_corner);
-        //
-        //        left_corner = HUGE_VAL;
-        //        for (i = 48; i <= 105; i++) // Previously 28
-        //            left_corner = MIN(LADARdistance[i], left_corner);
+//        right_corner = HUGE_VAL;
+//        for (i = 48; i <= 105; i++) // Previously 28
+//            right_corner = MIN(LADARdistance[i], right_corner);
+//
+//        left_corner = HUGE_VAL;
+//        for (i = 48; i <= 105; i++) // Previously 28
+//            left_corner = MIN(LADARdistance[i], left_corner);
 
 
         v1_x = robotdest[statePos].x - ROBOTps.x;
@@ -661,9 +659,9 @@ void RobotControl(void) {
 
 
         LeftRight = -robotdest[statePos].x * sin(ROBOTps.theta)
-        + robotdest[statePos].y * cos(ROBOTps.theta)
-        + ROBOTps.x * sin(ROBOTps.theta)
-        - ROBOTps.y * cos(ROBOTps.theta);
+                   + robotdest[statePos].y * cos(ROBOTps.theta)
+                   + ROBOTps.x * sin(ROBOTps.theta)
+                   - ROBOTps.y * cos(ROBOTps.theta);
 
 
         /*
@@ -689,20 +687,21 @@ void RobotControl(void) {
         // Point to point
         case 1:
             tc++;
-
             // Uses xy code to step through an array of positions (telling robot to move through points)
             if ( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y,
                             robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
             { statePos = (statePos + 1) % robotdestSize; }
+            if (min_front <= left_turn_Start_threshold) {
+                tc = 1001;
+            }
 
-
-            if (left_side <= obstacle && tc > 750) {
+            if (left_side <= obstacle && tc > 1000) {
                 // Go into left side wall following
 
                 tc = 0;
                 pval = 3;
             }
-            else if (right_side <= obstacle && tc > 750) {
+            else if (right_side <= obstacle && tc > 1000) {
                 // Go into right side wall follow state
                 tc = 0;
                 pval = 2;
@@ -719,23 +718,25 @@ void RobotControl(void) {
         case 2:
             tc++;
 
+
             // Something in front
             if (min_front <= left_turn_Start_threshold) {
-                turn = Kp_front_wall * (3000 - right_side);
-                vref = 0.2;
-            }
-            else if (fabsf(min_right) > 1000) {
-                turn = -.015 * (ref_right_wall - LADARdistance[10]);
-                vref = 0.2;
+                turn = Kp_front_wall * (3000 - min_front);
+                vref = 0;
             }
 
+            else if (fabsf(min_right )>=1000) {
+                turn = Kp_right_wall * (ref_right_wall - LADARdistance[10]);
+                vref = forward_velocity - 0.5;
+            }
             // Nothing in front, something on right
             else {
+
                 turn = Kp_right_wall * (ref_right_wall - min_right);
-                vref = forward_velocity;
+                vref = forward_velocity - 0.3;
             }
 
-            if (LeftRight > 1.0 && tc > 1000) {
+            if (LeftRight > 0.75 && tc > 1000) {
                 pval = 1;
                 tc = 0;
             }
@@ -756,27 +757,26 @@ void RobotControl(void) {
                 turn = -Kp_front_wall * (3000 - min_front);
                 vref = 0;
             }
-
-            else if (fabsf(min_left) > 1000) {
-                turn = -.015 * (ref_right_wall - LADARdistance[225]);
-                vref = 0.2;
+            // If min_right is giant use different sensor to wall follow
+            else if (fabsf(min_right )>=1000) {
+                turn = -Kp_right_wall * (ref_right_wall - LADARdistance[220]);
+                vref = forward_velocity - 0.5;
             }
 
             // Nothing in front, something on left
             else {
                 turn = -Kp_right_wall * (ref_right_wall - min_left);
-                vref = forward_velocity ;
-            }
-
-
-            if (LeftRight < -1.0 && tc > 1000) {
-                pval = 1;
-                tc = 0;
+                vref = forward_velocity - 0.3;
             }
 
             if ( (fabsf(robotdest[statePos].x - ROBOTps.x) < 0.5)
                     && (fabsf(robotdest[statePos].y - ROBOTps.y) < 0.5) )
             { pval = 1; }
+
+            if (LeftRight < -0.75 && tc > 1000) {
+                pval = 1;
+                tc = 0;
+            }
 
             break;
 
@@ -803,8 +803,7 @@ void RobotControl(void) {
         }
 
         if ( (timecount % 200) == 0 ) {
-            // LCDPrintfLine(1,"Lstrt:%.2f,RR:%.1f", left_turn_Start_threshold, ref_right_wall);
-            LCDPrintfLine(1,"turn:%.2f,ppv:%d", turn, ppval);
+            LCDPrintfLine(1,"p:%d,RR:%.1f", pval, ref_right_wall);
             LCDPrintfLine(2,"ML:%.1f,MR:%.1f", left_side, right_side);
         }
 
@@ -916,5 +915,4 @@ pose UpdateOptitrackStates(pose localROBOTps, int * flag) {
     }
     return localOPTITRACKps;
 }
-
 
