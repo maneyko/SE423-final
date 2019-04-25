@@ -169,15 +169,16 @@ float min_left   = 10000;
 float left_side  = 10000;
 float right_side = 10000;
 float obstacle = 400; //set to min distance before obstacle is detedcted
+float obstacle2 = 800;
 
-float ref_right_wall = 350;
+float ref_right_wall = 400;
 float left_turn_Start_threshold = 500;
 float left_turn_Stop_threshold = 700;
-float Kp_right_wall = -0.004;
-float Kp_front_wall = -0.004;
+float Kp_right_wall = -0.0025;
+float Kp_front_wall = -0.003;
 float front_turn_velocity = 0.5;
 float turn_command_saturation = 2.0;
-float forward_velocity = 1.3;
+float forward_velocity = 1.0;
 
 int pval = 1;  // Initial state
 long tc = 0;  // Personal timechecking variable
@@ -231,10 +232,10 @@ void ComWithLinux(void) {
             if (GET_LVDATA_TO_LINUX) {
 
                 // Default
-//                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"1.0 1.0 1.0 1.0");
+                //                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"1.0 1.0 1.0 1.0");
                 // you would do something like this
                 ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",
-                                                   ROBOTps.x, ROBOTps.y, ROBOTps.theta, (float)pval);
+                                                   ROBOTps.x, ROBOTps.y, (float)pval, (float)pval);
                 //ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",var1,var2,var3,var4);
 
                 for (i=0;i<ptrshrdmem->DSPSend_size;i++) {
@@ -610,12 +611,21 @@ void RobotControl(void) {
 
         // Use this to determine whether to right or left wall follow
         left_side = HUGE_VAL;
-        for (i = 120; i <= 180; i++) // Previously 200
+        for (i = 126; i <= 198; i++) // Previously 200
             left_side = MIN(LADARdistance[i], left_side);
 
         right_side = HUGE_VAL;
-        for (i = 48; i <= 104; i++) // Previously 28
+        for (i = 35; i <= 105; i++) // Previously 28
             right_side = MIN(LADARdistance[i], right_side);
+
+//        right_corner = HUGE_VAL;
+//        for (i = 48; i <= 105; i++) // Previously 28
+//            right_corner = MIN(LADARdistance[i], right_corner);
+//
+//        left_corner = HUGE_VAL;
+//        for (i = 48; i <= 105; i++) // Previously 28
+//            left_corner = MIN(LADARdistance[i], left_corner);
+
 
 
 
@@ -679,12 +689,12 @@ void RobotControl(void) {
             // Nothing in front, something on right
             else if ((right_side <= obstacle) && (min_front > left_turn_Start_threshold)) {
 
-                turn = Kp_right_wall * (ref_right_wall - min_right);
+                turn = Kp_right_wall * (ref_right_wall - right_side);
                 vref = forward_velocity - 0.3;
             }
 
             // Nothing in front, nothing on right
-            else if ((right_side > obstacle) && (min_front > left_turn_Start_threshold) && (tc >= 500)) {
+            else if (((right_side > obstacle2) && (min_front > left_turn_Start_threshold)) || (tc>=2000)){
                 pval = 1;
             }
 
@@ -705,17 +715,19 @@ void RobotControl(void) {
             }
 
             // Nothing in front, something on left
-            else if ( (left_side <= obstacle) && (min_front > left_turn_Start_threshold)) {
-                turn = -Kp_right_wall * (ref_right_wall - min_left);
+            else if ( (left_side <= obstacle) && (min_front > left_turn_Start_threshold))  {
+                turn = -Kp_right_wall * (ref_right_wall - left_side);
                 vref = forward_velocity - 0.3;
             }
 
             // Nothing in front, nothing on left
-            else if ((left_side > obstacle) && (min_front > left_turn_Start_threshold) && (tc >= 500)) {
+            else if (((left_side > obstacle2) && (min_front > left_turn_Start_threshold)) || (tc>=2000)){
                 pval = 1;
             }
 
             break;
+
+
         }
 
 
@@ -740,7 +752,7 @@ void RobotControl(void) {
 
         if ( (timecount % 200) == 0 ) {
             LCDPrintfLine(1,"x:%.2f,y:%.2f", ROBOTps.x, ROBOTps.y);
-            LCDPrintfLine(2,"t:%.1f,s:%d", ROBOTps.theta, statePos);
+            LCDPrintfLine(2,"t:%.1f,val1:%.1f", ROBOTps.theta, LVvalue1);
         }
 
         SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);
