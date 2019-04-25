@@ -648,7 +648,6 @@ void RobotControl(void) {
 
         // Point to point
         case 1:
-            tc = 0;
             // Uses xy code to step through an array of positions (telling robot to move through points)
             if ( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y,
                             robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
@@ -658,10 +657,12 @@ void RobotControl(void) {
 
             if (left_side <= obstacle) {
                 // Go into left side wall following
+                tc = 0;
                 pval = 3;
             }
             else if (right_side <= obstacle) {
                 // Go into right side wall follow state
+                tc = 0;
                 pval = 2;
             }
 
@@ -675,7 +676,7 @@ void RobotControl(void) {
             // Right wall following state
         case 2:
             tc++;
-            if ( (fabs(robotdest[statePos].x - ROBOTps.x) < 0.5)
+            if ( (fabs(robotdest[statePos].x - ROBOTps.x) < 0.5)  // Measured in tiles (.5 tiles away)
                     && (fabs(robotdest[statePos].y - ROBOTps.y) < 0.5) )
             { pval = 1; }
 
@@ -721,7 +722,7 @@ void RobotControl(void) {
             }
 
             // Nothing in front, nothing on left
-            else if (((left_side > obstacle2) && (min_front > left_turn_Start_threshold)) || (tc>=2000)){
+            else if (((left_side > obstacle2) && (min_front > left_turn_Start_threshold)) || (tc >= 2000)){
                 pval = 1;
             }
 
@@ -731,7 +732,7 @@ void RobotControl(void) {
         }
 
 
-        // Add code here to saturate the turn command so that it is not larger  .
+        // Add code here to saturate the turn command so that it is not larger
         // than turn_command_saturation or less than -turn_command_saturation
 
         turn = MIN(turn, turn_command_saturation);
