@@ -168,12 +168,12 @@ float min_right  = 10000;
 float min_left   = 10000;
 float left_side  = 10000;
 float right_side = 10000;
-float obstacle = 350; //set to min distance before obstacle is detected
+float obstacle = 200; //set to min distance before obstacle is detected
 float obstacle2 = 800;
 
-float ref_right_wall = 400;
-float left_turn_Start_threshold = 450;
-float left_turn_Stop_threshold = 450;
+float ref_right_wall = 350;
+float left_turn_Start_threshold = 250;
+float left_turn_Stop_threshold = 300;
 float Kp_right_wall = -0.0025;
 float Kp_front_wall = -0.005;
 float front_turn_velocity = 0.5;
@@ -801,8 +801,8 @@ void RobotControl(void) {
         }
 
         if ( (timecount % 200) == 0 ) {
-            LCDPrintfLine(1,"LR:%.2f,s:%d", LeftRight, statePos);
-            LCDPrintfLine(2,"t:%.1f,p:%d", ROBOTps.theta, pval);
+            LCDPrintfLine(1,"LR:%.2f,MF:%.1f", LeftRight, min_front);
+            LCDPrintfLine(2,"ML:%.1f,MR:%.1f", left_side, right_side);
         }
 
         SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);
