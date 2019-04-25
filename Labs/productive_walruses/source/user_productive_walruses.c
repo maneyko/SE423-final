@@ -643,13 +643,13 @@ void RobotControl(void) {
         for (i = 35; i <= 105; i++) // Previously 28
             right_side = MIN(LADARdistance[i], right_side);
 
-//        right_corner = HUGE_VAL;
-//        for (i = 48; i <= 105; i++) // Previously 28
-//            right_corner = MIN(LADARdistance[i], right_corner);
-//
-//        left_corner = HUGE_VAL;
-//        for (i = 48; i <= 105; i++) // Previously 28
-//            left_corner = MIN(LADARdistance[i], left_corner);
+        //        right_corner = HUGE_VAL;
+        //        for (i = 48; i <= 105; i++) // Previously 28
+        //            right_corner = MIN(LADARdistance[i], right_corner);
+        //
+        //        left_corner = HUGE_VAL;
+        //        for (i = 48; i <= 105; i++) // Previously 28
+        //            left_corner = MIN(LADARdistance[i], left_corner);
 
 
         v1_x = robotdest[statePos].x - ROBOTps.x;
@@ -659,9 +659,9 @@ void RobotControl(void) {
 
 
         LeftRight = -robotdest[statePos].x * sin(ROBOTps.theta)
-                   + robotdest[statePos].y * cos(ROBOTps.theta)
-                   + ROBOTps.x * sin(ROBOTps.theta)
-                   - ROBOTps.y * cos(ROBOTps.theta);
+        + robotdest[statePos].y * cos(ROBOTps.theta)
+        + ROBOTps.x * sin(ROBOTps.theta)
+        - ROBOTps.y * cos(ROBOTps.theta);
 
 
         /*
@@ -701,7 +701,7 @@ void RobotControl(void) {
                 tc = 0;
                 pval = 3;
             }
-            else if (right_side <= obstacle && tc > 1000) {
+            else if (right_side < obstacle && tc > 1000) {
                 // Go into right side wall follow state
                 tc = 0;
                 pval = 2;
@@ -725,7 +725,7 @@ void RobotControl(void) {
                 vref = 0;
             }
 
-            else if (fabsf(min_right )>=1000) {
+            else if (fabsf(min_right) >= 1000) {
                 turn = Kp_right_wall * (ref_right_wall - LADARdistance[10]);
                 vref = forward_velocity - 0.5;
             }
@@ -736,9 +736,12 @@ void RobotControl(void) {
                 vref = forward_velocity - 0.3;
             }
 
-            if (LeftRight > 0.75 && tc > 1000) {
+            if (LeftRight > 2.0 && tc > 1000) {
                 pval = 1;
                 tc = 0;
+            }
+            else if (tc >= 5000) {
+                pval = 1;
             }
 
             if ( (fabsf(robotdest[statePos].x - ROBOTps.x) < 0.5)  // Measured in tiles (.5 tiles away)
@@ -758,7 +761,7 @@ void RobotControl(void) {
                 vref = 0;
             }
             // If min_right is giant use different sensor to wall follow
-            else if (fabsf(min_right )>=1000) {
+            else if (fabsf(min_right) >=1000) {
                 turn = -Kp_right_wall * (ref_right_wall - LADARdistance[220]);
                 vref = forward_velocity - 0.5;
             }
@@ -773,9 +776,12 @@ void RobotControl(void) {
                     && (fabsf(robotdest[statePos].y - ROBOTps.y) < 0.5) )
             { pval = 1; }
 
-            if (LeftRight < -0.75 && tc > 1000) {
+            if (LeftRight < -2.0 && tc > 1000) {
                 pval = 1;
                 tc = 0;
+            }
+            else if (tc >= 5000) {
+                pval = 1;
             }
 
             break;
