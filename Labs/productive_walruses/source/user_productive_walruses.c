@@ -168,20 +168,19 @@ float min_right  = 10000;
 float min_left   = 10000;
 float left_side  = 10000;
 float right_side = 10000;
-float obstacle = 225; //set to min distance before obstacle is detected
+float obstacle = 240; //set to min distance before obstacle is detected
 float obstacle2 = 800;
 
 float ref_right_wall = 250;
-float left_turn_Start_threshold = 250;
-float left_turn_Stop_threshold = 300;
+float left_turn_Start_threshold = 275;
+float left_turn_Stop_threshold = 250;
 float Kp_right_wall = -0.0025;
 float Kp_front_wall = -0.005;
-float front_turn_velocity = 0.5;
 float turn_command_saturation = 4.0;
 float forward_velocity = 1.5;
 
 int pval = 1;  // Initial state
-long tc = 0;  // Personal timechecking variable
+long tc = 0;  // Personal timechecking variable.
 
 
 float v1_x = 0.0;
@@ -726,7 +725,7 @@ void RobotControl(void) {
 
 
             // Something in front
-            if ((min_front <= left_turn_Start_threshold)) {
+            if (min_front <= left_turn_Start_threshold) {
                 turn = Kp_front_wall * (3000 - min_front);
                 vref = 0;
             }
@@ -753,7 +752,6 @@ void RobotControl(void) {
             // Break out when objective is on right of robot
         case 3:
             tc++;
-
 
             // Something in front
             if ((min_front <= left_turn_Start_threshold)) {
