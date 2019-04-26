@@ -171,13 +171,25 @@ float right_side = 10000;
 float obstacle = 260; //set to min distance before obstacle is detected
 //float obstacle2 = 800;
 
-float ref_right_wall = 300;
-float left_turn_Start_threshold = 320;
-float left_turn_Stop_threshold = 270;
+//float ref_right_wall = 300;
+//float left_turn_Start_threshold = 320;
+//float left_turn_Stop_threshold = 270;
+//float Kp_right_wall = -0.003;
+//float Kp_front_wall = -0.003;
+//float turn_command_saturation = 4.0;
+//float forward_velocity = 1.0;
+
+//KS values
+
+float ref_right_wall = 350;
+float left_turn_Start_threshold = 400;
+float left_turn_Stop_threshold = 800;
 float Kp_right_wall = -0.003;
-float Kp_front_wall = -0.003;
-float turn_command_saturation = 4.0;
+float Kp_front_wall = -0.001;
+float turn_command_saturation = 2.0;
 float forward_velocity = 1.0;
+float front_turn_velocity = 0.2;
+
 
 int pval = 1;  // Initial state
 long tc = 0;  // Personal timechecking variable.
@@ -722,7 +734,8 @@ void RobotControl(void) {
             // Something in front
             if (min_front <= left_turn_Start_threshold) {
                 turn = Kp_front_wall * (3000 - min_front);
-                vref = 0;
+                //vref = 0;
+                vref = 0.2;
             }
 
             else if (fabsf(min_right) >= 1000) {
@@ -733,7 +746,8 @@ void RobotControl(void) {
             else {
 
                 turn = Kp_right_wall * (ref_right_wall - min_right);
-                vref = forward_velocity - 0.3;
+                //vref = forward_velocity - 0.3;
+                vref = 0.2;
             }
 
             if (LeftRight > 2.0 && tc > 1000) {
@@ -758,7 +772,8 @@ void RobotControl(void) {
             // Something in front
             if ((min_front <= left_turn_Start_threshold)) {
                 turn = -Kp_front_wall * (3000 - min_front);
-                vref = 0;
+                //vref = 0;
+                vref = 0.2;
             }
             // If min_right is giant use different sensor to wall follow
             else if (fabsf(min_right) >=1000) {
@@ -769,7 +784,8 @@ void RobotControl(void) {
             // Nothing in front, something on left
             else {
                 turn = -Kp_right_wall * (ref_right_wall - min_left);
-                vref = forward_velocity - 0.3;
+                //vref = forward_velocity - 0.3;
+                vref = 0.2;
             }
 
             if ( (fabsf(robotdest[statePos].x - ROBOTps.x) < 0.5)
