@@ -201,6 +201,7 @@ int dt_wf = 500;
 float v1_x = 0.0;
 float v1_y = 0.0;
 float v1_theta = 0.0;
+float Rv1_theta = 0.0;
 float v1_mag = 0.0;
 
 float hit_x = 0.0;
@@ -209,11 +210,11 @@ float hit_theta = 0.0;
 float hit_mag = 0.0;
 
 float rad2deg(float radval) {
-    return radval * 180.0 / PI;
+    return (float)(radval * 180.0 / PI);
 }
 
 float deg2rad(float degval) {
-    return degval * PI / 180.0;
+    return (float)(degval * PI / 180.0);
 }
 
 // Function Prototypes (at bottom)
@@ -666,8 +667,18 @@ void RobotControl(void) {
         v1_mag = (float)sqrt(v1_x * v1_x + v1_y * v1_y);
         v1_theta = rad2deg((float)atanf(v1_y / v1_x));
 
+        Rv1_theta = v1_theta - rad2deg(ROBOTps.theta);
+
+        if (Rv1_theta > 180)
+            while (Rv1_theta > 180)
+                Rv1_theta -= 360.0;
+
+        if (Rv1_theta < -180)
+            while (Rv1_theta < -180)
+                Rv1_theta += 360.0;
+
         LeftRight = cos(ROBOTps.theta) * (robotdest[statePos].y - ROBOTps.y)
-                                  + sin(ROBOTps.theta) * (robotdest[statePos].x - ROBOTps.x);
+                  + sin(ROBOTps.theta) * (robotdest[statePos].x - ROBOTps.x);
 
         // Wall following case structure
         switch (pval) {
@@ -707,7 +718,7 @@ void RobotControl(void) {
             tc++;
 
             // Objective is on right side of robot again
-            if (v1_theta < -10 && fabsf(hit_mag - v1_mag) > 0.75) {
+            if (Rv1_theta < -10 && fabsf(hit_mag - v1_mag) > 0.75) {
                 pval = 1;
             }
 
@@ -741,7 +752,7 @@ void RobotControl(void) {
             tc++;
 
             // Objective is on right side again
-            if (v1_theta > 10 && fabsf(hit_mag - v1_mag) > 0.75) {
+            if (Rv1_theta > 10 && fabsf(hit_mag - v1_mag) > 0.75) {
                 pval = 1;
             }
 
@@ -786,8 +797,8 @@ void RobotControl(void) {
         }
 
         if ( (timecount % 200) == 0 ) {
-            LCDPrintfLine(1,"LS:%.1f,L30:%.1f", left_side, right_side);
-            LCDPrintfLine(2,"f60:%.1f,pp:%d", front_60, ppval);
+            LCDPrintfLine(1,"Rt:%.1f,f120:%.1f", ROBOTps.theta, front_120);
+            LCDPrintfLine(2,"Rv1:%.1f,v1t:%.1f", Rv1_theta, v1_theta);
         }
 
         SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);
