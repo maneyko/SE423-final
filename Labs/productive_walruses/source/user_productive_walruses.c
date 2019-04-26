@@ -163,37 +163,40 @@ int errorcheck = 1;
 // ======================================================== START Student Variables ========================================================
 
 // ====== Start Wall Following and Dead Reckoning Student Variables ========
-float min_front  = 10000;
-float min_right  = 10000;
-float min_left   = 10000;
-float left_side  = 10000;
-float right_side = 10000;
-float obstacle = 260; //set to min distance before obstacle is detected
+
+int lo = 0, hi = 0;
+
+float front_180 = 10000.0;
+float front_120 = 10000.0;
+float front_90 = 10000.0;
+float front_60 = 10000.0;
+float front_30 = 10000.0;
+
+float left_30 = 10000.0;
+float left_50 = 10000.0;
+float left_side = 10000.0;
+
+float right_30 = 10000.0;
+float right_50 = 10000.0;
+float right_side = 10000.0;
+
+
+float obstacle = 240; //set to min distance before obstacle is detected
 //float obstacle2 = 800;
 
-//float ref_right_wall = 300;
-//float left_turn_Start_threshold = 320;
-//float left_turn_Stop_threshold = 270;
-//float Kp_right_wall = -0.003;
-//float Kp_front_wall = -0.003;
-//float turn_command_saturation = 4.0;
-//float forward_velocity = 1.0;
-
-//KS values
-
-float ref_right_wall = 350;
-float left_turn_Start_threshold = 400;
-float left_turn_Stop_threshold = 800;
-float Kp_right_wall = -0.003;
-float Kp_front_wall = -0.001;
-float turn_command_saturation = 2.0;
-float forward_velocity = 1.0;
-float front_turn_velocity = 0.2;
-
+float ref_right_wall = 250;
+float left_turn_Start_threshold = 275;
+float left_turn_Stop_threshold = 250;
+float Kp_right_wall = -0.005;
+float Kp_front_wall = -0.003;
+float turn_command_saturation = 4.0;
+float forward_velocity = 1.5;
 
 int pval = 1;  // Initial state
+int ppval = 1;
 long tc = 0;  // Personal timechecking variable.
-
+int dt = 0;
+int dt_wf = 500;
 
 float v1_x = 0.0;
 float v1_y = 0.0;
@@ -213,7 +216,17 @@ float deg2rad(float degval) {
     return degval * PI / 180.0;
 }
 
+// Function Prototypes (at bottom)
+float _min_ladar_t = 10000.0;
+int _ii = 0;
+float min_LADAR(int lo, int hi) {
+    _min_ladar_t = 10000.0;
+    for (_ii = lo; _ii <= hi; _ii++)
+        _min_ladar_t = MIN(LADARdistance[_ii], _min_ladar_t);
+    return _min_ladar_t;
+}
 
+//float min_LADAR(int lo, int hi);
 float LeftRight = 0.0;
 
 // ======================================================== END Student Variables ========================================================
@@ -456,7 +469,7 @@ Int main()
     robotdest[1].x = -5;     robotdest[1].y = -3;  // Point 1
     robotdest[2].x =  3;     robotdest[2].y =  7;  // Point 2
     robotdest[3].x = -3;     robotdest[3].y =  7;  // Point 3
-    robotdest[4].x =  0;     robotdest[4].y = -2;  // Go to (0, -2)
+    robotdest[4].x =  0;     robotdest[4].y =  0;  // Go to (0, 0)
     robotdest[5].x =  5;     robotdest[5].y = -3;  // Point 4
     robotdest[6].x =  0;     robotdest[6].y = 11;  // Point 5
     robotdest[7].x =  0;     robotdest[7].y = -1;  // Start
@@ -568,7 +581,8 @@ void RobotControl(void) {
         newOPTITRACKpose = 0;
 
         SetRobotOutputs(0,0,0,0,0,0,0,0,0,0);
-    } else {
+    }
+    else {
 
         gyro_angle = gyro_angle - ((gyro-gyro_zero) + old_gyro)*.0005 + gyro_drift;
         old_gyro = gyro-gyro_zero;
@@ -630,186 +644,136 @@ void RobotControl(void) {
         // ================================================= BEGIN Student Code ====================================================================
 
 
-        // Check front of robot
-        min_front = HUGE_VAL;
-        for (i = 105; i <= 125; i++)
-            min_front = MIN(LADARdistance[i], min_front);
-
-        // Checking right side of robot
-        min_right = HUGE_VAL;
-        for (i = 18; i <= 38; i++)
-            min_right = MIN(LADARdistance[i], min_right);
-
-        // Checking left side of robot
-        min_left = HUGE_VAL;
-        for (i = 190; i <= 210; i++)
-            min_left = MIN(LADARdistance[i], min_left);
 
 
-        // Use this to determine whether to right or left wall follow
-        left_side = HUGE_VAL;
-        for (i = 126; i <= 198; i++) // Previously 200
-            left_side = MIN(LADARdistance[i], left_side);
 
-        right_side = HUGE_VAL;
-        for (i = 35; i <= 105; i++) // Previously 28
-            right_side = MIN(LADARdistance[i], right_side);
 
-        //        right_corner = HUGE_VAL;
-        //        for (i = 48; i <= 105; i++) // Previously 28
-        //            right_corner = MIN(LADARdistance[i], right_corner);
-        //
-        //        left_corner = HUGE_VAL;
-        //        for (i = 48; i <= 105; i++) // Previously 28
-        //            left_corner = MIN(LADARdistance[i], left_corner);
+        // Centered about 0deg -> 114
 
+        front_180 = min_LADAR(28, 200);
+        front_120 = min_LADAR(56, 171);
+        front_90 = min_LADAR(71, 157);
+        front_60 = min_LADAR(85, 142);
+        front_30 = min_LADAR(100, 128);
+
+
+        left_30 = min_LADAR(186, 214);
+        left_50 = min_LADAR(176, 223);
+        left_side = min_LADAR(114, 224);
+
+        right_30 = min_LADAR(14, 42);
+        right_50 = min_LADAR(4, 51);
+        right_side = min_LADAR(4, 113);
 
         v1_x = robotdest[statePos].x - ROBOTps.x;
         v1_y = robotdest[statePos].y - ROBOTps.y;
         v1_mag = (float)sqrt(v1_x * v1_x + v1_y * v1_y);
-        v1_theta = (float)atanf(v1_y / v1_x);
+        v1_theta = rad2deg((float)atanf(v1_y / v1_x));
 
-
-        LeftRight = -robotdest[statePos].x * sin(ROBOTps.theta)
-        + robotdest[statePos].y * cos(ROBOTps.theta)
-        + ROBOTps.x * sin(ROBOTps.theta)
-        - ROBOTps.y * cos(ROBOTps.theta);
-
-
-        /*
-         * Strategy idea:
-         *
-         * Default: go in a straight line to the objective (point-to-point)
-         * If a wall is encountered, left/right wall follow until the objective is visible again,
-         * then go straight towards the objective again.
-         *
-         * Question:
-         * How do you get the current (X,Y) position, and angle of the robot (in world coords)?
-         * Answer: ROBOTps.x, ROBOTps.y, ROBOTps.theta
-         *
-         *
-         */
-
-
-
+        LeftRight = cos(ROBOTps.theta) * (robotdest[statePos].y - ROBOTps.y)
+                                  + sin(ROBOTps.theta) * (robotdest[statePos].x - ROBOTps.x);
 
         // Wall following case structure
         switch (pval) {
 
         // Point to point
         case 1:
-            tc++;
-            // Uses xy code to step through an array of positions (telling robot to move through points)
+            tc = 0;
+
+            // If moving directly towards robot found target
             if ( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y,
                             robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
             { statePos = (statePos + 1) % robotdestSize; }
-            if (min_front <= left_turn_Start_threshold) {
-                tc = 1001;
-            }
 
-            if (left_side <= obstacle && tc > 1000) {
-                // Go into left side wall following
-
-                tc = 0;
-                pval = 3;
-            }
-            else if (right_side < obstacle && tc > 1000) {
-                // Go into right side wall follow state
-                tc = 0;
-                pval = 2;
-            }
-
-            else {  // No obstacle, continue moving towards object
+            // Nothing in front or around -> keep moving to destination!
+            if (front_180 >= 320) {
                 pval = 1;
+                break;
             }
-
+            // Something around robot -> wall follow it
+            else {
+                hit_x = v1_x;
+                hit_y = v1_y;
+                hit_theta = v1_theta;
+                hit_mag = v1_mag;
+                if (left_side < 320) {
+                    pval = 2;
+                }
+                if (right_side < 320) {
+                    pval = 3;
+                }
+            }
             break;
 
-            // Right wall following state
+            // Left wall following state
             // Break out when objective is on left of robot
         case 2:
             tc++;
 
+            // Objective is on right side of robot again
+            if (v1_theta < -10 && fabsf(hit_mag - v1_mag) > 0.75) {
+                pval = 1;
+            }
 
             // Something in front
-            if (min_front <= left_turn_Start_threshold) {
-                turn = Kp_front_wall * (3000 - min_front);
-                //vref = 0;
-                vref = 0.2;
+            if (front_60 <= 320) {
+                ppval = 1;
+                // Turn (CW) until nothing is in front
+                turn = 0.003 * (3000 - front_60);
+                vref = 0;
             }
 
-            else if (fabsf(min_right) >= 1000) {
-                turn = Kp_right_wall * (ref_right_wall - LADARdistance[10]);
-                vref = forward_velocity - 0.5;
-            }
-            // Nothing in front, something on right
-            else {
-
-                turn = Kp_right_wall * (ref_right_wall - min_right);
-                //vref = forward_velocity - 0.3;
-                vref = 0.2;
-            }
-
-            if (LeftRight > 2.0 && tc > 1000) {
-                pval = 1;
-                tc = 0;
-            }
-            else if (tc >= 5000) {
+            if (left_50 > 500) {  // Too far from wall
                 pval = 1;
             }
 
-            if ( (fabsf(robotdest[statePos].x - ROBOTps.x) < 0.5)  // Measured in tiles (.5 tiles away)
-                    && (fabsf(robotdest[statePos].y - ROBOTps.y) < 0.5) )
-            { pval = 1; }
+            // Wall on left, nothing in front
+            if (front_60 > 320) {
+                ppval = 2;
+                turn = 0.005 * (left_50 - 250);
+                vref = forward_velocity * 0.8;
+            }
+
+            if (v1_mag < 0.5)
+            { statePos = (statePos + 1) % robotdestSize; }
 
             break;
 
-            // Left wall following state
+            // Right wall following state
             // Break out when objective is on right of robot
         case 3:
             tc++;
 
+            // Objective is on right side again
+            if (v1_theta > 10 && fabsf(hit_mag - v1_mag) > 0.75) {
+                pval = 1;
+            }
+
             // Something in front
-            if ((min_front <= left_turn_Start_threshold)) {
-                turn = -Kp_front_wall * (3000 - min_front);
-                //vref = 0;
-                vref = 0.2;
-            }
-            // If min_right is giant use different sensor to wall follow
-            else if (fabsf(min_right) >=1000) {
-                turn = -Kp_right_wall * (ref_right_wall - LADARdistance[220]);
-                vref = forward_velocity - 0.5;
+            if (front_60 <= 320) {
+                // Turn (CCW) until nothing is in front
+                turn = 0.003 * (-3000 + front_60);
+                vref = 0;
             }
 
-            // Nothing in front, something on left
-            else {
-                turn = -Kp_right_wall * (ref_right_wall - min_left);
-                //vref = forward_velocity - 0.3;
-                vref = 0.2;
-            }
-
-            if ( (fabsf(robotdest[statePos].x - ROBOTps.x) < 0.5)
-                    && (fabsf(robotdest[statePos].y - ROBOTps.y) < 0.5) )
-            { pval = 1; }
-
-            if (LeftRight < -2.0 && tc > 1000) {
-                pval = 1;
-                tc = 0;
-            }
-            else if (tc >= 5000) {
+            if (right_50 > 500) {  // Too large
                 pval = 1;
             }
+
+            // Wall on right, nothing in front
+            if (front_60 > 320) {
+                turn = 0.005 * (250 - right_50);
+                vref = forward_velocity * 0.8;
+            }
+
+            if (v1_mag < 0.5)
+            { statePos = (statePos + 1) % robotdestSize; }
 
             break;
-
         }
 
-
-        // Add code here to saturate the turn command so that it is not larger
-        // than turn_command_saturation or less than -turn_command_saturation
-
-        turn = MIN(turn, turn_command_saturation);
-        turn = MAX(turn, -turn_command_saturation);
+        turn = MIN(turn, 4.0);
+        turn = MAX(turn, -4.0);
 
 
         //==================================================== end wall following/point to point====================
@@ -820,13 +784,14 @@ void RobotControl(void) {
                 LADARangle[i] = newLADARangle[i];
                 LADARdataX[i] = newLADARdataX[i];
                 LADARdataY[i] = newLADARdataY[i];
+
             }
 
         }
 
         if ( (timecount % 200) == 0 ) {
-            LCDPrintfLine(1,"p:%d,RR:%.1f", pval, ref_right_wall);
-            LCDPrintfLine(2,"ML:%.1f,MR:%.1f", left_side, right_side);
+            LCDPrintfLine(1,"LS:%.1f,RS:%.1f", left_side, right_side);
+            LCDPrintfLine(2,"f60:%.1f,pp:%d", front_60, ppval);
         }
 
         SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);
