@@ -644,10 +644,6 @@ void RobotControl(void) {
         // ================================================= BEGIN Student Code ====================================================================
 
 
-
-
-
-
         // Centered about 0deg -> 114
 
         front_180 = min_LADAR(28, 200);
@@ -719,18 +715,18 @@ void RobotControl(void) {
             if (front_60 <= 320) {
                 ppval = 1;
                 // Turn (CW) until nothing is in front
-                turn = 0.003 * (3000 - front_60);
+                turn = 0.005 * (3000 - front_60);
                 vref = 0;
             }
 
-            if (left_50 > 500) {  // Too far from wall
+            if (left_50 > 800) {  // Too far from wall
                 pval = 1;
             }
 
             // Wall on left, nothing in front
             if (front_60 > 320) {
                 ppval = 2;
-                turn = 0.005 * (left_50 - 250);
+                turn = 0.005 * (300 - left_50);
                 vref = forward_velocity * 0.8;
             }
 
@@ -752,17 +748,17 @@ void RobotControl(void) {
             // Something in front
             if (front_60 <= 320) {
                 // Turn (CCW) until nothing is in front
-                turn = 0.003 * (-3000 + front_60);
+                turn = 0.005 * (-3000 + front_60);
                 vref = 0;
             }
 
-            if (right_50 > 500) {  // Too large
+            if (right_50 > 800) {  // Too large
                 pval = 1;
             }
 
             // Wall on right, nothing in front
             if (front_60 > 320) {
-                turn = 0.005 * (250 - right_50);
+                turn = 0.005 * (-300 + right_50);
                 vref = forward_velocity * 0.8;
             }
 
@@ -790,7 +786,7 @@ void RobotControl(void) {
         }
 
         if ( (timecount % 200) == 0 ) {
-            LCDPrintfLine(1,"LS:%.1f,RS:%.1f", left_side, right_side);
+            LCDPrintfLine(1,"LS:%.1f,L30:%.1f", left_side, right_side);
             LCDPrintfLine(2,"f60:%.1f,pp:%d", front_60, ppval);
         }
 
