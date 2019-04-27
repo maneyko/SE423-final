@@ -529,7 +529,7 @@ Int main()
     robotdest[1].x = -5;     robotdest[1].y = -3;  // Point 1
     robotdest[2].x =  3;     robotdest[2].y =  7;  // Point 2
     robotdest[3].x = -3;     robotdest[3].y =  7;  // Point 3
-    robotdest[4].x =  0;     robotdest[4].y =  0;  // Go to (0, 0)
+    robotdest[4].x =  0;     robotdest[4].y = -1;  // Go to (0, 0)
     robotdest[5].x =  5;     robotdest[5].y = -3;  // Point 4
     robotdest[6].x =  0;     robotdest[6].y = 11;  // Point 5
     robotdest[7].x =  0;     robotdest[7].y = -1;  // Start
@@ -719,13 +719,11 @@ void RobotControl(void) {
         left_rear = min_LADAR(208,224);
         left_forward = min_LADAR(114, 200);
 
-
         right_30 = min_LADAR(14, 42);
         right_50 = min_LADAR(4, 51);
         right_side = min_LADAR(4, 113);
         right_rear = min_LADAR(4, 20);
         right_forward = min_LADAR(28, 114);
-
 
         v1_x = robotdest[statePos].x - ROBOTps.x;
         v1_y = robotdest[statePos].y - ROBOTps.y;
@@ -788,17 +786,18 @@ void RobotControl(void) {
         case 2:
             tc++;
 
-            // Something in front, nothing on left
-            if (front_60 <= 400 && left_30 > 400) {
+            if (left_50 > 800)  // Nothing on left anymore
+                pval = 1;
+
+            // Something in front
+            if (front_60 <= 400) {
                 // Turn (CW) until nothing is in front
                 turn = 0.003 * (1000 - front_60);
                 vref = 0.2;
+                break;
             }
 
-//            if (front_60 <= 250 && left_50 <= 400)
-
-            // Wall on left, nothing in front
-            if (front_60 > 400) {
+            if (left_50 < 700) {
                 turn = 0.005 * (300 - left_30);
                 vref = forward_velocity * 0.7;
             }
@@ -813,16 +812,18 @@ void RobotControl(void) {
             // Break out when objective is on right of robot
         case 3:
             tc++;
+            if (right_50 > 800)  // Nothing on right anymore
+                pval = 1;
 
             // Something in front
             if (front_60 <= 400) {
                 // Turn (CCW) until nothing is in front
                 turn = 0.003 * (-1000 + front_60);
                 vref = 0.2;
+                break;
             }
 
-            // Wall on right, nothing in front
-            if (front_60 > 400) {
+            if (right_50 < 700) {
                 turn = 0.005 * (-300 + right_30);
                 vref = forward_velocity * 0.7;
             }
@@ -848,11 +849,10 @@ void RobotControl(void) {
                 LADARdataY[i] = newLADARdataY[i];
 
             }
-
         }
 
         if ( (timecount % 200) == 0 ) {
-            LCDPrintfLine(1,"f60:%.1f,mLD:%.1f", front_60, mLD60);
+            LCDPrintfLine(1,"f60:%.1f,p:%d", front_60, pval);
             LCDPrintfLine(2,"L30:%.1f,R30:%.1f", left_30, right_30);
         }
 
