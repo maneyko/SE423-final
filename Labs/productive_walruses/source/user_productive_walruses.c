@@ -759,7 +759,7 @@ void RobotControl(void) {
             { statePos = (statePos + 1) % robotdestSize; }
 
             // Nothing in front or around -> keep moving to destination!
-            if (front_180 >= 400 || mLD60 > 400) {
+            if (mLD60 > 400) {
                 pval = 1;
                 break;
             }
@@ -785,6 +785,11 @@ void RobotControl(void) {
             // Break out when objective is on left of robot
         case 2:
             tc++;
+
+            if (ROBOTps.y < -1) {
+                pval = 1;
+                break;
+            }
 
             if (left_50 > 800)  // Nothing on left anymore
                 pval = 1;
@@ -812,6 +817,12 @@ void RobotControl(void) {
             // Break out when objective is on right of robot
         case 3:
             tc++;
+
+            if (ROBOTps.y < -1) {
+                pval = 1;
+                break;
+            }
+
             if (right_50 > 800)  // Nothing on right anymore
                 pval = 1;
 
@@ -852,7 +863,7 @@ void RobotControl(void) {
         }
 
         if ( (timecount % 200) == 0 ) {
-            LCDPrintfLine(1,"f60:%.1f,p:%d", front_60, pval);
+            LCDPrintfLine(1,"f60:%.1f,p:%d,%.1f", front_60, pval, mLD60);
             LCDPrintfLine(2,"L30:%.1f,R30:%.1f", left_30, right_30);
         }
 
