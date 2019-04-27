@@ -229,6 +229,12 @@ float deg2rad(float degval) {
 float _min_ladar_t = 10000.0;
 int _ii = 0;
 float min_LADAR(int lo, int hi) {
+    if (lo > hi)
+        return -1;
+    if (lo < 0)
+        lo = 3;
+    if (hi > 227)
+        hi = 224;
     _min_ladar_t = 10000.0;
     for (_ii = lo; _ii <= hi; _ii++)
         _min_ladar_t = MIN(LADARdistance[_ii], _min_ladar_t);
@@ -250,19 +256,14 @@ float get_adjustment_angle(void) {
             || (v1_x < 0 && v1_y < 0))
         v1_theta2 = v1_theta2 + 180;
 
-    else if (v1_x > 0 && v1_y < 0)
+    else if (v1_x >= 0 && v1_y < 0)
         v1_theta2 = v1_theta2 + 360;
 
     retval = v1_theta2 - mytheta;
 
     if (retval > 180)
         retval -= 360.0;
-
-    else if (0 <= retval && retval <= 180)
-        Rv1_theta = retval;
-    else if (-180 <= retval && retval < 0)
-        Rv1_theta = retval;
-    else if (retval < -180)
+    if (retval < -180)
         retval += 360;
 
     diff_angle = -retval;
@@ -529,7 +530,7 @@ Int main()
     robotdest[1].x = -5;     robotdest[1].y = -3;  // Point 1
     robotdest[2].x =  3;     robotdest[2].y =  7;  // Point 2
     robotdest[3].x = -3;     robotdest[3].y =  7;  // Point 3
-    robotdest[4].x =  0;     robotdest[4].y = -1;  // Go to (0, 0)
+    robotdest[4].x =  0;     robotdest[4].y = -1;  // Go to (0, -1)
     robotdest[5].x =  5;     robotdest[5].y = -3;  // Point 4
     robotdest[6].x =  0;     robotdest[6].y = 11;  // Point 5
     robotdest[7].x =  0;     robotdest[7].y = -1;  // Start
@@ -745,7 +746,7 @@ void RobotControl(void) {
         mLD60 = min_LD_obj60();
 
         LeftRight = cos(ROBOTps.theta) * (robotdest[statePos].y - ROBOTps.y)
-                  + sin(ROBOTps.theta) * (ROBOTps.x - robotdest[statePos].x);
+                  - sin(ROBOTps.theta) * (robotdest[statePos].x - ROBOTps.x);
 
         // Wall following case structure
         switch (pval) {
