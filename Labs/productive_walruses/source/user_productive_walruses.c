@@ -203,9 +203,11 @@ float v1_x = 0.0;
 float v1_y = 0.0;
 float v1_theta = 0.0;
 float Rv1_theta = 0.0;
+float Rv1_theta2 = 0.0;
 float v1_mag = 0.0;
 
 float mytheta = 0.0;
+float mytheta360 = 0.0;
 float v1_theta2 = 0.0;
 float diff_angle = 0.0;
 
@@ -226,7 +228,7 @@ float deg2rad(float degval) {
 }
 
 // Function Prototypes (at bottom)
-float _min_ladar_t = 10000.0;
+float _min_ladar_val = 10000.0;
 int _ii = 0;
 float min_LADAR(int lo, int hi) {
     if (lo > hi)
@@ -235,12 +237,26 @@ float min_LADAR(int lo, int hi) {
         lo = 3;
     if (hi > 227)
         hi = 224;
-    _min_ladar_t = 10000.0;
+    _min_ladar_val = 10000.0;
     for (_ii = lo; _ii <= hi; _ii++)
-        _min_ladar_t = MIN(LADARdistance[_ii], _min_ladar_t);
-    return _min_ladar_t;
+        _min_ladar_val = MIN(LADARdistance[_ii], _min_ladar_val);
+    return _min_ladar_val;
 }
 
+float _att = 0.0;
+float atan360(float vx, float vy) {
+    _att = fabsf((float)atanf(vy/vx));
+
+    if (vx >= 0 && vy >= 0)
+        return _att;
+    if (vx < 0 && vy >= 0)
+        return 90 + (90 - _att);
+    if (vx < 0 && vy < 0)
+        return 180 + _att;
+    if (vx >= 0 && vy < 0)
+        return 270 + (90 - _att);
+    return -1;
+}
 
 float retval = 0.0;
 float get_adjustment_angle(void) {
@@ -733,7 +749,6 @@ void RobotControl(void) {
         v1_theta2 = v1_theta;
 
         mytheta = rad2deg(ROBOTps.theta);
-
         if (mytheta > 360)
             while (mytheta > 360)
                 mytheta -= 360.0;
@@ -741,6 +756,12 @@ void RobotControl(void) {
             while (mytheta < 0)
                 mytheta += 360.0;
 
+
+        mytheta360 = rad2deg(ROBOTps.theta);
+        mytheta360 = fmodf(mytheta360, 360);
+        if (mytheta360 < 0) mytheta360 += 360.0;
+
+//        Rv1_theta2 = atan360(v1_x, v1_y) - mytheta360;
         Rv1_theta = get_adjustment_angle();
 
         mLD60 = min_LD_obj60();
@@ -864,7 +885,7 @@ void RobotControl(void) {
         }
 
         if ( (timecount % 200) == 0 ) {
-            LCDPrintfLine(1,"f60:%.1f,p:%d,%.1f", front_60, pval, mLD60);
+            LCDPrintfLine(1,"rv:%.1f,p:%d,%.1f", Rv1_theta, pval, mLD60);
             LCDPrintfLine(2,"L30:%.1f,R30:%.1f", left_30, right_30);
         }
 
