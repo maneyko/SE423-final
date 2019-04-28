@@ -232,6 +232,7 @@ user_productive_walruses.obj: C:/CCStudio_v8/bios_6_70_01_03/packages/ti/sysbios
 user_productive_walruses.obj: C:/CCStudio_v8/bios_6_70_01_03/packages/ti/sysbios/hal/Hwi.h
 user_productive_walruses.obj: C:/CCStudio_v8/bios_6_70_01_03/packages/ti/sysbios/knl/Task.h
 user_productive_walruses.obj: C:/CCStudio_v8/bios_6_70_01_03/packages/ti/sysbios/knl/Task.h
+user_productive_walruses.obj: ../../include/student_vars.h
 
 C:/kt2_smm2_dg2_ma2/SE423Repo/Labs/productive_walruses/source/user_productive_walruses.c: 
 C:/CCStudio_v8/ccsv8/tools/compiler/ti-cgt-c6000_8.2.2/include/math.h: 
@@ -465,3 +466,4 @@ C:/CCStudio_v8/bios_6_70_01_03/packages/ti/sysbios/hal/Hwi.h:
 C:/CCStudio_v8/bios_6_70_01_03/packages/ti/sysbios/hal/Hwi.h: 
 C:/CCStudio_v8/bios_6_70_01_03/packages/ti/sysbios/knl/Task.h: 
 C:/CCStudio_v8/bios_6_70_01_03/packages/ti/sysbios/knl/Task.h: 
+../../include/student_vars.h: 

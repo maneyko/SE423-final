@@ -164,147 +164,7 @@ int errorcheck = 1;
 
 // ====== Start Wall Following and Dead Reckoning Student Variables ========
 
-float front_180 = 10000.0;
-float front_120 = 10000.0;
-float front_90 = 10000.0;
-float front_60 = 10000.0;
-float front_30 = 10000.0;
-
-float left_30 = 10000.0;
-float left_50 = 10000.0;
-float left_side = 10000.0;
-float left_rear = 10000.0;
-float left_forward = 10000.0;
-
-float right_30 = 10000.0;
-float right_50 = 10000.0;
-float right_side = 10000.0;
-float right_rear = 10000.0;
-float right_forward = 10000.0;
-
-float obstacle = 240; //set to min distance before obstacle is detected
-//float obstacle2 = 800;
-
-float ref_right_wall = 250;
-float left_turn_Start_threshold = 275;
-float left_turn_Stop_threshold = 250;
-float Kp_right_wall = -0.005;
-float Kp_front_wall = -0.003;
-float turn_command_saturation = 4.0;
-float forward_velocity = 1.5;
-
-int pval = 1;  // Initial state
-int ppval = 1;
-long tc = 0;  // Personal timechecking variable.
-int dt = 0;
-int dt_wf = 500;
-
-float v1_x = 0.0;
-float v1_y = 0.0;
-float v1_theta = 0.0;
-float Rv1_theta = 0.0;
-float Rv1_theta2 = 0.0;
-float v1_mag = 0.0;
-
-float mytheta = 0.0;
-float mytheta360 = 0.0;
-float v1_theta2 = 0.0;
-float diff_angle = 0.0;
-
-float hit_x = 0.0;
-float hit_y = 0.0;
-float hit_theta = 0.0;
-float hit_Rv1t = 0.0;
-float hit_mag = 0.0;
-
-float mLD60 = 0.0;
-
-float rad2deg(float radval) {
-    return (float)(radval * 180.0 / PI);
-}
-
-float deg2rad(float degval) {
-    return (float)(degval * PI / 180.0);
-}
-
-// Function Prototypes (at bottom)
-float _min_ladar_val = 10000.0;
-int _ii = 0;
-float min_LADAR(int lo, int hi) {
-    if (lo > hi)
-        return -1;
-    if (lo < 0)
-        lo = 3;
-    if (hi > 227)
-        hi = 224;
-    _min_ladar_val = 10000.0;
-    for (_ii = lo; _ii <= hi; _ii++)
-        _min_ladar_val = MIN(LADARdistance[_ii], _min_ladar_val);
-    return _min_ladar_val;
-}
-
-float _att = 0.0;
-float atan360(float vx, float vy) {
-    _att = fabsf((float)atanf(vy/vx));
-
-    if (vx >= 0 && vy >= 0)
-        return _att;
-    if (vx < 0 && vy >= 0)
-        return 90 + (90 - _att);
-    if (vx < 0 && vy < 0)
-        return 180 + _att;
-    if (vx >= 0 && vy < 0)
-        return 270 + (90 - _att);
-    return -1;
-}
-
-float retval = 0.0;
-float get_adjustment_angle(void) {
-    // Takes global variables:
-    // v1_x, v1_y, v1_theta, mytheta
-    retval = 0.0;
-    v1_theta2 = v1_theta;
-
-    if (v1_x >= 0 && v1_y >= 0)
-        v1_theta2 = v1_theta2;
-
-    else if ((v1_x < 0 && v1_y >= 0)
-            || (v1_x < 0 && v1_y < 0))
-        v1_theta2 = v1_theta2 + 180;
-
-    else if (v1_x >= 0 && v1_y < 0)
-        v1_theta2 = v1_theta2 + 360;
-
-    retval = v1_theta2 - mytheta;
-
-    if (retval > 180)
-        retval -= 360.0;
-    if (retval < -180)
-        retval += 360;
-
-    diff_angle = -retval;
-    return retval;
-}
-
-int _mdpt = 0;
-float _rval = 0.0;
-float min_LD_obj60(void) {
-    // Needs global variables:
-    // Rv1_theta
-
-    if (fabsf(Rv1_theta) > 95.0)
-        return -1.0;
-
-    _mdpt = (int)(Rv1_theta / 1.05) + 113;
-    _rval = min_LADAR(_mdpt - 29, _mdpt + 29);
-
-    if ((50.0 < _rval) && (_rval < 9999.0))
-        return _rval;
-    else
-        return -1.0;
-}
-
-float LeftRight = 0.0;
+#include "student_vars.h"
 
 // ======================================================== END Student Variables ========================================================
 
@@ -718,6 +578,17 @@ void RobotControl(void) {
         ROBOTps.y = x_pred[1][0];
         ROBOTps.theta = x_pred[2][0];
 
+        if (newLADARdata == 1) {
+            newLADARdata = 0;
+            for (i=0;i<228;i++) {
+                LADARdistance[i] = newLADARdistance[i];
+                LADARangle[i] = newLADARangle[i];
+                LADARdataX[i] = newLADARdataX[i];
+                LADARdataY[i] = newLADARdataY[i];
+
+            }
+        }
+
         // ================================================= BEGIN Student Code ====================================================================
 
 
@@ -745,26 +616,18 @@ void RobotControl(void) {
         v1_x = robotdest[statePos].x - ROBOTps.x;
         v1_y = robotdest[statePos].y - ROBOTps.y;
         v1_mag = (float)sqrt(v1_x * v1_x + v1_y * v1_y);
-        v1_theta = rad2deg((float)atanf(v1_y / v1_x));
-        v1_theta2 = v1_theta;
+        v1_theta = atan360(v1_x, v1_y);
 
-        mytheta = rad2deg(ROBOTps.theta);
-        if (mytheta > 360)
-            while (mytheta > 360)
-                mytheta -= 360.0;
-        if (mytheta < 0)
-            while (mytheta < 0)
-                mytheta += 360.0;
+        mytheta = bound360(rad2deg(ROBOTps.theta));
 
+        Ro_theta = bound180(v1_theta - mytheta);
+        Ro_theta2 = get_adjustment_angle();       // Should be the same as Ro_theta
 
-        mytheta360 = rad2deg(ROBOTps.theta);
-        mytheta360 = fmodf(mytheta360, 360);
-        if (mytheta360 < 0) mytheta360 += 360.0;
+        min_LD_index = min_LADAR_i(4, 223);
+        min_LD_val = LADARdistance[min_LD_index];
 
-//        Rv1_theta2 = atan360(v1_x, v1_y) - mytheta360;
-        Rv1_theta = get_adjustment_angle();
+        min_LD_obj60 = min_LD_obj(Ro_theta, 60);
 
-        mLD60 = min_LD_obj60();
 
         LeftRight = cos(ROBOTps.theta) * (robotdest[statePos].y - ROBOTps.y)
                   - sin(ROBOTps.theta) * (robotdest[statePos].x - ROBOTps.x);
@@ -775,24 +638,35 @@ void RobotControl(void) {
         // Point to point
         case 1:
 
+            if (front_180 < 170) {  // About to hit a wall!
+                if (min_LD_index > 113)
+                    pval = 2;
+                else
+                    pval = 3;
+                break;
+            }
+
             // If moving directly towards robot found target
             if ( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y,
                             robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
             { statePos = (statePos + 1) % robotdestSize; }
 
+
+
             // Nothing in front or around -> keep moving to destination!
-            if (mLD60 > 400) {
+            if (min_LD_obj60 > 400) {
                 pval = 1;
                 break;
             }
+
             // Something around robot -> wall follow it
             else {
                 hit_x = v1_x;
                 hit_y = v1_y;
                 hit_theta = v1_theta;
-                hit_Rv1t = Rv1_theta;
+                hit_Ro_theta = Ro_theta;
                 hit_mag = v1_mag;
-                if (left_forward <= right_forward) {
+                if (min_LD_index > 113) {
                     pval = 2;
                     tc = 0;
                 }
@@ -808,13 +682,25 @@ void RobotControl(void) {
         case 2:
             tc++;
 
-            if (ROBOTps.y < -1) {
+            if (ROBOTps.y < -1.5) {
                 pval = 1;
                 break;
             }
 
-            if (left_50 > 800)  // Nothing on left anymore
+            // Emergency case
+            if (min_LADAR(114, 200) < 200) {
+                // Turn (CW) until nothing is in front
+                turn = 0.003 * (1000 - 200);
+                vref = 0.2;
+                ppval = 1;
+                break;
+            }
+
+            // Object in front 60 and nothing stopping us from going there
+            if (( (fabsf(Ro_theta) < 30) && min_LD_obj60 > 400 ) || v1_mag < 0.5) {
                 pval = 1;
+                break;
+            }
 
             // Something in front
             if (front_60 <= 400) {
@@ -824,13 +710,17 @@ void RobotControl(void) {
                 break;
             }
 
-            if (left_50 < 700) {
-                turn = 0.005 * (300 - left_30);
-                vref = forward_velocity * 0.7;
+            // Something on back left
+            if (min_LADAR(224, 219) <= 400 && front_60 > 400 && left_30 > 400) {
+                turn = 0.003 * (1000 - front_60);
+                vref = 0.2;
+                break;
             }
 
-            if (mLD60 > 400 || v1_mag < 0.5) {
-                pval = 1;
+            // Nothing in front
+            if (front_60 > 400) {
+                turn = 0.005 * (300 - left_30);
+                vref = forward_velocity * 0.7;
             }
 
             break;
@@ -840,13 +730,22 @@ void RobotControl(void) {
         case 3:
             tc++;
 
-            if (ROBOTps.y < -1) {
+            if (ROBOTps.y < -1.5) {
                 pval = 1;
                 break;
             }
 
-            if (right_50 > 800)  // Nothing on right anymore
+            if (min_LADAR(28, 113) < 200) {
+                // Turn (CW) until nothing is in front
+                turn = 0.003 * (-1000 + 200);
+                vref = 0.2;
+                break;
+            }
+
+            if (( (fabsf(Ro_theta) < 30) && min_LD_obj60 > 400 ) || v1_mag < 0.5) {
                 pval = 1;
+                break;
+            }
 
             // Something in front
             if (front_60 <= 400) {
@@ -856,13 +755,16 @@ void RobotControl(void) {
                 break;
             }
 
-            if (right_50 < 700) {
-                turn = 0.005 * (-300 + right_30);
-                vref = forward_velocity * 0.7;
+            // Something on back right
+            if (min_LADAR(4, 9) <= 400 && front_60 > 400 && right_30 > 400) {
+                turn = 0.003 * (-1000 + front_60);
+                vref = 0.2;
+                break;
             }
 
-            if (mLD60 > 400 || v1_mag < 0.5) {
-                pval = 1;
+            if (front_60 < 700) {
+                turn = 0.005 * (-300 + right_30);
+                vref = forward_velocity * 0.7;
             }
 
             break;
@@ -870,23 +772,15 @@ void RobotControl(void) {
 
         turn = MIN(turn, 4.0);
         turn = MAX(turn, -4.0);
+        vref = MIN(vref, 2.0);
+        vref = MAX(0, vref);
 
 
         //==================================================== end wall following/point to point====================
-        if (newLADARdata == 1) {
-            newLADARdata = 0;
-            for (i=0;i<228;i++) {
-                LADARdistance[i] = newLADARdistance[i];
-                LADARangle[i] = newLADARangle[i];
-                LADARdataX[i] = newLADARdataX[i];
-                LADARdataY[i] = newLADARdataY[i];
-
-            }
-        }
 
         if ( (timecount % 200) == 0 ) {
-            LCDPrintfLine(1,"rv:%.1f,p:%d,%.1f", Rv1_theta, pval, mLD60);
-            LCDPrintfLine(2,"L30:%.1f,R30:%.1f", left_30, right_30);
+            LCDPrintfLine(1,"pp:%d,f60:%.1f", ppval, front_60);
+            LCDPrintfLine(2,"mi:%d,mv:%.1f,p:%d", min_LD_index, min_LD_val, pval);
         }
 
         SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);
