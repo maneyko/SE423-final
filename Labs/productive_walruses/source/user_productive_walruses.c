@@ -710,16 +710,16 @@ void RobotControl(void) {
                 break;
             }
 
-            // Something on back left
-            if (min_LADAR(224, 219) <= 400 && front_60 > 400 && left_30 > 400) {
-                turn = 0.003 * (1000 - front_60);
-                vref = 0.2;
-                break;
+            min_side_ind = min_LADAR_i(224, 114);
+
+            if (!( (185 < min_side_ind) && (min_side_ind < 215) ) && (min_LADAR(224, 114) < 700)) {
+                turn = -1.0 * (200 - min_side_ind);
+                vref = 0.0;
             }
 
-            // Nothing in front
-            if (front_60 > 400) {
-                turn = 0.005 * (300 - left_30);
+            // Nothing in front, something on left
+            if (front_60 > 400 && min_LADAR(224, 114) < 400) {
+                turn = 0.005 * (300 - min_LADAR(224, 114));
                 vref = forward_velocity * 0.7;
             }
 
@@ -735,6 +735,7 @@ void RobotControl(void) {
                 break;
             }
 
+            // Emergency case
             if (min_LADAR(28, 113) < 200) {
                 // Turn (CW) until nothing is in front
                 turn = 0.003 * (-1000 + 200);
@@ -755,15 +756,16 @@ void RobotControl(void) {
                 break;
             }
 
-            // Something on back right
-            if (min_LADAR(4, 9) <= 400 && front_60 > 400 && right_30 > 400) {
-                turn = 0.003 * (-1000 + front_60);
-                vref = 0.2;
-                break;
+
+            min_side_ind = min_LADAR_i(4, 113);
+
+            if (!( (13 < min_side_ind) && (min_side_ind < 43) ) && (min_LADAR(4, 113) < 700)) {
+                turn = 1.0 * (28 - min_side_ind);
+                vref = 0.0;
             }
 
-            if (front_60 < 700) {
-                turn = 0.005 * (-300 + right_30);
+            if (front_60 > 400) {
+                turn = 0.005 * (-300 + min_LADAR(4, 113));
                 vref = forward_velocity * 0.7;
             }
 

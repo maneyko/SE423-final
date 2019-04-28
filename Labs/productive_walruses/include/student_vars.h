@@ -61,6 +61,9 @@ float hit_mag = 0.0;
 int min_LD_index = 0;
 float min_LD_val = 0;
 float min_LD_obj60 = 0.0;
+
+int min_side_ind = 0;
+
 float LeftRight = 0.0;
 
 // =========================== Student Functions ===========================
