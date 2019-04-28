@@ -713,8 +713,9 @@ void RobotControl(void) {
             min_side_ind = min_LADAR_i(224, 114);
 
             if (!( (185 < min_side_ind) && (min_side_ind < 215) ) && (min_LADAR(224, 114) < 700)) {
-                turn = -1.0 * (200 - min_side_ind);
+                turn = 1.0 * (200 - min_side_ind);
                 vref = 0.0;
+                break;
             }
 
             // Nothing in front, something on left
@@ -762,6 +763,7 @@ void RobotControl(void) {
             if (!( (13 < min_side_ind) && (min_side_ind < 43) ) && (min_LADAR(4, 113) < 700)) {
                 turn = 1.0 * (28 - min_side_ind);
                 vref = 0.0;
+                break;
             }
 
             if (front_60 > 400) {
