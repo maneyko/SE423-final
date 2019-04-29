@@ -682,7 +682,7 @@ void RobotControl(void) {
         case 2:
             tc++;
 
-            if (ROBOTps.y < -1.5) {
+            if (ROBOTps.y < -1.5 || fabs(ROBOTps.x) > 6) {
                 pval = 1;
                 break;
             }
@@ -690,7 +690,7 @@ void RobotControl(void) {
             // Emergency case
             if (min_LADAR(114, 200) < 200) {
                 // Turn (CW) until nothing is in front
-                turn = 0.003 * (1000 - 200);
+                turn = 2.4;
                 vref = 0.2;
                 ppval = 1;
                 break;
@@ -739,7 +739,7 @@ void RobotControl(void) {
             // Emergency case
             if (min_LADAR(28, 113) < 200) {
                 // Turn (CW) until nothing is in front
-                turn = 0.003 * (-1000 + 200);
+                turn = -2.4;
                 vref = 0.2;
                 break;
             }
@@ -776,6 +776,7 @@ void RobotControl(void) {
 
         turn = MIN(turn, 4.0);
         turn = MAX(turn, -4.0);
+
         vref = MIN(vref, 2.0);
         vref = MAX(0, vref);
 

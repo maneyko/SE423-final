@@ -66,7 +66,7 @@ extern float adcA5;  // ADC A5 -    Analog IR2
 extern float adcB5;  // ADC B5 - USONIC2
 extern float adcA6;  // ADC A6 - Analog IR3
 extern float adcA7;  // ADC A7 - Analog IR4
-extern float compass;
+extern float compass;  // [0-3600] in .1 degrees
 extern float switchstate;
 
 extern sharedmemstruct *ptrshrdmem;
@@ -131,6 +131,11 @@ extern float blue_x_obj;
 extern float blue_y_obj;
 extern int Nblue;
 
+extern float green_x_obj;
+extern float green_y_obj;
+extern int Ngreen;
+
+
 extern int new_coordata;
 
 
@@ -138,11 +143,18 @@ float blue_x_obj_local = 0;
 float blue_y_obj_local = 0;
 int Nblue_local = 0;
 
+float green_x_obj_local = 0;
+float green_y_obj_local = 0;
+int Ngreen_local = 0;
+
+
 float real_dist = 0;
 
 float kp_vision = 0.03;
 
 extern int prnt_flag;
+
+long tc = 0;
 
 //====== Start Wall Following and Dead Reckoning Student Variables ========
 float min_front = 10000000;
@@ -225,16 +237,16 @@ void ComWithLinux(void) {
         if (GET_LVDATA_FROM_LINUX) {
 
             if (ptrshrdmem->DSPRec_size > 256) ptrshrdmem->DSPRec_size = 256;
-                for (i=0;i<ptrshrdmem->DSPRec_size;i++) {
-                    fromLinuxstring[i] = ptrshrdmem->DSPRec_buf[i];
-                }
-                fromLinuxstring[i] = '\0';
+            for (i=0;i<ptrshrdmem->DSPRec_size;i++) {
+                fromLinuxstring[i] = ptrshrdmem->DSPRec_buf[i];
+            }
+            fromLinuxstring[i] = '\0';
 
-                if (new_LV_data == 0) {
-                    //sscanf(fromLinuxstring,"%f%f",&LVvalue1,&LVvalue2);
-                    sscanf(fromLinuxstring,"%f%f",&Kg_A2,&LVvalue2);
-                    new_LV_data = 1;
-                }
+            if (new_LV_data == 0) {
+                //sscanf(fromLinuxstring,"%f%f",&LVvalue1,&LVvalue2);
+                sscanf(fromLinuxstring,"%f%f",&Kg_A2,&LVvalue2);
+                new_LV_data = 1;
+            }
 
             CLR_LVDATA_FROM_LINUX;
 
@@ -246,7 +258,7 @@ void ComWithLinux(void) {
                 // Default
                 //ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"1.0 1.0 1.0 1.0");
                 // you would do something like this
-                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",12-x_curA2,y_curA2,v_L,v_R);
+                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",x_curA2,y_curA2,v_L,v_R);
                 //ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",var1,var2,var3,var4);
 
                 for (i=0;i<ptrshrdmem->DSPSend_size;i++) {
@@ -267,9 +279,9 @@ void ComWithLinux(void) {
             // This is an example write to scratch
             // The Linux program SaveScratchToFile can be used to write the
             // ptrshrdmem->scratch[0-499] memory to a .txt file.
-//          for (i=100;i<300;i++) {
-//              ptrshrdmem->scratch[i] = (float)i;
-//          }
+            //          for (i=100;i<300;i++) {
+            //              ptrshrdmem->scratch[i] = (float)i;
+            //          }
 
             // Flush or write back source
             Cache_wb((void *)ptrshrdmem,sizeof(sharedmemstruct), Cache_Type_ALL, EDMA3_CACHE_WAIT);
@@ -337,7 +349,7 @@ Int main()
     CLRBIT(SYSCONFIG->PINMUX[13], 0xFFFFFFFF);
     SETBIT(SYSCONFIG->PINMUX[13], 0x88888811); //Set GPIO 6.8-13 to GPIOs and IMPORTANT Sets GP6[15] to /RESETOUT used by PHY, GP6[14] CLKOUT appears unconnected
 
-    #warn GP6.15 is also connected to CAMERA RESET This is a Bug in my board design Need to change Camera Reset to different IO.
+#warn GP6.15 is also connected to CAMERA RESET This is a Bug in my board design Need to change Camera Reset to different IO.
 
     GPIO_setDir(GPIO_BANK6, GPIO_PIN8, GPIO_OUTPUT);
     GPIO_setDir(GPIO_BANK6, GPIO_PIN9, GPIO_OUTPUT);
@@ -348,7 +360,7 @@ Int main()
 
 
     while ((T1_TGCR & 0x7) != 0x7) {
-      for (index=0;index<50000;index++) {}  // small delay before checking again
+        for (index=0;index<50000;index++) {}  // small delay before checking again
 
     }
 
@@ -499,11 +511,11 @@ void RobotControl(void) {
         }
     }
 
-//=================================== Start Dead reckoning position tracking ===================================
+    //=================================== Start Dead reckoning position tracking ===================================
     min_front = 10000000;
-       for (i = 111; i < 116; i++)
-           if (LADARdistance[i] < min_front)
-               min_front = LADARdistance[i];
+    for (i = 111; i < 116; i++)
+        if (LADARdistance[i] < min_front)
+            min_front = LADARdistance[i];
 
     min_right = 10000000;
     for (i = 52; i < 57; i++)  // checking right side of robot
@@ -537,7 +549,7 @@ void RobotControl(void) {
         enc_old_L = enc_current_L;
         enc_old_R = enc_current_R;
 
-       // finish calculating velocities
+        // finish calculating velocities
 
 
         rate_zero_A2 = rate_gyro_sumA2 / 3000.0;
@@ -562,40 +574,38 @@ void RobotControl(void) {
         // 3. Calculate the X, Y position of your robot using the average of the left and right wheel
         // velocity and your bearing
         // enc_A2
-        x_curA2 = x_oldA2 + (((v_L + v_R) / 2 ) * (cos(theta_A2) * 0.001));
-        y_curA2 = y_oldA2 + (((v_L + v_R) / 2 ) * (sin(theta_A2) * 0.001));
-
-        x_oldA2 = x_curA2;
-        y_oldA2 = y_curA2;
+        x_curA2 = x_oldA2 + (((v_L + v_R) / 2 ) * ((cos(theta_A2)) * 0.001));
+        y_curA2 = y_oldA2 + (((v_L + v_R) / 2 ) * ((sin(theta_A2)) * 0.001));
 
 
         // for enc_A3
         x_curA3 = x_oldA3 + (((v_L + v_R) / 2 ) * (cos(theta_A3) * 0.001));
         y_curA3 = y_oldA3 + (((v_L + v_R) / 2 ) * (sin(theta_A3) * 0.001));
-
-        x_oldA3 = x_curA3;
-        y_oldA3 = y_curA3;
-
-
-        // 3. Display this angle and X Y coordinates to the LCD every 100ms or so.
+        //        x_oldA2 = x_curA2;
+        //        y_oldA2 = y_curA2;
+        //        x_oldA3 = x_curA3;
+        //        y_oldA3 = y_curA3;
     }
 
- //=============================================================Start wall following code=================================================
+    // 3. Display this angle and X Y coordinates to the LCD every 100ms or so.
+
+
+    //=============================================================Start wall following code=================================================
     switch (pval) {
     case 1:  // Driving forward checking for object in front of vehicle // Left turn
-           turn = Kp_front_wall * (3000 - min_front);
+        turn = Kp_front_wall * (3000 - min_front);
 
-           vref = 0;
+        vref = 0;
 
-           if (min_front > left_turn_Stop_threshold)
-               pval = 2;
+        if (min_front > left_turn_Stop_threshold)
+            pval = 2;  // no objects in front
         break;
 
-    // Right wall following state
+        // Right wall following state
     case 2:  // No objects in front of robot and a wall is to the right
 
-//         Checks for missing front wall AND rear right before right turn
-        if ( (min_right >= 1000) ) {
+        //         Checks for missing front wall AND rear right before right turn
+        if ((min_right >= 1000) || ((min_right<= -1000))) {
             turn = Kp_right_wall * (ref_right_wall - LADARdistance[45]);
             vref = forward_velocity;
         }
@@ -619,57 +629,81 @@ void RobotControl(void) {
         turn = -turn_command_saturation;
     //=====================================end wall following code==========================================================================================
 
-//    // Get rid of these two lines when implementing wall following
-//    vref = 0.0;
-//    turn = 0.0;
-//    //^^^^^^^^
-//============================================= start vision interfacing code ===============================================
-//    if (new_coordata == 1) {
-//        blue_x_obj_local = blue_x_obj;
-//        blue_y_obj_local = blue_y_obj;
-//        Nblue_local = Nblue;
-//
-//        new_coordata = 0;
-//    }
-//    min_front = 10000000;
-//    for (i = 111; i < 116; i++) { // finds distance from front obstacle
-//        if (LADARdistance[i] < min_front) {
-//            min_front = LADARdistance[i];
-//        }
-//    }
-//
-//
-//
-//
-////    if ((blue_x_obj_local >= 20) || (blue_x_obj_local <= -20 )) { // if there is a light follow light
-//    turn = (kp_vision) * (0-blue_x_obj_local);
-//    vref = .7 ;
-////    }
-//    if (min_front < 305) { // object less than 1 tile away
-//        vref = 0;
-//        turn = 0;
-//    }
+    //============================================= start vision interfacing code ===============================================
+    if (new_coordata == 1) {
+        blue_x_obj_local = blue_x_obj;
+        blue_y_obj_local = blue_y_obj;
+        Nblue_local = Nblue;
 
-//    else {
-//        turn = 0;
-//        vref = 1;
-//    }
+        green_x_obj_local = green_x_obj;
+        green_y_obj_local = green_y_obj;
+        Ngreen_local = Ngreen;
+
+        new_coordata = 0;
+    }
+
+    if ((2980 < compass) && (compass < 3240) && (tc > 2000)
+            && (Ngreen_local > 10) && (min_front < left_turn_Start_threshold)) {
+        tc = 0;
+        x_curA2 = 4.71;
+        y_curA2 = 9.94;
+        theta_A2 = PI/2;
+
+        // wait for some time
+    }
+    else if ((2530 < compass) && (compass < 2750) && (tc > 2000)
+            && (Ngreen_local > 10) && (min_front < left_turn_Start_threshold)) {
+        tc = 0;
+        x_curA2 = -4.82;
+        y_curA2 = 10.01;
+        theta_A2 = PI;
+
+        // wait for some time
+    }
+    tc++;
+
+    if (tc > 20000)
+        tc = 5000;
+
+    //    turn = (kp_vision) * (-blue_x_obj_local);
+    //    vref = .7 ;
+    //    if (min_front < 305) { // object less than 1 tile away
+    //        vref = 0;
+    //        turn = 0;
+    //    }
+    //
+    //    else {
+    //        turn = 0;
+    //        vref = 1;
+    //    }
 
 
-//
-//    real_dist = 0.0003743184838 * blue_y_obj_local*blue_y_obj_local*blue_y_obj_local
-//            + 0.0741693807894 * blue_y_obj_local*blue_y_obj_local
-//            + 5.1755570014914 * blue_y_obj_local
-//            + 147.4450726009405; //cubic poly funct
-//
-//
+    //
+    //    real_dist = 0.0003743184838 * blue_y_obj_local*blue_y_obj_local*blue_y_obj_local
+    //            + 0.0741693807894 * blue_y_obj_local*blue_y_obj_local
+    //            + 5.1755570014914 * blue_y_obj_local
+    //            + 147.4450726009405; //cubic poly funct
+
+
+    x_oldA2 = x_curA2;
+    y_oldA2 = y_curA2;
+    x_oldA3 = x_curA3;
+    y_oldA3 = y_curA3;
+
+
     SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);
-//
+
     timecount++;
-//    if (timecount % 100 == 0) {
-//        LCDPrintfLine(1, "Bx:%.1f,By:%.1f,Nb:%.1f", blue_x_obj_local, blue_y_obj_local, Nblue_local);
-//        LCDPrintfLine(2, "real_dist:%.1f", real_dist);
-//    }
+    if (timecount % 100 == 0) {
+        //        LCDPrintfLine(1, "Bx:%.1f,By:%.1f,Nb:%.1f", blue_x_obj_local, blue_y_obj_local, Nblue_local);
+
+        LCDPrintfLine(1, "x:%.2f,y:%.2f", compass, x_curA2, y_curA2);
+        //        LCDPrintfLine(2, "real_dist:%.1f", real_dist);
+        //
+        LCDPrintfLine(2, "Gx:%.1f,Gy:%.1f,Ng:%.1f", green_x_obj_local, green_y_obj_local, Ngreen_local);
+        //        LCDPrintfLine(2, "real_dist:%.1f", real_dist);
+    }
+
     //============================================= End vision interfacing code ===============================================
 }
 
