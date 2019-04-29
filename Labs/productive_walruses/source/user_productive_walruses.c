@@ -131,8 +131,8 @@ float gyro_x = 0,gyro_y = 0;
 float gyro4x_gain = 1;
 
 int statePos = 0;   // index into robotdest
-int robotdestSize = 8;  // number of positions to use out of robotdest
-pose robotdest[8];  // array of waypoints for the robot
+int robotdestSize = 10;  // number of positions to use out of robotdest
+pose robotdest[10];  // array of waypoints for the robot
 
 extern float newLADARdistance[LADAR_MAX_DATA_SIZE];  //in mm
 extern float newLADARangle[LADAR_MAX_DATA_SIZE];        // in degrees
@@ -630,13 +630,17 @@ void RobotControl(void) {
 
 
         LeftRight = cos(ROBOTps.theta) * (robotdest[statePos].y - ROBOTps.y)
-                  - sin(ROBOTps.theta) * (robotdest[statePos].x - ROBOTps.x);
+                                                  - sin(ROBOTps.theta) * (robotdest[statePos].x - ROBOTps.x);
 
         // Wall following case structure
         switch (pval) {
 
         // Point to point
         case 1:
+            if (Nblue_local >= 10) {
+                pval = 4;
+                break;
+            }
 
             if (front_180 < 170) {  // About to hit a wall!
                 if (min_LD_index > 113)
@@ -681,6 +685,12 @@ void RobotControl(void) {
             // Break out when objective is on left of robot
         case 2:
             tc++;
+
+            if (Nblue_local >= 10) {
+                pval = 4;
+                break;
+            }
+
 
             if (ROBOTps.y < -1.5 || fabs(ROBOTps.x) > 6) {
                 pval = 1;
@@ -731,6 +741,12 @@ void RobotControl(void) {
         case 3:
             tc++;
 
+            if (Nblue_local >= 10) {
+                pval = 4;
+                break;
+            }
+
+
             if (ROBOTps.y < -1.5) {
                 pval = 1;
                 break;
@@ -772,6 +788,30 @@ void RobotControl(void) {
             }
 
             break;
+
+
+        case 4:
+
+
+            if (front_180 < 170) {  // About to hit a wall!
+                if (min_LD_index > 113)
+                    pval = 2;
+                else
+                    pval = 3;
+                break;
+            }
+
+            //    turn = (kp_vision) * (-blue_x_obj_local);
+            if (blue_x_obj_local < -10) turn = -0.5;
+            else if  (blue_x_obj_local > 10) turn = 0.5 ;
+
+
+            if ((blue_x_obj_local > -10) && (blue_x_obj_local < 10 ) ) {
+                turn = 0;
+                vref = 1;
+            }
+
+            break;
         }
 
         turn = MIN(turn, 4.0);
@@ -781,11 +821,49 @@ void RobotControl(void) {
         vref = MAX(0, vref);
 
 
+        //============================================= start vision interfacing code ===============================================
+        if (new_coordata == 1) {
+            blue_x_obj_local = blue_x_obj;
+            blue_y_obj_local = blue_y_obj;
+            Nblue_local = Nblue;
+
+            green_x_obj_local = green_x_obj;
+            green_y_obj_local = green_y_obj;
+            Ngreen_local = Ngreen;
+
+            new_coordata = 0;
+        }
+
+
+        //            real_dist = 0.0003743184838 * blue_y_obj_local*blue_y_obj_local*blue_y_obj_local
+        //                    + 0.0741693807894 * blue_y_obj_local*blue_y_obj_local
+        //                    + 5.1755570014914 * blue_y_obj_local
+        //                    + 147.4450726009405; //cubic poly funct
+
+        //        real_dist = 0.001067264458466 * blue_y_obj_local * blue_y_obj_local * blue_y_obj_local
+        //                + 0.104301358777567 * blue_y_obj_local * blue_y_obj_local
+        //                + 4.144240004893442 * blue_y_obj_local
+        //                + 90.646330776724142;
+
+
+        //        real_dist = 0.000049108611726 * blue_y_obj_local * blue_y_obj_local * blue_y_obj_local
+        //                  - 0.015793996729639 * blue_y_obj_local * blue_y_obj_local
+        //                  + 1.824761711822894 * blue_y_obj_local
+        //                  - 72.534953983825943;
+
+
+        //        real_dist = 0.001067264458466 * blue_y_obj_local * blue_y_obj_local * blue_y_obj_local
+        //                  - 0.046182929866072 * blue_y_obj_local * blue_y_obj_local
+        //                  + 1.412673846053174 * blue_y_obj_local
+        //                  + 15.462154215112076;
+
+        real_dist = blue_y_obj_local + 110;
+
         //==================================================== end wall following/point to point====================
 
         if ( (timecount % 200) == 0 ) {
-            LCDPrintfLine(1,"pp:%d,f60:%.1f", ppval, front_60);
-            LCDPrintfLine(2,"mi:%d,mv:%.1f,p:%d", min_LD_index, min_LD_val, pval);
+            LCDPrintfLine(1,"bx:%.1f,by:%.1f", blue_x_obj_local, blue_y_obj_local);
+            LCDPrintfLine(2,"nb:%d,rd:%.1f,p:%d", Nblue_local, real_dist, pval);
         }
 
         SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);

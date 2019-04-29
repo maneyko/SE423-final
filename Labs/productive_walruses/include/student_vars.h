@@ -6,6 +6,35 @@
  *
  */
 
+// ****************** Color Vision Variables ************************
+
+extern float blue_x_obj;
+extern float blue_y_obj;
+extern int Nblue;
+
+extern float green_x_obj;
+extern float green_y_obj;
+extern int Ngreen;
+
+
+extern int new_coordata;
+
+
+float blue_x_obj_local = 0;
+float blue_y_obj_local = 0;
+int Nblue_local = 0;
+
+float green_x_obj_local = 0;
+float green_y_obj_local = 0;
+int Ngreen_local = 0;
+
+float real_dist = 0;
+
+float kp_vision = 0.03;
+
+extern int prnt_flag;
+// *********************** End Color Vision******************************
+
 float front_180 = 10000.0;
 float front_120 = 10000.0;
 float front_90 = 10000.0;
