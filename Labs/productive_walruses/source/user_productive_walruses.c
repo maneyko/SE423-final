@@ -630,7 +630,7 @@ void RobotControl(void) {
 
 
         LeftRight = cos(ROBOTps.theta) * (robotdest[statePos].y - ROBOTps.y)
-                                                  - sin(ROBOTps.theta) * (robotdest[statePos].x - ROBOTps.x);
+                                                          - sin(ROBOTps.theta) * (robotdest[statePos].x - ROBOTps.x);
 
         // Wall following case structure
         switch (pval) {
@@ -835,6 +835,11 @@ void RobotControl(void) {
         }
 
 
+        real_dist = 0.0011000349405 * blue_y_obj_local*blue_y_obj_local*blue_y_obj_local
+                            + 0.1822854638960 * blue_y_obj_local*blue_y_obj_local
+                            + 10.8406447250287 * blue_y_obj_local
+                            + 258.6162738196003+23; //cubic poly funct     (4/30/19)
+
         //            real_dist = 0.0003743184838 * blue_y_obj_local*blue_y_obj_local*blue_y_obj_local
         //                    + 0.0741693807894 * blue_y_obj_local*blue_y_obj_local
         //                    + 5.1755570014914 * blue_y_obj_local
@@ -857,13 +862,13 @@ void RobotControl(void) {
         //                  + 1.412673846053174 * blue_y_obj_local
         //                  + 15.462154215112076;
 
-        real_dist = blue_y_obj_local + 110;
+        //        real_dist = blue_y_obj_local + 110;
 
         //==================================================== end wall following/point to point====================
 
         if ( (timecount % 200) == 0 ) {
-            LCDPrintfLine(1,"bx:%.1f,by:%.1f", blue_x_obj_local, blue_y_obj_local);
-            LCDPrintfLine(2,"nb:%d,rd:%.1f,p:%d", Nblue_local, real_dist, pval);
+            LCDPrintfLine(1,"by:%.1f,nb:%d", blue_y_obj_local, Nblue_local);
+            LCDPrintfLine(2,"rd:%.1f,p:%d",real_dist, pval);
         }
 
         SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);
