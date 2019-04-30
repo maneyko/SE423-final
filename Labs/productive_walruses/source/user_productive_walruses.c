@@ -827,9 +827,9 @@ void RobotControl(void) {
             blue_y_obj_local = blue_y_obj;
             Nblue_local = Nblue;
 
-            green_x_obj_local = green_x_obj;
-            green_y_obj_local = green_y_obj;
-            Ngreen_local = Ngreen;
+            pink_x_obj_local = pink_x_obj;
+            pink_y_obj_local = pink_y_obj;
+            Npink_local = Npink;
 
             new_coordata = 0;
         }

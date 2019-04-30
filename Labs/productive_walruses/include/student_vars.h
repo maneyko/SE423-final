@@ -12,9 +12,9 @@ extern float blue_x_obj;
 extern float blue_y_obj;
 extern int Nblue;
 
-extern float green_x_obj;
-extern float green_y_obj;
-extern int Ngreen;
+extern float pink_x_obj;
+extern float pink_y_obj;
+extern int Npink;
 
 
 extern int new_coordata;
@@ -24,9 +24,9 @@ float blue_x_obj_local = 0;
 float blue_y_obj_local = 0;
 int Nblue_local = 0;
 
-float green_x_obj_local = 0;
-float green_y_obj_local = 0;
-int Ngreen_local = 0;
+float pink_x_obj_local = 0;
+float pink_y_obj_local = 0;
+int Npink_local = 0;
 
 float real_dist = 0;
 

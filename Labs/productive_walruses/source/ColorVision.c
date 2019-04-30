@@ -143,9 +143,9 @@ float blue_x_obj = 0;
 float blue_y_obj = 0;
 int Nblue = 0;
 
-float green_x_obj = 0;
-float green_y_obj = 0;
-int Ngreen = 0;
+float pink_x_obj = 0;
+float pink_y_obj = 0;
+int Npink = 0;
 
 int prnt_flag = 0;
 int color_togg = 0;
@@ -339,19 +339,19 @@ void userProcessColorImageFunc_laser(bgr *ptrImage) {  // runs every 40ms
             specs_vrad = 73;
         }
         else if (color_togg == 1) {
-            // ===== Neon green color code =====
-            specs_h = 76;
-            specs_hrad = 23;
+            // ===== Neon pink color code =====
+            specs_h = 257;
+            specs_hrad = 10;
             if((specs_h-specs_hrad)<0) {  // wrap 0->360
                 specs_h2=specs_h+256;
             }
             else {  // wrap 360->0
                 specs_h2=specs_h-256;
             }
-            specs_s = 142;
-            specs_srad = 48;
-            specs_v = 180;
-            specs_vrad = 22;
+            specs_s = 207;
+            specs_srad = 32;
+            specs_v = 255;
+            specs_vrad = 1;
         }
 
         // Initialize all arrays for equivalency
@@ -569,9 +569,9 @@ void userProcessColorImageFunc_laser(bgr *ptrImage) {  // runs every 40ms
                 }
 
                 else if (color_togg == 1) {
-                    green_x_obj = object_x;
-                    green_y_obj = object_y;
-                    Ngreen = numpels;
+                    pink_x_obj = object_x;
+                    pink_y_obj = object_y;
+                    Npink = numpels;
                 }
 
 
@@ -593,9 +593,9 @@ void userProcessColorImageFunc_laser(bgr *ptrImage) {  // runs every 40ms
                 }
 
                 else if (color_togg == 1) {
-                    green_x_obj = object_x;
-                    green_y_obj = object_y;
-                    Ngreen = numpels;
+                    pink_x_obj = object_x;
+                    pink_y_obj = object_y;
+                    Npink = numpels;
                 }
 
                 //new_object_theta = 0.0;
@@ -692,9 +692,9 @@ void userProcessColorImageFunc_laser(bgr *ptrImage) {  // runs every 40ms
             Nblue = largest_num_pixels; // change to number blue pixels
         }
         else if (color_togg == 1) {
-            green_x_obj = rbar - IMAGE_ROWS/2; //change centroid_x to centroid green
-            green_y_obj = cbar - IMAGE_COLUMNS/2;
-            Ngreen = largest_num_pixels; // change to number blue pixels
+            pink_x_obj = rbar - IMAGE_ROWS/2; //change centroid_x to centroid green
+            pink_y_obj = cbar - IMAGE_COLUMNS/2;
+            Npink = largest_num_pixels; // change to number blue pixels
         }
         prnt_flag = 1;
     }
