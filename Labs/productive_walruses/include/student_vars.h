@@ -82,6 +82,9 @@ float Ro_theta2 = 0.0;
 
 float mytheta = 0.0;
 
+float Lx = 0.0;
+float Ly = 0.0;
+
 float hit_x = 0.0;
 float hit_y = 0.0;
 float hit_theta = 0.0;
@@ -93,6 +96,7 @@ float min_LD_val = 0;
 float min_LD_obj60 = 0.0;
 
 int min_side_ind = 0;
+float min_side_val = 0.0;
 
 float LeftRight = 0.0;
 

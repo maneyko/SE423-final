@@ -686,6 +686,15 @@ void RobotControl(void) {
             tc++;
 
             min_side_ind = min_LADAR_i(224, 114);
+            min_side_val = LADARdistance[min_side_ind];
+            Ly = LADARdataY[min_side_ind];
+            Lx = fabs(LADARdataX[min_side_ind]);
+
+            if (min_side_val < 400 && (Ly >= 11.5 || Lx >= 5.5)) {
+                // Turn (CW) until nothing is in front
+                pval = 3;
+                break;
+            }
 
             // Get robot perpendicular to wall
             if ( !(185 < min_side_ind && min_side_ind < 215) && min_LADAR(224, 114) < 700) {
@@ -742,7 +751,16 @@ void RobotControl(void) {
         case 3:
             tc++;
 
-            min_side_ind = min_LADAR_i(4, 113);
+            min_side_ind = min_LADAR_i(224, 114);
+            min_side_val = LADARdistance[min_side_ind];
+            Ly = LADARdataY[min_side_ind];
+            Lx = fabs(LADARdataX[min_side_ind]);
+
+            if (min_side_val < 400 && (Ly >= 11.5 || Lx >= 5.5)) {
+                // Turn (CW) until nothing is in front
+                pval = 2;
+                break;
+            }
 
             if ( !(13 < min_side_ind && min_side_ind < 43) && min_LADAR(4, 113) < 700 ) {
                 turn = 0.03 * (28 - min_side_ind);
@@ -751,11 +769,16 @@ void RobotControl(void) {
             }
 
             // Emergency case
-            if (min_LADAR(28, 113) < 200) {
-                // Turn (CW) until nothing is in front
-                turn = -1.0;
-                vref = 0.1;
-                break;
+            if (min_LADAR(28, 113) < 250) {
+                int index = 0;
+                index  = min_LADAR_i(28, 113);
+                if (LADARdataY[index] < 11.5 && fabs(LADARdataX[index]) < 5.5) {
+
+                    // Turn (CW) until nothing is in front
+                    turn = -1.0;
+                    vref = 0.1;
+                    break;
+                }
             }
 
             // Nothing in front, something on right
@@ -805,7 +828,7 @@ void RobotControl(void) {
                 bf = 1;
                 turn = -kp_vision * blue_x_obj_local;
                 vref = 1;
-                if (real_dist_blue <= 45 || real_dist_blue >= 100) {
+                if (45 >= real_dist_blue|| real_dist_blue >= 100) {
                     tc = 0;
                     if ((tc >= 1000 && tc <= 3000) && (bf == 1)) {
                         vref = 0;
