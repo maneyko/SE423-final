@@ -687,7 +687,7 @@ void RobotControl(void) {
 
             min_side_ind = min_LADAR_i(224, 114);
 
-            // Get robot perpendicular to wall (between 185 and 215)
+            // Get robot perpendicular to wall
             if ( !(185 < min_side_ind && min_side_ind < 215) && min_LADAR(224, 114) < 700) {
                 turn = 0.03 * (200 - min_side_ind);
                 vref = 0.0;
@@ -695,18 +695,10 @@ void RobotControl(void) {
             }
 
             // Emergency case -- about to hit a wall!
-            if (min_LADAR(114, 200) < 200) {
+            if (min_LADAR(114, 200) < 250) {
                 // Turn (CW) until nothing is in front
                 turn = 1.0;
                 vref = 0.1;
-                break;
-            }
-
-            // Something in front
-            if (front_60 <= 400 && min_LADAR(152, 162) < 600) {
-                // Turn (CW) until nothing is in front
-                turn = 0.003 * (1000 - front_60);
-                vref = 0.2;
                 break;
             }
 
@@ -763,14 +755,6 @@ void RobotControl(void) {
                 // Turn (CW) until nothing is in front
                 turn = -1.0;
                 vref = 0.1;
-                break;
-            }
-
-            // Something in front
-            if (front_60 <= 400 && min_LADAR(65, 75) < 600) {
-                // Turn (CCW) until nothing is in front
-                turn = 0.003 * (-1000 + front_60);
-                vref = 0.2;
                 break;
             }
 
