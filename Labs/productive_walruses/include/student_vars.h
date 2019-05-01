@@ -28,7 +28,8 @@ float pink_x_obj_local = 0;
 float pink_y_obj_local = 0;
 int Npink_local = 0;
 
-float real_dist = 0;
+float real_dist_blue = 0;
+float real_dist_pink = 0;
 
 float kp_vision = 0.03;
 
@@ -52,7 +53,7 @@ float right_50 = 10000.0;
 float right_side = 10000.0;
 float right_rear = 10000.0;
 float right_forward = 10000.0;
-
+int bf = 0;
 float obstacle = 240; //set to min distance before obstacle is detected
 //float obstacle2 = 800;
 

@@ -630,25 +630,13 @@ void RobotControl(void) {
 
 
         LeftRight = cos(ROBOTps.theta) * (robotdest[statePos].y - ROBOTps.y)
-                                                          - sin(ROBOTps.theta) * (robotdest[statePos].x - ROBOTps.x);
+                                                                                                                                                  - sin(ROBOTps.theta) * (robotdest[statePos].x - ROBOTps.x);
 
         // Wall following case structure
         switch (pval) {
 
         // Point to point
         case 1:
-            if (Nblue_local >= 10) {
-                pval = 4;
-                break;
-            }
-
-            if (front_180 < 170) {  // About to hit a wall!
-                if (min_LD_index > 113)
-                    pval = 2;
-                else
-                    pval = 3;
-                break;
-            }
 
             // If moving directly towards robot found target
             if ( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y,
@@ -657,10 +645,18 @@ void RobotControl(void) {
 
 
 
+            // About to hit a wall!
+            if (front_180 < 170) {
+                if (min_LD_index > 113)
+                    pval = 2;
+                else
+                    pval = 3;
+            }
+
+
             // Nothing in front or around -> keep moving to destination!
             if (min_LD_obj60 > 400) {
                 pval = 1;
-                break;
             }
 
             // Something around robot -> wall follow it
@@ -679,6 +675,17 @@ void RobotControl(void) {
                     tc = 0;
                 }
             }
+
+            //Found a Weed!
+            if (Nblue_local >= 10) {
+                tc = 0;
+                pval = 4;
+            }
+            if (Npink_local >= 10) {
+                tc = 0;
+                pval = 5;
+            }
+
             break;
 
             // Left wall following state
@@ -686,52 +693,50 @@ void RobotControl(void) {
         case 2:
             tc++;
 
-            if (Nblue_local >= 10) {
-                pval = 4;
-                break;
-            }
-
-
-            if (ROBOTps.y < -1.5 || fabs(ROBOTps.x) > 6) {
-                pval = 1;
-                break;
-            }
-
-            // Emergency case
-            if (min_LADAR(114, 200) < 200) {
-                // Turn (CW) until nothing is in front
-                turn = 2.4;
-                vref = 0.2;
-                ppval = 1;
-                break;
-            }
-
-            // Object in front 60 and nothing stopping us from going there
-            if (( (fabsf(Ro_theta) < 30) && min_LD_obj60 > 400 ) || v1_mag < 0.5) {
-                pval = 1;
-                break;
-            }
-
-            // Something in front
-            if (front_60 <= 400) {
-                // Turn (CW) until nothing is in front
-                turn = 0.003 * (1000 - front_60);
-                vref = 0.2;
-                break;
-            }
-
             min_side_ind = min_LADAR_i(224, 114);
 
             if (!( (185 < min_side_ind) && (min_side_ind < 215) ) && (min_LADAR(224, 114) < 700)) {
                 turn = 0.1 * (200 - min_side_ind);
                 vref = 0.0;
-                break;
             }
 
+
+            // Emergency case, about to hit a wall!
+            if (min_LADAR(114, 200) < 200) {
+                // Turn (CW) until nothing is in front
+                turn = 2.4;
+                vref = 0.2;
+                ppval = 1;
+            }
+            // Something in front
+            if (front_60 <= 400) {
+                // Turn (CW) until nothing is in front
+                turn = 0.003 * (1000 - front_60);
+                vref = 0.2;
+            }
             // Nothing in front, something on left
             if (front_60 > 400 && min_LADAR(224, 114) < 400) {
                 turn = 0.005 * (300 - min_LADAR(224, 114));
                 vref = forward_velocity * 0.7;
+            }
+
+
+            //Found a Weed!
+            if (Nblue_local >= 10) {
+                tc = 0;
+                pval = 4;
+            }
+            if (Npink_local >= 10) {
+                tc = 0;
+                pval = 5;
+            }
+            //Out of bounds
+            if (ROBOTps.y < -3 || fabs(ROBOTps.x) > 5.75) {
+                pval = 1;
+            }
+            // Object in front 60 and nothing stopping us from going there
+            if (( (fabsf(Ro_theta) < 30) && min_LD_obj60 > 400 ) || v1_mag < 0.5) {
+                pval = 1;
             }
 
             break;
@@ -741,15 +746,11 @@ void RobotControl(void) {
         case 3:
             tc++;
 
-            if (Nblue_local >= 10) {
-                pval = 4;
-                break;
-            }
+            min_side_ind = min_LADAR_i(4, 113);
 
-
-            if (ROBOTps.y < -1.5) {
-                pval = 1;
-                break;
+            if (!( (13 < min_side_ind) && (min_side_ind < 43) ) && (min_LADAR(4, 113) < 700)) {
+                turn = 0.1 * (28 - min_side_ind);
+                vref = 0.0;
             }
 
             // Emergency case
@@ -757,62 +758,120 @@ void RobotControl(void) {
                 // Turn (CW) until nothing is in front
                 turn = -2.4;
                 vref = 0.2;
-                break;
             }
-
-            if (( (fabsf(Ro_theta) < 30) && min_LD_obj60 > 400 ) || v1_mag < 0.5) {
-                pval = 1;
-                break;
-            }
-
             // Something in front
             if (front_60 <= 400) {
                 // Turn (CCW) until nothing is in front
                 turn = 0.003 * (-1000 + front_60);
                 vref = 0.2;
-                break;
             }
-
-
-            min_side_ind = min_LADAR_i(4, 113);
-
-            if (!( (13 < min_side_ind) && (min_side_ind < 43) ) && (min_LADAR(4, 113) < 700)) {
-                turn = 0.1 * (28 - min_side_ind);
-                vref = 0.0;
-                break;
-            }
-
+            //Nothing in front, something on right
             if (front_60 > 400) {
                 turn = 0.005 * (-300 + min_LADAR(4, 113));
                 vref = forward_velocity * 0.7;
+            }
+
+
+            //Found a Weed!
+            if (Nblue_local >= 10) {
+                tc = 0;
+                pval = 4;
+            }
+            if (Npink_local >= 10) {
+                tc = 0;
+                pval = 5;
+            }
+
+            // Out of bounds
+            if (ROBOTps.y < -3 || fabs(ROBOTps.x) > 5.75) {
+                pval = 1;
+            }
+            //Nothing stopping us from going there
+            if (( (fabsf(Ro_theta) < 30) && min_LD_obj60 > 400 ) || v1_mag < 0.5) {
+                pval = 1;
             }
 
             break;
 
 
         case 4:
+            tc++;
+
+            vref = 0;
+            turn = (kp_vision) * (-blue_x_obj_local);
+            //            if (blue_x_obj_local < -10) turn = -0.5;
+            //            else if  (blue_x_obj_local > 10) turn = 0.5 ;
+
+            if ((blue_x_obj_local > -10) && (blue_x_obj_local < 10 ) && (blue_y_obj_local != 0 )) {
+                bf = 1;
+                turn = (kp_vision)*(-blue_x_obj_local);
+                vref = 1;
+                if (real_dist_blue <= 45 || real_dist_blue >= 100){
+                    tc = 0;
+                    vref = 4;
+                    if ((tc >= 1000 && tc <= 3000) && (bf ==1)){
+                        vref = 2; // stopping for 2 sec
+                    }
+                    if ((tc > 3000) && (bf == 1)){
+                        vref = 3;
+                        pval = 1;
+                        bf = 0;
+                    }
+                }
+            }
 
 
-            if (front_180 < 170) {  // About to hit a wall!
+
+
+
+
+            // About to hit a wall!
+            if (front_180 < 170) {
                 if (min_LD_index > 113)
                     pval = 2;
                 else
                     pval = 3;
-                break;
             }
 
-            //    turn = (kp_vision) * (-blue_x_obj_local);
-            if (blue_x_obj_local < -10) turn = -0.5;
-            else if  (blue_x_obj_local > 10) turn = 0.5 ;
 
+            break;
+        case 5:
 
-            if ((blue_x_obj_local > -10) && (blue_x_obj_local < 10 ) ) {
-                turn = 0;
+            tc++;
+
+            vref = 0;
+            turn = (kp_vision) * (-pink_x_obj_local);
+            //            if (pink_x_obj_local < -10) turn = -0.5;
+            //            else if  (pink_x_obj_local > 10) turn = 0.5 ;
+
+            if ((pink_x_obj_local > -10) && (pink_x_obj_local < 10 ) ) {
+                turn = (kp_vision)*(-pink_x_obj_local);
                 vref = 1;
+            }
+            if (real_dist_pink <= 45){
+                tc = 0;
+                tc++;
+                if (tc >= 1000 && tc <= 3000){
+                    vref = 0;
+                }
+                if (tc >= 3000){
+                    vref = 1;
+                    pval = 1;
+                }
+            }
+
+
+            // About to hit a wall!
+            if (front_180 < 170) {
+                if (min_LD_index > 113)
+                    pval = 2;
+                else
+                    pval = 3;
             }
 
             break;
         }
+
 
         turn = MIN(turn, 4.0);
         turn = MAX(turn, -4.0);
@@ -835,10 +894,15 @@ void RobotControl(void) {
         }
 
 
-        real_dist = 0.0011000349405 * blue_y_obj_local*blue_y_obj_local*blue_y_obj_local
-                            + 0.1822854638960 * blue_y_obj_local*blue_y_obj_local
-                            + 10.8406447250287 * blue_y_obj_local
-                            + 258.6162738196003+23; //cubic poly funct     (4/30/19)
+        real_dist_blue = 0.0011000349405 * blue_y_obj_local*blue_y_obj_local*blue_y_obj_local
+                + 0.1822854638960 * blue_y_obj_local*blue_y_obj_local
+                + 10.8406447250287 * blue_y_obj_local
+                + 258.6162738196003+23; //cubic poly funct     (4/30/19)
+
+        real_dist_pink = 0.0011000349405 * pink_y_obj_local*pink_y_obj_local*pink_y_obj_local
+                + 0.1822854638960 * pink_y_obj_local*pink_y_obj_local
+                + 10.8406447250287 * pink_y_obj_local
+                + 258.6162738196003+23;
 
         //            real_dist = 0.0003743184838 * blue_y_obj_local*blue_y_obj_local*blue_y_obj_local
         //                    + 0.0741693807894 * blue_y_obj_local*blue_y_obj_local
@@ -868,7 +932,7 @@ void RobotControl(void) {
 
         if ( (timecount % 200) == 0 ) {
             LCDPrintfLine(1,"by:%.1f,nb:%d", blue_y_obj_local, Nblue_local);
-            LCDPrintfLine(2,"rd:%.1f,p:%d",real_dist, pval);
+            LCDPrintfLine(2,"rd:%.1f,pv:%d",vref, pval);
         }
 
         SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);

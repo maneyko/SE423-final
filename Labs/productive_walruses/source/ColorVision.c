@@ -334,13 +334,13 @@ void userProcessColorImageFunc_laser(bgr *ptrImage) {  // runs every 40ms
                 specs_h2=specs_h-256;
             }
             specs_s = 189;
-            specs_srad = 65;
+            specs_srad = 66;
             specs_v = 181;
-            specs_vrad = 73;
+            specs_vrad = 74;
         }
         else if (color_togg == 1) {
             // ===== Neon pink color code =====
-            specs_h = 257;
+            specs_h = 2;
             specs_hrad = 10;
             if((specs_h-specs_hrad)<0) {  // wrap 0->360
                 specs_h2=specs_h+256;
@@ -349,9 +349,9 @@ void userProcessColorImageFunc_laser(bgr *ptrImage) {  // runs every 40ms
                 specs_h2=specs_h-256;
             }
             specs_s = 207;
-            specs_srad = 32;
-            specs_v = 255;
-            specs_vrad = 1;
+            specs_srad = 48;
+            specs_v = 230;
+            specs_vrad = 25;
         }
 
         // Initialize all arrays for equivalency
@@ -683,21 +683,21 @@ void userProcessColorImageFunc_laser(bgr *ptrImage) {  // runs every 40ms
         //CLRLED4;
     }  // Ends if statement to see if image pointer is null
 
-    if (prnt_flag == 0) {
-        // Make
-        //            Cx = -(centroid_x-(IMAGE_COLUMNS/2));
-        if (color_togg == 0) {
-            blue_x_obj = rbar - IMAGE_ROWS/2; //change centroid_x to centroid blue
-            blue_y_obj = cbar - IMAGE_COLUMNS/2;
-            Nblue = largest_num_pixels; // change to number blue pixels
-        }
-        else if (color_togg == 1) {
-            pink_x_obj = rbar - IMAGE_ROWS/2; //change centroid_x to centroid green
-            pink_y_obj = cbar - IMAGE_COLUMNS/2;
-            Npink = largest_num_pixels; // change to number blue pixels
-        }
-        prnt_flag = 1;
-    }
+//    if (prnt_flag == 0) {
+//        // Make
+//        //            Cx = -(centroid_x-(IMAGE_COLUMNS/2));
+//        if (color_togg == 0) {
+//            blue_x_obj = rbar - IMAGE_ROWS/2; //change centroid_x to centroid blue
+//            blue_y_obj = cbar - IMAGE_COLUMNS/2;
+//            Nblue = largest_num_pixels; // change to number blue pixels
+//        }
+//        else if (color_togg == 1) {
+//            pink_x_obj = rbar - IMAGE_ROWS/2; //change centroid_x to centroid green
+//            pink_y_obj = cbar - IMAGE_COLUMNS/2;
+//            Npink = largest_num_pixels; // change to number blue pixels
+//        }
+//        prnt_flag = 1;
+//    }
     if (color_togg == 0)
         color_togg = 1;
     else if (color_togg == 1)
