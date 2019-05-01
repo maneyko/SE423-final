@@ -629,7 +629,7 @@ void RobotControl(void) {
         min_LD_obj60 = min_LD_obj(Ro_theta, 60);
 
 
-        LeftRight = cos(ROBOTps.theta) * (robotdest[statePos].y - ROBOTps.y)
+        LeftRight = cos(ROBOTps.theta) * (robotdest[statePos].y - ROBOTps.y);
                                                                                                                                                   - sin(ROBOTps.theta) * (robotdest[statePos].x - ROBOTps.x);
 
         // Wall following case structure
@@ -688,7 +688,7 @@ void RobotControl(void) {
 
             break;
 
-            // Left wall following state
+            //  wall following state
             // Break out when objective is on left of robot
         case 2:
             tc++;
