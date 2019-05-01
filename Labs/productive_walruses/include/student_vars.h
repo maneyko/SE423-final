@@ -54,7 +54,9 @@ float right_50 = 10000.0;
 float right_side = 10000.0;
 float right_rear = 10000.0;
 float right_forward = 10000.0;
-int bf = 0;
+
+int bf = 0;  // Blue flag
+
 float obstacle = 240;  // Set to min distance before obstacle is detected
 
 float ref_right_wall = 250;
@@ -165,6 +167,7 @@ float min_LD_obj(float angle, int degfan) {
 
     if (degfan > 100 || degfan < 0)
         return -1.0;
+
     if (fabsf(angle) > 95.0)
         return -1.0;
 
