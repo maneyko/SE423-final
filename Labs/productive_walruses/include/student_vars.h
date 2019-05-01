@@ -34,7 +34,8 @@ float real_dist_pink = 0;
 float kp_vision = 0.03;
 
 extern int prnt_flag;
-// *********************** End Color Vision******************************
+
+// *********************** End Color Vision ***********************
 
 float front_180 = 10000.0;
 float front_120 = 10000.0;
@@ -54,8 +55,7 @@ float right_side = 10000.0;
 float right_rear = 10000.0;
 float right_forward = 10000.0;
 int bf = 0;
-float obstacle = 240; //set to min distance before obstacle is detected
-//float obstacle2 = 800;
+float obstacle = 240;  // Set to min distance before obstacle is detected
 
 float ref_right_wall = 250;
 float left_turn_Start_threshold = 275;
@@ -68,8 +68,6 @@ float forward_velocity = 1.5;
 int pval = 1;  // Initial state
 int ppval = 1;
 long tc = 0;  // Personal timechecking variable.
-int dt = 0;
-int dt_wf = 500;
 
 float v1_x = 0.0;
 float v1_y = 0.0;
@@ -150,7 +148,7 @@ float min_LADAR(int lo, int hi) {
 
 
 int _mdpt = 0;
-int _offset = 0.0;
+int _offset = 0;
 float _rval = 0.0;
 float min_LD_obj(float angle, int degfan) {
     /*
