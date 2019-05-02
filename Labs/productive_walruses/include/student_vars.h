@@ -39,6 +39,13 @@ long weed_timer = 0;
 
 float kp_vision = 0.03;
 
+
+float weed_blueX[3] = {20, 20, 20};
+float weed_blueY[3] = {20, 20, 20};
+
+float weed_pinkX[3] = {20, 20, 20};
+float weed_pinkY[3] = {20, 20, 20};
+
 extern int prnt_flag;
 
 // *********************** End Color Vision ***********************
@@ -233,6 +240,10 @@ float get_adjustment_angle(void) {
     if (_temp_theta < -180)
         _temp_theta += 360;
     return _temp_theta;
+}
+
+float round_to_nearest_half(float num) {
+    return round(num * 2.0) / 2.0;
 }
 
 

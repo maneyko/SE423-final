@@ -1,7 +1,7 @@
 ******************************************************************************
                TMS320C6x Linker PC v8.2.2                      
 ******************************************************************************
->> Linked Wed May  1 23:36:19 2019
+>> Linked Wed May  1 23:59:39 2019
 
 OUTPUT FILE NAME:   <productive_walruses.out>
 ENTRY POINT SYMBOL: "_c_int00"  address: 1181c180
@@ -997,7 +997,7 @@ address   name
 118284b8  ROBOTps                                                             
 1182dcb8  Ro_theta                                                            
 1182dcbc  Ro_theta2                                                           
-118014c4  RobotControl                                                        
+11801504  RobotControl                                                        
 1182d898  S                                                                   
 11810940  SPI_init                                                            
 118107c0  SPI_xfer                                                            
@@ -1026,7 +1026,7 @@ address   name
 1180a1e8  UTIL_isUIBoardAttached                                              
 1180a060  UTIL_printMem                                                       
 11803648  UpdateLCDwithLADAR                                                  
-11800b18  UpdateOptitrackStates                                               
+11800b58  UpdateOptitrackStates                                               
 11809bc0  VPIF_HWI                                                            
 1182ddbc  VPIF_beginning_line                                                 
 1180cba8  VPIF_initReceive                                                    
@@ -1134,10 +1134,10 @@ ffffffff  __c_args__
 1182de08  adcB4                                                               
 1182de10  adcB5                                                               
 1180dab8  addtime                                                             
-118000f4  arr_min1d                                                           
-11800050  arr_min1d_i                                                         
+11800124  arr_min1d                                                           
+11800080  arr_min1d_i                                                         
 11818b20  atan2f                                                              
-11800aa0  atan360                                                             
+11800ae0  atan360                                                             
 11819de0  atanf                                                               
 11819ee0  atoi                                                                
 ffffffff  binit                                                               
@@ -1152,8 +1152,8 @@ ffffffff  binit
 1182dda0  blue_y_obj                                                          
 1182dc00  blue_y_obj_local                                                    
 1182dee0  bluegain                                                            
-11800a18  bound180                                                            
-118009a0  bound360                                                            
+11800a58  bound180                                                            
+118009e0  bound360                                                            
 1182db20  c                                                                   
 1182de7c  cCommandName                                                        
 1182de75  cLADARdata                                                          
@@ -1175,7 +1175,7 @@ ffffffff  binit
 1182dd5c  current_object                                                      
 1182decc  danindex                                                            
 11803470  decode2byteLADAR                                                    
-11800968  deg2rad                                                             
+118009a8  deg2rad                                                             
 1182db2c  delta                                                               
 1182ddc4  done                                                                
 11822fc0  enc0_array                                                          
@@ -1219,7 +1219,7 @@ ffffffff  binit
 1182dc40  front_60                                                            
 1182dc3c  front_90                                                            
 11819640  fseek                                                               
-118008a0  get_adjustment_angle                                                
+118008e0  get_adjustment_angle                                                
 11818c60  getdevice                                                           
 1182db30  green                                                               
 1182dbb4  gyro                                                                
@@ -1263,17 +1263,17 @@ ffffffff  binit
 1182dc84  left_turn_Stop_threshold                                            
 1181d820  lseek                                                               
 1181ab20  ltoa                                                                
-1180024c  main                                                                
+11800274  main                                                                
 1181eda0  malloc                                                              
 1182dec4  mcbspReset                                                          
 1181d880  memccpy                                                             
 1181c220  memcpy                                                              
 1181ac00  memset                                                              
 1182db44  min                                                                 
-11800108  min_LADAR                                                           
-11800230  min_LADAR_i                                                         
+11800134  min_LADAR                                                           
+11800258  min_LADAR_i                                                         
 1182dce0  min_LD_index                                                        
-11800124  min_LD_obj                                                          
+11800150  min_LD_obj                                                          
 1182dce8  min_LD_obj60                                                        
 1182dce4  min_LD_val                                                          
 1182dcec  min_side_ind                                                        
@@ -1337,7 +1337,7 @@ ffffffff  binit
 11815c60  putc                                                                
 1182dc98  pval                                                                
 1182db50  r                                                                   
-11800020  rad2deg                                                             
+1180004c  rad2deg                                                             
 1182db54  rbar                                                                
 1182dc14  real_dist_blue                                                      
 1182dc1c  real_dist_blue_mm                                                   
@@ -1357,6 +1357,7 @@ ffffffff  binit
 11828420  robotdest                                                           
 1182dbd0  robotdestSize                                                       
 11803224  roundFloatToInt                                                     
+11800018  round_to_nearest_half                                               
 1182db5c  sat                                                                 
 1182de48  scalingLadar                                                        
 1182de30  send_F28335_Extra1                                                  
@@ -1859,24 +1860,25 @@ address   name
 00008000  ti_sysbios_family_c64p_Cache_l2Size                                 
 11800000  __ASM__                                                             
 11800000  swap                                                                
-11800020  rad2deg                                                             
-11800050  arr_min1d_i                                                         
+11800018  round_to_nearest_half                                               
+1180004c  rad2deg                                                             
+11800080  arr_min1d_i                                                         
 11800098  __ISA__                                                             
 118000b0  __PLAT__                                                            
 118000d8  __TARG__                                                            
-118000f4  arr_min1d                                                           
 11800100  __TRDR__                                                            
-11800108  min_LADAR                                                           
-11800124  min_LD_obj                                                          
-11800230  min_LADAR_i                                                         
-1180024c  main                                                                
-118008a0  get_adjustment_angle                                                
-11800968  deg2rad                                                             
-118009a0  bound360                                                            
-11800a18  bound180                                                            
-11800aa0  atan360                                                             
-11800b18  UpdateOptitrackStates                                               
-118014c4  RobotControl                                                        
+11800124  arr_min1d                                                           
+11800134  min_LADAR                                                           
+11800150  min_LD_obj                                                          
+11800258  min_LADAR_i                                                         
+11800274  main                                                                
+118008e0  get_adjustment_angle                                                
+118009a8  deg2rad                                                             
+118009e0  bound360                                                            
+11800a58  bound180                                                            
+11800ae0  atan360                                                             
+11800b58  UpdateOptitrackStates                                               
+11801504  RobotControl                                                        
 11802d10  ComWithLinux                                                        
 11803200  signf                                                               
 11803224  roundFloatToInt                                                     
@@ -2810,4 +2812,4 @@ UNDEFED   __TI_INITARRAY_Limit
 UNDEFED   __TI_TLS_INIT_Base                                                  
 UNDEFED   __TI_TLS_INIT_Limit                                                 
 
-[959 symbols]
+[960 symbols]

@@ -808,8 +808,8 @@ void RobotControl(void) {
             real_dist_blue_mm = real_dist_blue * 10.0;  // Convert to MM
 
             // Finding x and y for weed
-            weed_x = ROBOTps.x + real_dist_blue_mm / TILE_TO_MM * cos(ROBOTps.theta);
-            weed_y = ROBOTps.y + real_dist_blue_mm / TILE_TO_MM * sin(ROBOTps.theta);
+            weed_x = round_to_nearest_half(ROBOTps.x + real_dist_blue_mm / TILE_TO_MM * cos(ROBOTps.theta));
+            weed_y = round_to_nearest_half(ROBOTps.y + real_dist_blue_mm / TILE_TO_MM * sin(ROBOTps.theta));
 
             // Turn towards the blue object
             if (fabsf(blue_x_obj_local) > 10 && Nblue_local >= 10) {
@@ -896,12 +896,11 @@ void RobotControl(void) {
             break;
         }
 
-
         turn = MIN(turn, 4.0);
         turn = MAX(turn, -4.0);
 
         vref = MIN(vref, 2.0);
-        vref = MAX(0, vref);
+        vref = MAX(vref, 0);
 
         //==================================================== end wall following/point to point====================
 
