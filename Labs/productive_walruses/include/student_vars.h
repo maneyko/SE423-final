@@ -35,18 +35,22 @@ float real_dist_pink_mm = 0.0;
 float weed_x = 0.0;
 float weed_y = 0.0;
 
-long weed_timer = 0;
-
 float kp_vision = 0.03;
 
+long weed_time = 0;
 
+int blue_weed_ind = 0;
 float weed_blueX[3] = {20, 20, 20};
 float weed_blueY[3] = {20, 20, 20};
 
+int pink_weed_ind = 0;
 float weed_pinkX[3] = {20, 20, 20};
 float weed_pinkY[3] = {20, 20, 20};
 
 extern int prnt_flag;
+
+int departed_state = 0;
+int facing_weed = 0;
 
 // *********************** End Color Vision ***********************
 
@@ -69,11 +73,6 @@ float right_50 = 10000.0;
 float right_side = 10000.0;
 float right_rear = 10000.0;
 float right_forward = 10000.0;
-
-int blue_flag = 0;
-int pink_flag = 0;
-
-float obstacle = 240;  // Set to min distance before obstacle is detected
 
 float ref_right_wall = 250;
 float left_turn_Start_threshold = 275;
@@ -245,6 +244,62 @@ float get_adjustment_angle(void) {
 float round_to_nearest_half(float num) {
     return round(num * 2.0) / 2.0;
 }
+
+int _size = 0;
+int _j = 0;
+int in_arr1d(float arr[], float val, int size) {
+    _j = 0;
+    for (_j = 0; _j < size; _j++) {
+        if (arr[_j] == val)
+            return 1;
+    }
+
+    return 0;
+}
+
+//int _j = 0;
+//float _temp_val = 0.0;
+//float _temp_val2 = 0.0;
+//
+//int insert_arr1d(float arr[], float index, float val, int size) {
+//
+//    _j = 0;
+//    _temp_val = 0.0;
+//
+//    for (_j = index; _j < size; _j++) {
+//        _temp_val = arr[_j];
+//        if (_j == index) {
+//            arr[_j] = val;
+//        }
+//        else {
+//            arr[_j] = _temp_val;
+//            _temp_val2 = arr[_j];
+//        }
+//    }
+//
+//    return 0;
+//}
+//
+//int insert_arr1d(float arr[], float index, float val, int size) {
+//
+//    _j = 0;
+//    _temp_val = 0.0;
+//
+//    for (_j = size-1; _j >= 0; _j--) {
+//        if ((j-1) < 0) continue;
+//
+//        _temp_val = arr[_j];
+//        if (_j == (size-1)) {
+//            arr[_j] = arr[j-1];
+//        }
+//        else {
+//            arr[_j] = _temp_val;
+//            _temp_val2 = arr[_j];
+//        }
+//    }
+//
+//    return 0;
+//}
 
 
 #endif
