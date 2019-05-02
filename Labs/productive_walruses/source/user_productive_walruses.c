@@ -591,7 +591,6 @@ void RobotControl(void) {
 
         // ================================================= BEGIN Student Code ====================================================================
 
-
         // Centered about 0deg -> 114
 
         front_180 = min_LADAR(28, 200);
@@ -620,7 +619,6 @@ void RobotControl(void) {
         mytheta = bound360(rad2deg(ROBOTps.theta));
 
         Ro_theta = bound180(v1_theta - mytheta);
-        Ro_theta2 = get_adjustment_angle();       // Should be the same as Ro_theta
 
         min_LD_index = min_LADAR_i(4, 223);
         min_LD_val = LADARdistance[min_LD_index];
@@ -643,20 +641,6 @@ void RobotControl(void) {
             new_coordata = 0;
         }
 
-
-        real_dist_blue = 0.0011000349405  * blue_y_obj_local * blue_y_obj_local * blue_y_obj_local
-                       + 0.1822854638960  * blue_y_obj_local * blue_y_obj_local
-                       + 10.8406447250287 * blue_y_obj_local
-                       + 258.6162738196003 + 23.0;  // in CM
-
-        real_dist_pink = 0.0011000349405  * pink_y_obj_local * pink_y_obj_local * pink_y_obj_local
-                       + 0.1822854638960  * pink_y_obj_local * pink_y_obj_local
-                       + 10.8406447250287 * pink_y_obj_local
-                       + 258.6162738196003 + 23.0;  // in CM
-
-        real_dist_blue_mm = real_dist_blue / 10.0;  // Convert to MM
-        real_dist_pink_mm = real_dist_pink / 10.0;  // Convert to MM
-
         // Wall following case structure
         switch (pval) {
 
@@ -670,6 +654,17 @@ void RobotControl(void) {
                     pval = 2;
                 else
                     pval = 3;
+                break;
+            }
+
+            // Found a Weed!
+            if (Nblue_local >= 10) {
+                pval = 4;
+                break;
+            }
+
+            if (Npink_local >= 10) {
+                pval = 5;
                 break;
             }
 
@@ -700,6 +695,17 @@ void RobotControl(void) {
 
             min_side_ind = min_LADAR_i(224, 114);
             min_side_val = LADARdistance[min_side_ind];
+
+            // Found a Weed!
+            if (Nblue_local >= 10) {
+                pval = 4;
+                break;
+            }
+
+            if (Npink_local >= 10) {
+                pval = 5;
+                break;
+            }
 
             // Get robot perpendicular to wall
             if ( !(185 < min_side_ind && min_side_ind < 215) && min_LADAR(224, 114) < 700) {
@@ -746,6 +752,17 @@ void RobotControl(void) {
             min_side_ind = min_LADAR_i(4, 113);
             min_side_val = LADARdistance[min_side_ind];
 
+            // Found a Weed!
+            if (Nblue_local >= 10) {
+                pval = 4;
+                break;
+            }
+
+            if (Npink_local >= 10) {
+                pval = 5;
+                break;
+            }
+
             if ( !(13 < min_side_ind && min_side_ind < 43) && min_LADAR(4, 113) < 700 ) {
                 turn = 0.03 * (28 - min_side_ind);
                 vref = 0.2;
@@ -782,28 +799,46 @@ void RobotControl(void) {
 
             break;
 
-
         case 4:
-            weed_timer++;
-            vref = 0;
-            turn = -kp_vision * blue_x_obj_local;
-            //            if (blue_x_obj_local < -10) turn = -0.5;
-            //            else if  (blue_x_obj_local > 10) turn = 0.5 ;
+            real_dist_blue = 0.0011000349405  * blue_y_obj_local * blue_y_obj_local * blue_y_obj_local
+                           + 0.1822854638960  * blue_y_obj_local * blue_y_obj_local
+                           + 10.8406447250287 * blue_y_obj_local
+                           + 258.6162738196003 + 23.0;  // in CM
 
-            if ((blue_x_obj_local > -10) && (blue_x_obj_local < 10) && (blue_y_obj_local != 0 )) {
-//                bf = 1;
+            real_dist_blue_mm = real_dist_blue * 10.0;  // Convert to MM
+
+            // Finding x and y for weed
+            weed_x = ROBOTps.x + real_dist_blue_mm / TILE_TO_MM * cos(ROBOTps.theta);
+            weed_y = ROBOTps.y + real_dist_blue_mm / TILE_TO_MM * sin(ROBOTps.theta);
+
+            // Turn towards the blue object
+            if (fabsf(blue_x_obj_local) > 10 && Nblue_local >= 10) {
+                vref = 0;
+                turn = -0.03 * blue_x_obj_local;
+                break;
+            }
+
+
+
+//            if (fabsf(blue_x_obj_local) <= 10 && Nblue_local >= 10
+//                    && (-65 < blue_y_obj_local && blue_y_obj_local < -30)) {
+//                real_dist_blue_hard(?) = real_dist_blue_mm;
+//            }
+
+            // Facing the blue object
+            if (fabsf(blue_x_obj_local) <= 10 && Nblue_local >= 10) {
 //                turn = -kp_vision * blue_x_obj_local;
 //                vref = 1;
 //                if (45 >= real_dist_blue|| real_dist_blue >= 100) {
 //                    tc = 0;
-//                    if ((tc >= 1000 && tc <= 3000) && (bf == 1)) {
+//                    if ((tc >= 1000 && tc <= 3000) && (blue_flag == 1)) {
 //                        vref = 0;
 //                        turn = 0;
 
-//                    if ((tc > 3000) && (bf == 1)) {
+//                    if ((tc > 3000) && (blue_flag == 1)) {
 //                        vref = 3;
 //                        pval = 1;
-//                        bf = 0;
+//                        blue_flag = 0;
 //                        break;
 //                    }
 
@@ -821,7 +856,13 @@ void RobotControl(void) {
 
             break;
         case 5:
-            tc++;
+
+            real_dist_pink = 0.0011000349405  * pink_y_obj_local * pink_y_obj_local * pink_y_obj_local
+                           + 0.1822854638960  * pink_y_obj_local * pink_y_obj_local
+                           + 10.8406447250287 * pink_y_obj_local
+                           + 258.6162738196003 + 23.0;  // in CM
+
+            real_dist_pink_mm = real_dist_pink * 10.0;  // Convert to MM
 
             vref = 0;
             turn = -kp_vision * pink_x_obj_local;
@@ -865,8 +906,8 @@ void RobotControl(void) {
         //==================================================== end wall following/point to point====================
 
         if ( (timecount % 200) == 0 ) {
-            LCDPrintfLine(1,"f60:%.1f,pv:%d", front_60, pval);
-            LCDPrintfLine(2,"mi:%d,mv:%.1f", min_LD_index, min_LD_val);
+            LCDPrintfLine(1,"bx:%.1f,by:%.1f", blue_x_obj_local, blue_y_obj_local);
+            LCDPrintfLine(2,"wx:%.1f,wy:%.1f", weed_x, weed_y);
         }
 
         SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);

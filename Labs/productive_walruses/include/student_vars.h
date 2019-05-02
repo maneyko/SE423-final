@@ -19,19 +19,21 @@ extern int Npink;
 
 extern int new_coordata;
 
-
-float blue_x_obj_local = 0;
-float blue_y_obj_local = 0;
+float blue_x_obj_local = 0.0;
+float blue_y_obj_local = 0.0;
 int Nblue_local = 0;
 
-float pink_x_obj_local = 0;
-float pink_y_obj_local = 0;
+float pink_x_obj_local = 0.0;
+float pink_y_obj_local = 0.0;
 int Npink_local = 0;
 
-float real_dist_blue = 0;
-float real_dist_pink = 0;
-float real_dist_blue_mm = 0;
-float real_dist_pink_mm = 0;
+float real_dist_blue = 0.0;
+float real_dist_pink = 0.0;
+float real_dist_blue_mm = 0.0;
+float real_dist_pink_mm = 0.0;
+
+float weed_x = 0.0;
+float weed_y = 0.0;
 
 long weed_timer = 0;
 
@@ -40,6 +42,8 @@ float kp_vision = 0.03;
 extern int prnt_flag;
 
 // *********************** End Color Vision ***********************
+
+#define TILE_TO_MM 304.0
 
 float front_180 = 10000.0;
 float front_120 = 10000.0;
@@ -59,7 +63,8 @@ float right_side = 10000.0;
 float right_rear = 10000.0;
 float right_forward = 10000.0;
 
-int bf = 0;  // Blue flag
+int blue_flag = 0;
+int pink_flag = 0;
 
 float obstacle = 240;  // Set to min distance before obstacle is detected
 
