@@ -632,6 +632,33 @@ void RobotControl(void) {
         LeftRight = cos(ROBOTps.theta) * (robotdest[statePos].y - ROBOTps.y)
                   - sin(ROBOTps.theta) * (robotdest[statePos].x - ROBOTps.x);
 
+
+       if (new_coordata == 1) {
+            blue_x_obj_local = blue_x_obj;
+            blue_y_obj_local = blue_y_obj;
+            Nblue_local = Nblue;
+
+            pink_x_obj_local = pink_x_obj;
+            pink_y_obj_local = pink_y_obj;
+            Npink_local = Npink;
+
+            new_coordata = 0;
+        }
+
+
+        real_dist_blue = 0.0011000349405  * blue_y_obj_local * blue_y_obj_local * blue_y_obj_local
+                + 0.1822854638960  * blue_y_obj_local * blue_y_obj_local
+                + 10.8406447250287 * blue_y_obj_local
+                + 258.6162738196003 + 23.0;  // in CM
+
+        real_dist_pink = 0.0011000349405  * pink_y_obj_local * pink_y_obj_local * pink_y_obj_local
+                + 0.1822854638960  * pink_y_obj_local * pink_y_obj_local
+                + 10.8406447250287 * pink_y_obj_local
+                + 258.6162738196003 + 23.0;  // in CM
+
+        real_dist_blue_mm = real_dist_blue / 10.0;  // Convert to MM
+        real_dist_pink_mm = real_dist_pink / 10.0;  // Convert to MM
+
         // Wall following case structure
         switch (pval) {
 
@@ -817,32 +844,34 @@ void RobotControl(void) {
 
 
         case 4:
-            tc++;
-
+            //tc++;
+            weed_timer ++;
             vref = 0;
             turn = -kp_vision * blue_x_obj_local;
             //            if (blue_x_obj_local < -10) turn = -0.5;
             //            else if  (blue_x_obj_local > 10) turn = 0.5 ;
 
             if ((blue_x_obj_local > -10) && (blue_x_obj_local < 10) && (blue_y_obj_local != 0 )) {
-                bf = 1;
-                turn = -kp_vision * blue_x_obj_local;
-                vref = 1;
-                if (45 >= real_dist_blue|| real_dist_blue >= 100) {
-                    tc = 0;
-                    if ((tc >= 1000 && tc <= 3000) && (bf == 1)) {
-                        vref = 0;
-                        turn = 0;
+//                bf = 1;
+//                turn = -kp_vision * blue_x_obj_local;
+//                vref = 1;
+//                if (45 >= real_dist_blue|| real_dist_blue >= 100) {
+//                    tc = 0;
+//                    if ((tc >= 1000 && tc <= 3000) && (bf == 1)) {
+//                        vref = 0;
+//                        turn = 0;
 
-                    }
-                    if ((tc > 3000) && (bf == 1)) {
-                        vref = 3;
-                        pval = 1;
-                        bf = 0;
-                        break;
-                    }
+//                    if ((tc > 3000) && (bf == 1)) {
+//                        vref = 3;
+//                        pval = 1;
+//                        bf = 0;
+//                        break;
+//                    }
+
+
+
                 }
-            }
+
 
             // About to hit a wall!
             if (front_180 < 170) {
@@ -894,31 +923,6 @@ void RobotControl(void) {
 
         vref = MIN(vref, 2.0);
         vref = MAX(0, vref);
-
-
-        //============================================= start vision interfacing code ===============================================
-        if (new_coordata == 1) {
-            blue_x_obj_local = blue_x_obj;
-            blue_y_obj_local = blue_y_obj;
-            Nblue_local = Nblue;
-
-            pink_x_obj_local = pink_x_obj;
-            pink_y_obj_local = pink_y_obj;
-            Npink_local = Npink;
-
-            new_coordata = 0;
-        }
-
-
-        real_dist_blue = 0.0011000349405  * blue_y_obj_local * blue_y_obj_local * blue_y_obj_local
-                + 0.1822854638960  * blue_y_obj_local * blue_y_obj_local
-                + 10.8406447250287 * blue_y_obj_local
-                + 258.6162738196003 + 23;  // in CM
-
-        real_dist_pink = 0.0011000349405  * pink_y_obj_local * pink_y_obj_local * pink_y_obj_local
-                + 0.1822854638960  * pink_y_obj_local * pink_y_obj_local
-                + 10.8406447250287 * pink_y_obj_local
-                + 258.6162738196003 + 23;  // in CM
 
         //==================================================== end wall following/point to point====================
 

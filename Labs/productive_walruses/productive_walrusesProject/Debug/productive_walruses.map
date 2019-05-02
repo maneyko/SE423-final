@@ -1,7 +1,7 @@
 ******************************************************************************
                TMS320C6x Linker PC v8.2.2                      
 ******************************************************************************
->> Linked Wed May  1 17:13:19 2019
+>> Linked Wed May  1 19:12:34 2019
 
 OUTPUT FILE NAME:   <productive_walruses.out>
 ENTRY POINT SYMBOL: "_c_int00"  address: 1181c0e0
@@ -12,7 +12,7 @@ MEMORY CONFIGURATION
          name            origin    length      used     unused   attr    fill
 ----------------------  --------  ---------  --------  --------  ----  --------
   IROM                  11700000   00100000  00000000  00100000  R  X
-  IRAM                  11800000   00038000  0002ec96  0000936a  RW X
+  IRAM                  11800000   00038000  0002eca2  0000935e  RW X
   L3_CBA_RAM            80000000   00020000  00000000  00020000  RW X
   DDR                   c3000000   01000000  00000000  01000000  RW X
 
@@ -28,17 +28,17 @@ run origin  load origin   length   init length attrs members
   1181f680    1181f680    00008e68   00000000    rw- .far
 118284e8    118284e8    00002632   00002632    r--
   118284e8    118284e8    00002632   00002632    r-- .const.2
-1182ab20    1182ab20    0000330f   00000000    rw-
+1182ab20    1182ab20    0000331b   00000000    rw-
   1182ab20    1182ab20    00002000   00000000    rw- .stack
   1182cb20    1182cb20    00000f3c   00000000    rw- .fardata
   1182da5c    1182da5c    00000068   00000000    rw- .bss
-  1182dac4    1182dac4    0000036b   00000000    rw- .neardata
-1182de30    1182de30    0000002c   00000000    r--
-  1182de30    1182de30    0000002c   00000000    r-- .rodata
-1182de60    1182de60    00000120   00000000    rw-
-  1182de60    1182de60    00000120   00000000    rw- .cio
-1182df80    1182df80    00000074   00000074    r--
-  1182df80    1182df80    00000074   00000074    r-- .switch.1
+  1182dac4    1182dac4    00000377   00000000    rw- .neardata
+1182de3c    1182de3c    0000002c   00000000    r--
+  1182de3c    1182de3c    0000002c   00000000    r-- .rodata
+1182de68    1182de68    00000120   00000000    rw-
+  1182de68    1182de68    00000120   00000000    rw- .cio
+1182df88    1182df88    00000074   00000074    r--
+  1182df88    1182df88    00000074   00000074    r-- .switch.1
 1182e000    1182e000    00000cb0   00000cb0    r-x
   1182e000    1182e000    00000200   00000200    r-x .vecs
   1182e200    1182e200    00000044   00000044    r-- .switch.2
@@ -83,17 +83,17 @@ section   page    origin      length       input sections
                   1182dac0    00000004     (.common:value)
 
 .neardata 
-*          0    1182dac4    0000036b     UNINITIALIZED
-                  1182dac4    000001a4     user_productive_walruses.obj (.neardata)
-                  1182dc68    000000a8     ColorVision.obj (.neardata)
-                  1182dd10    00000080     COECSL_edma3.obj (.neardata)
-                  1182dd90    00000068     Ladar.obj (.neardata)
-                  1182ddf8    00000028     COECSL_mcbsp.obj (.neardata)
-                  1182de20    00000008     LCDprintf.obj (.neardata)
-                  1182de28    00000007     ColorLCD.obj (.neardata)
+*          0    1182dac4    00000377     UNINITIALIZED
+                  1182dac4    000001b0     user_productive_walruses.obj (.neardata)
+                  1182dc74    000000a8     ColorVision.obj (.neardata)
+                  1182dd1c    00000080     COECSL_edma3.obj (.neardata)
+                  1182dd9c    00000068     Ladar.obj (.neardata)
+                  1182de04    00000028     COECSL_mcbsp.obj (.neardata)
+                  1182de2c    00000008     LCDprintf.obj (.neardata)
+                  1182de34    00000007     ColorLCD.obj (.neardata)
 
-.rodata    0    1182de30    0000002c     UNINITIALIZED
-                  1182de30    0000002c     productive_walruses_pe674.oe674 (.rodata)
+.rodata    0    1182de3c    0000002c     UNINITIALIZED
+                  1182de3c    0000002c     productive_walruses_pe674.oe674 (.rodata)
 
 .cinit     0    1182e248    00000a68     
                   1182e248    0000091c     (.cinit..fardata.load) [load image, compression = rle]
@@ -707,14 +707,14 @@ xdc.meta   0    11800000    00000128     COPY SECTION
                   1182da54    00000004     --HOLE--
                   1182da58    00000004     productive_walruses_pe674.oe674 (.fardata:ti_sysbios_knl_Task_Module_State_0_idleTask__A)
 
-.cio       0    1182de60    00000120     UNINITIALIZED
-                  1182de60    00000120     rts6740_elf.lib : trgmsg.obj (.cio)
+.cio       0    1182de68    00000120     UNINITIALIZED
+                  1182de68    00000120     rts6740_elf.lib : trgmsg.obj (.cio)
 
 .switch.1 
-*          0    1182df80    00000074     
-                  1182df80    00000038     rts6740_elf.lib : _printfi.obj (.switch:__TI_printfi)
-                  1182dfb8    00000028                     : _scanfi.obj (.switch:__TI_scanfi)
-                  1182dfe0    00000014     user_productive_walruses.obj (.switch:RobotControl)
+*          0    1182df88    00000074     
+                  1182df88    00000038     rts6740_elf.lib : _printfi.obj (.switch:__TI_printfi)
+                  1182dfc0    00000028                     : _scanfi.obj (.switch:__TI_scanfi)
+                  1182dfe8    00000014     user_productive_walruses.obj (.switch:RobotControl)
 
 .switch.2 
 *          0    1182e200    00000044     
@@ -727,7 +727,7 @@ MODULE SUMMARY
        Module                            code     ro data   rw data
        ------                            ----     -------   -------
     .\
-       user_productive_walruses.obj      12640    96        5472   
+       user_productive_walruses.obj      12640    96        5484   
        Ladar.obj                         7968     72        5718   
        ColorVision.obj                   5120     16        6940   
        COECSL_edma3.obj                  1216     0         4136   
@@ -738,7 +738,7 @@ MODULE SUMMARY
        LCDprintf.obj                     416      0         8      
        pru.obj                           256      0         0      
     +--+---------------------------------+--------+---------+---------+
-       Total:                            34976    208       22585  
+       Total:                            34976    208       22597  
                                                                    
     C:\kt2_smm2_dg2_ma2\SE423Repo\Labs\productive_walruses\productive_walrusesProject\Debug\configPkg\package\cfg\
        productive_walruses_pe674.oe674   4608     7490      17376  
@@ -868,15 +868,15 @@ MODULE SUMMARY
        Stack:                            0        0         8192   
        Linker Generated:                 0        2660      0      
     +--+---------------------------------+--------+---------+---------+
-       Grand Total:                      129120   12696     49753  
+       Grand Total:                      129120   12696     49765  
 
 
 LINKER GENERATED COPY TABLES
 
 __TI_cinit_table @ 1182ec88 records: 5, size/record: 8, table size: 40
 	.fardata: load addr=1182e248, load size=0000091c bytes, run addr=1182cb20, run size=00000f3c bytes, compression=rle
-	.neardata: load addr=1182eb64, load size=000000d2 bytes, run addr=1182dac4, run size=0000036b bytes, compression=rle
-	.rodata: load addr=1182ec36, load size=00000032 bytes, run addr=1182de30, run size=0000002c bytes, compression=rle
+	.neardata: load addr=1182eb64, load size=000000d2 bytes, run addr=1182dac4, run size=00000377 bytes, compression=rle
+	.rodata: load addr=1182ec36, load size=00000032 bytes, run addr=1182de3c, run size=0000002c bytes, compression=rle
 	.far: load addr=1182ec68, load size=0000000b bytes, run addr=1181f680, run size=00008e68 bytes, compression=rle
 	.bss: load addr=1182ec73, load size=00000009 bytes, run addr=1182da5c, run size=00000068 bytes, compression=rle
 
@@ -897,9 +897,9 @@ address   name
 1182d9f0  Bu                                                                  
 1181eca0  C$$EXIT                                                             
 1181d598  C$$IO$$                                                             
-1182de34  CLK_addtime                                                         
-1182de38  CLK_startMcBSP                                                      
-1182dcb0  Cdifference                                                         
+1182de40  CLK_addtime                                                         
+1182de44  CLK_startMcBSP                                                      
+1182dcbc  Cdifference                                                         
 11808804  Check_Equivalency                                                   
 11802c6c  ComWithLinux                                                        
 1181042c  EDMA3_0_ISR                                                         
@@ -911,10 +911,10 @@ address   name
 1180a2a8  EVMOMAPL138_initRAM                                                 
 1180a1ac  EVMOMAPL138_lpscTransition                                          
 1180a160  EVMOMAPL138_pinmuxConfig                                            
-1182dd64  F28335_Extra1                                                       
-1182dd68  F28335_Extra2                                                       
-1182dd6c  F28335_Extra3                                                       
-1182dd70  F28335_Extra4                                                       
+1182dd70  F28335_Extra1                                                       
+1182dd74  F28335_Extra2                                                       
+1182dd78  F28335_Extra3                                                       
+1182dd7c  F28335_Extra4                                                       
 11808884  Fix_Equivalency                                                     
 11811468  GPIO_getInput                                                       
 11811400  GPIO_getOutput                                                      
@@ -928,10 +928,10 @@ address   name
 118172a0  HOSTrename                                                          
 1181b320  HOSTunlink                                                          
 1181a700  HOSTwrite                                                           
-1182de48  HWI4_VPIF95                                                         
-1182de50  HWI5_EDMA3_1                                                        
-1182de4c  HWI7_PRU6                                                           
-1182de3c  HWI8_EDMA3_0                                                        
+1182de54  HWI4_VPIF95                                                         
+1182de5c  HWI5_EDMA3_1                                                        
+1182de58  HWI7_PRU6                                                           
+1182de48  HWI8_EDMA3_0                                                        
 1180f1ec  I2CGPIO_getInput                                                    
 1180f090  I2CGPIO_getInputAll                                                 
 1180efa4  I2CGPIO_init                                                        
@@ -942,39 +942,39 @@ address   name
 1180e9ac  I2C_write                                                           
 1182da68  Image_data                                                          
 1182d758  K                                                                   
-1182dbd4  Kp_front_wall                                                       
-1182dbd0  Kp_right_wall                                                       
+1182dbe0  Kp_front_wall                                                       
+1182dbdc  Kp_right_wall                                                       
 11804a90  LADAR_Get_and_Process_Scan                                          
 1180444c  LADAR_scan                                                          
 118041e0  LADAR_sendG                                                         
 11825878  LADARangle                                                          
-1182ddcc  LADARcenterFt                                                       
+1182ddd8  LADARcenterFt                                                       
 11825c60  LADARdataX                                                          
 11826048  LADARdataY                                                          
 118045d0  LADARdetections2xy                                                  
 11826430  LADARdistance                                                       
 11824b00  LADARinBuffer                                                       
-1182ddc8  LADARleftFt                                                         
+1182ddd4  LADARleftFt                                                         
 11824ae0  LADARoutBuffer                                                      
-1182dd98  LADARprocess                                                        
+1182dda4  LADARprocess                                                        
 118282f4  LADARps                                                             
-1182dd94  LADARready                                                          
-1182ddd0  LADARrightFt                                                        
+1182dda0  LADARready                                                          
+1182dddc  LADARrightFt                                                        
 11804fb4  LADARtask                                                           
 1180b118  LCD                                                                 
 1181758c  LCDPrintfLine                                                       
 1182da6c  LCD_Image                                                           
 1182da70  LCD_mem                                                             
 11803448  LCD_saturate                                                        
-1182de20  LCDnewMsgLine1                                                      
-1182de24  LCDnewMsgLine2                                                      
+1182de2c  LCDnewMsgLine1                                                      
+1182de30  LCDnewMsgLine2                                                      
 11817440  LCDvPrintfLine                                                      
 1182dad0  LVvalue1                                                            
 1182dad4  LVvalue2                                                            
-1182dc3c  LeftRight                                                           
+1182dc48  LeftRight                                                           
 1182da74  Linux_Image                                                         
-1182dc0c  Lx                                                                  
-1182dc10  Ly                                                                  
+1182dc18  Lx                                                                  
+1182dc1c  Ly                                                                  
 1180bd2c  Matrix1x3_Mult                                                      
 1180bc80  Matrix3x1_Add                                                       
 1180bb90  Matrix3x1_Mult                                                      
@@ -983,10 +983,10 @@ address   name
 1180b784  Matrix3x3_Invert                                                    
 1180b5c4  Matrix3x3_Mult                                                      
 1180b520  Matrix3x3_Trans                                                     
-1182de00  McBSPrecerror                                                       
-1182dcec  Nblue                                                               
+1182de0c  McBSPrecerror                                                       
+1182dcf8  Nblue                                                               
 1182db64  Nblue_local                                                         
-1182dcf8  Npink                                                               
+1182dd04  Npink                                                               
 1182db70  Npink_local                                                         
 1182842c  OPTITRACKps                                                         
 11828418  Optitrackdata                                                       
@@ -1002,21 +1002,21 @@ address   name
 1182d7a8  Q                                                                   
 1182d7d0  R                                                                   
 11828438  ROBOTps                                                             
-1182dc00  Ro_theta                                                            
-1182dc04  Ro_theta2                                                           
+1182dc0c  Ro_theta                                                            
+1182dc10  Ro_theta2                                                           
 118014c4  RobotControl                                                        
 1182d7f8  S                                                                   
 118108a0  SPI_init                                                            
 11810720  SPI_xfer                                                            
-1182de40  SWI_LCD                                                             
-1182de30  SWI_RobotControl                                                    
-1182de44  SWI_vision                                                          
+1182de4c  SWI_LCD                                                             
+1182de3c  SWI_RobotControl                                                    
+1182de50  SWI_vision                                                          
 1182d820  S_inv                                                               
 1180dacc  SetRobotOutputs                                                     
 1180da28  SetRobotOutputs_manual                                              
 11808854  Set_Equivalency                                                     
-1182de54  TASK_ComWithLinux                                                   
-1182de58  TASK_LADAR                                                          
+1182de60  TASK_ComWithLinux                                                   
+1182de64  TASK_LADAR                                                          
 1182da78  Thres_Image                                                         
 1180f610  UART_init                                                           
 1180f5f4  UART_rxByte                                                         
@@ -1035,12 +1035,12 @@ address   name
 118035a8  UpdateLCDwithLADAR                                                  
 11800b18  UpdateOptitrackStates                                               
 11809b20  VPIF_HWI                                                            
-1182dd04  VPIF_beginning_line                                                 
+1182dd10  VPIF_beginning_line                                                 
 1180cb08  VPIF_initReceive                                                    
 1180c92c  VPIF_initReceive_withPRU                                            
 1180c6e0  VPIF_initTransmit                                                   
 11800000  __ASM__                                                             
-1182de60  __CIOBUF_                                                           
+1182de68  __CIOBUF_                                                           
 11800098  __ISA__                                                             
 118000b0  __PLAT__                                                            
 118000d8  __TARG__                                                            
@@ -1104,42 +1104,42 @@ ffffffff  __c_args__
 1181c040  __remu                                                              
 1181e200  _args_main                                                          
 00000000  _argsize                                                            
-1182dc40  _att                                                                
+1182dc4c  _att                                                                
 11819480  _auto_init_elf                                                      
 1181c0e0  _c_int00                                                            
 1182a3c0  _ctypes_                                                            
 1182d2d8  _device                                                             
 1182cd80  _ftable                                                             
-1182dc48  _ii                                                                 
-1182dc4c  _index                                                              
+1182dc54  _ii                                                                 
+1182dc58  _index                                                              
 1182cd7c  _lock                                                               
-1182dc50  _mdpt                                                               
+1182dc5c  _mdpt                                                               
 1181eb80  _nop                                                                
-1182dc54  _offset                                                             
+1182dc60  _offset                                                             
 1181ec20  _register_lock                                                      
 1181ec40  _register_unlock                                                    
-1182dc58  _rval                                                               
+1182dc64  _rval                                                               
 1182ab20  _stack                                                              
 1182d138  _stream                                                             
 1181d660  _subcull                                                            
-1182dc44  _swap_val                                                           
-1182dc5c  _temp_theta                                                         
+1182dc50  _swap_val                                                           
+1182dc68  _temp_theta                                                         
 1182d074  _unlock                                                             
 1181eca0  abort                                                               
-1182dd2c  adcA0                                                               
-1182dd34  adcA1                                                               
-1182dd3c  adcA2                                                               
-1182dd44  adcA3                                                               
-1182dd4c  adcA4                                                               
-1182dd54  adcA5                                                               
-1182dd5c  adcA6                                                               
-1182dd60  adcA7                                                               
-1182dd30  adcB0                                                               
-1182dd38  adcB1                                                               
-1182dd40  adcB2                                                               
-1182dd48  adcB3                                                               
-1182dd50  adcB4                                                               
-1182dd58  adcB5                                                               
+1182dd38  adcA0                                                               
+1182dd40  adcA1                                                               
+1182dd48  adcA2                                                               
+1182dd50  adcA3                                                               
+1182dd58  adcA4                                                               
+1182dd60  adcA5                                                               
+1182dd68  adcA6                                                               
+1182dd6c  adcA7                                                               
+1182dd3c  adcB0                                                               
+1182dd44  adcB1                                                               
+1182dd4c  adcB2                                                               
+1182dd54  adcB3                                                               
+1182dd5c  adcB4                                                               
+1182dd64  adcB5                                                               
 1180da18  addtime                                                             
 118000f4  arr_min1d                                                           
 11800050  arr_min1d_i                                                         
@@ -1147,30 +1147,30 @@ ffffffff  __c_args__
 11800aa0  atan360                                                             
 11819d40  atanf                                                               
 11819e40  atoi                                                                
-1182dbbc  bf                                                                  
+1182dbc8  bf                                                                  
 ffffffff  binit                                                               
 1182a598  bitval_u32                                                          
-1182de2e  bkgrnd_blue                                                         
-1182de2d  bkgrnd_green                                                        
-1182de2c  bkgrnd_red                                                          
+1182de3a  bkgrnd_blue                                                         
+1182de39  bkgrnd_green                                                        
+1182de38  bkgrnd_red                                                          
 1182da7c  blue                                                                
-1182dce4  blue_x_obj                                                          
+1182dcf0  blue_x_obj                                                          
 1182db5c  blue_x_obj_local                                                    
-1182dce8  blue_y_obj                                                          
+1182dcf4  blue_y_obj                                                          
 1182db60  blue_y_obj_local                                                    
-1182de28  bluegain                                                            
+1182de34  bluegain                                                            
 11800a18  bound180                                                            
 118009a0  bound360                                                            
 1182da80  c                                                                   
-1182ddc4  cCommandName                                                        
-1182ddbd  cLADARdata                                                          
-1182ddbc  cPrevLADARdata                                                      
+1182ddd0  cCommandName                                                        
+1182ddc9  cLADARdata                                                          
+1182ddc8  cPrevLADARdata                                                      
 1182da84  cbar                                                                
 1181a8c0  close                                                               
-1182dca8  color                                                               
-1182dcac  color2                                                              
-1182dd00  color_togg                                                          
-1182dd24  compass                                                             
+1182dcb4  color                                                               
+1182dcb8  color2                                                              
+1182dd0c  color_togg                                                          
+1182dd30  compass                                                             
 11809d90  config_pll0                                                         
 11809be0  config_pll1                                                         
 1182d498  cornersX                                                            
@@ -1179,39 +1179,39 @@ ffffffff  binit
 11814fe0  cosf                                                                
 11813960  cosl                                                                
 1182da88  current                                                             
-1182dca4  current_object                                                      
-1182de14  danindex                                                            
+1182dcb0  current_object                                                      
+1182de20  danindex                                                            
 118033d0  decode2byteLADAR                                                    
 11800968  deg2rad                                                             
 1182da8c  delta                                                               
-1182dd0c  done                                                                
+1182dd18  done                                                                
 11822f40  enc0_array                                                          
-1182dd14  enc1                                                                
+1182dd20  enc1                                                                
 1182daf8  enc1old                                                             
-1182dd18  enc2                                                                
+1182dd24  enc2                                                                
 1182dafc  enc2old                                                             
-1182dd1c  enc3                                                                
-1182dd20  enc4                                                                
-1182dd08  equivalency                                                         
+1182dd28  enc3                                                                
+1182dd2c  enc4                                                                
+1182dd14  equivalency                                                         
 11825078  equivalency_objects                                                 
-1182dda8  errC                                                                
-1182dda4  errL                                                                
-1182ddac  errR                                                                
+1182ddb4  errC                                                                
+1182ddb0  errL                                                                
+1182ddb8  errR                                                                
 1182d72c  errno                                                               
 1182db58  errorcheck                                                          
 1181a9a0  exit                                                                
 1182d848  eye3                                                                
-1182dd10  f28335RecFirsttime                                                  
+1182dd1c  f28335RecFirsttime                                                  
 11828480  f28335TXData                                                        
 11828300  f28335recData                                                       
 118277b8  final_object_stats                                                  
 1181cc40  finddevice                                                          
 1182db38  firstdata                                                           
-1182de18  firsttimeLine1                                                      
-1182de1c  firsttimeLine2                                                      
-1182de04  firsttimeintMCBSPrec                                                
+1182de24  firsttimeLine1                                                      
+1182de28  firsttimeLine2                                                      
+1182de10  firsttimeintMCBSPrec                                                
 11812c40  fmodf                                                               
-1182dbdc  forward_velocity                                                    
+1182dbe8  forward_velocity                                                    
 11815bc0  fputc                                                               
 11811d40  fputs                                                               
 1182db44  frame_error                                                         
@@ -1220,11 +1220,11 @@ ffffffff  binit
 11817780  frexpf                                                              
 11816d60  frexpl                                                              
 11828098  fromLinuxstring                                                     
-1182db84  front_120                                                           
-1182db80  front_180                                                           
-1182db90  front_30                                                            
-1182db8c  front_60                                                            
-1182db88  front_90                                                            
+1182db90  front_120                                                           
+1182db8c  front_180                                                           
+1182db9c  front_30                                                            
+1182db98  front_60                                                            
+1182db94  front_90                                                            
 118195a0  fseek                                                               
 118008a0  get_adjustment_angle                                                
 11818bc0  getdevice                                                           
@@ -1238,14 +1238,14 @@ ffffffff  binit
 1182db20  gyro_x                                                              
 1182db24  gyro_y                                                              
 1182db04  gyro_zero                                                           
-1182dc20  hit_Ro_theta                                                        
-1182dc24  hit_mag                                                             
-1182dc1c  hit_theta                                                           
-1182dc14  hit_x                                                               
-1182dc18  hit_y                                                               
+1182dc2c  hit_Ro_theta                                                        
+1182dc30  hit_mag                                                             
+1182dc28  hit_theta                                                           
+1182dc20  hit_x                                                               
+1182dc24  hit_y                                                               
 1182da94  hue                                                                 
 118282a8  i2cdata                                                             
-1182ddc0  iLADARrcv                                                           
+1182ddcc  iLADARrcv                                                           
 1182da98  index                                                               
 118098a4  init_ColorVision                                                    
 11810260  init_DMA                                                            
@@ -1253,122 +1253,124 @@ ffffffff  binit
 1180b090  init_LCD                                                            
 1180ad00  init_LCD_mem                                                        
 1180d5e0  init_McBSP                                                          
-1182dc94  k                                                                   
-1182db7c  kp_vision                                                           
+1182dca0  k                                                                   
+1182db88  kp_vision                                                           
 1182da9c  largest_num_pixels                                                  
 1182daa0  largest_object                                                      
 11817de0  ldexp                                                               
 11817f60  ldexpf                                                              
 11817de0  ldexpl                                                              
-1182dc9c  left                                                                
-1182db94  left_30                                                             
-1182db98  left_50                                                             
-1182dba4  left_forward                                                        
-1182dba0  left_rear                                                           
-1182db9c  left_side                                                           
-1182dbc8  left_turn_Start_threshold                                           
-1182dbcc  left_turn_Stop_threshold                                            
+1182dca8  left                                                                
+1182dba0  left_30                                                             
+1182dba4  left_50                                                             
+1182dbb0  left_forward                                                        
+1182dbac  left_rear                                                           
+1182dba8  left_side                                                           
+1182dbd4  left_turn_Start_threshold                                           
+1182dbd8  left_turn_Stop_threshold                                            
 1181d780  lseek                                                               
 1181aa80  ltoa                                                                
 1180024c  main                                                                
 1181ed00  malloc                                                              
-1182de0c  mcbspReset                                                          
+1182de18  mcbspReset                                                          
 1181d7e0  memccpy                                                             
 1181c180  memcpy                                                              
 1181ab60  memset                                                              
 1182daa4  min                                                                 
 11800108  min_LADAR                                                           
 11800230  min_LADAR_i                                                         
-1182dc28  min_LD_index                                                        
+1182dc34  min_LD_index                                                        
 11800124  min_LD_obj                                                          
-1182dc30  min_LD_obj60                                                        
-1182dc2c  min_LD_val                                                          
-1182dc34  min_side_ind                                                        
-1182dc38  min_side_val                                                        
+1182dc3c  min_LD_obj60                                                        
+1182dc38  min_LD_val                                                          
+1182dc40  min_side_ind                                                        
+1182dc44  min_side_val                                                        
 1181c220  modf                                                                
 1181d840  modff                                                               
 1181c220  modfl                                                               
 118124e0  my_atanf                                                            
 118087f0  my_max                                                              
 118087e0  my_min                                                              
-1182dc08  mytheta                                                             
-1182dcb4  neighbor_type                                                       
+1182dc14  mytheta                                                             
+1182dcc0  neighbor_type                                                       
 11826818  newLADARangle                                                       
-1182dde0  newLADARdata                                                        
+1182ddec  newLADARdata                                                        
 11826c00  newLADARdataX                                                       
 11826fe8  newLADARdataY                                                       
 118273d0  newLADARdistance                                                    
-1182ddfc  newServos                                                           
-1182dc90  new_C02                                                             
-1182dc8c  new_C20                                                             
+1182de08  newServos                                                           
+1182dc9c  new_C02                                                             
+1182dc98  new_C20                                                             
 1182dad8  new_LV_data                                                         
-1182dc7c  new_coordata                                                        
-1182dc84  new_num_found_objects                                               
-1182dc88  new_object_theta                                                    
+1182dc88  new_coordata                                                        
+1182dc90  new_num_found_objects                                               
+1182dc94  new_object_theta                                                    
 1182db3c  new_optitrack                                                       
-1182dd74  new_sendtolinux_F28335_Extra                                        
+1182dd80  new_sendtolinux_F28335_Extra                                        
 1182dadc  newnavdata                                                          
 1182dae4  newturn                                                             
 1182dae0  newvref                                                             
-1182dc70  noimagefound                                                        
-1182dda0  numReadings                                                         
-1182dd88  num_EDMA3_0                                                         
-1182dca0  num_unique_objects                                                  
-1182dd8c  numofints                                                           
-1182dc80  numpels                                                             
-1182ddd4  numreadings_lastscan                                                
-1182dcbc  object_detected                                                     
+1182dc7c  noimagefound                                                        
+1182ddac  numReadings                                                         
+1182dd94  num_EDMA3_0                                                         
+1182dcac  num_unique_objects                                                  
+1182dd98  numofints                                                           
+1182dc8c  numpels                                                             
+1182dde0  numreadings_lastscan                                                
+1182dcc8  object_detected                                                     
 11823ee0  object_stats                                                        
-1182dc74  object_x                                                            
-1182dc78  object_y                                                            
-1182dbc0  obstacle                                                            
+1182dc80  object_x                                                            
+1182dc84  object_y                                                            
+1182dbcc  obstacle                                                            
 1182db0c  old_gyro                                                            
 11828478  parmbuf                                                             
 1182daa8  pic_data                                                            
-1182dcf0  pink_x_obj                                                          
+1182dcfc  pink_x_obj                                                          
 1182db68  pink_x_obj_local                                                    
-1182dcf4  pink_y_obj                                                          
+1182dd00  pink_y_obj                                                          
 1182db6c  pink_y_obj_local                                                    
-1182dbe4  ppval                                                               
+1182dbf0  ppval                                                               
 1182db40  previous_frame                                                      
-1182dcc4  print_b                                                             
-1182dcc5  print_g                                                             
-1182dcc0  print_hue                                                           
-1182dcc3  print_r                                                             
-1182dcc1  print_sat                                                           
-1182dcc2  print_val                                                           
+1182dcd0  print_b                                                             
+1182dcd1  print_g                                                             
+1182dccc  print_hue                                                           
+1182dccf  print_r                                                             
+1182dccd  print_sat                                                           
+1182dcce  print_val                                                           
 1181ac40  printf                                                              
-1182dcfc  prnt_flag                                                           
+1182dd08  prnt_flag                                                           
 1182daac  ptrshrdmem                                                          
 11815bc0  putc                                                                
-1182dbe0  pval                                                                
+1182dbec  pval                                                                
 1182dab0  r                                                                   
 11800020  rad2deg                                                             
 1182dab4  rbar                                                                
 1182db74  real_dist_blue                                                      
+1182db7c  real_dist_blue_mm                                                   
 1182db78  real_dist_pink                                                      
+1182db80  real_dist_pink_mm                                                   
 1182dab8  red                                                                 
-1182dbc4  ref_right_wall                                                      
+1182dbd0  ref_right_wall                                                      
 1181d1c0  remove                                                              
-1182dba8  right_30                                                            
-1182dbac  right_50                                                            
-1182dbb8  right_forward                                                       
-1182dbb4  right_rear                                                          
-1182dbb0  right_side                                                          
-1182ddec  robotT                                                              
-1182dde4  robotX                                                              
-1182dde8  robotY                                                              
+1182dbb4  right_30                                                            
+1182dbb8  right_50                                                            
+1182dbc4  right_forward                                                       
+1182dbc0  right_rear                                                          
+1182dbbc  right_side                                                          
+1182ddf8  robotT                                                              
+1182ddf0  robotX                                                              
+1182ddf4  robotY                                                              
 118283a0  robotdest                                                           
 1182db30  robotdestSize                                                       
 11803184  roundFloatToInt                                                     
 1182dabc  sat                                                                 
-1182dd90  scalingLadar                                                        
-1182dd78  send_F28335_Extra1                                                  
-1182dd7c  send_F28335_Extra2                                                  
-1182dd80  send_F28335_Extra3                                                  
-1182dd84  send_F28335_Extra4                                                  
+1182dd9c  scalingLadar                                                        
+1182dd84  send_F28335_Extra1                                                  
+1182dd88  send_F28335_Extra2                                                  
+1182dd8c  send_F28335_Extra3                                                  
+1182dd90  send_F28335_Extra4                                                  
 1180d9b0  send_McBSP                                                          
-1182ddf8  servosPosted                                                        
+1182de04  servosPosted                                                        
 1180ac40  set_background                                                      
 1182db00  settlegyro                                                          
 11815de0  setvbuf                                                             
@@ -1376,13 +1378,13 @@ ffffffff  binit
 11813f80  sin                                                                 
 118154c0  sinf                                                                
 11813f80  sinl                                                                
-1182dcd8  specs_h                                                             
-1182dcdc  specs_h2                                                            
-1182dce0  specs_hrad                                                          
-1182dcc8  specs_s                                                             
-1182dccc  specs_srad                                                          
-1182dcd0  specs_v                                                             
-1182dcd4  specs_vrad                                                          
+1182dce4  specs_h                                                             
+1182dce8  specs_h2                                                            
+1182dcec  specs_hrad                                                          
+1182dcd4  specs_s                                                             
+1182dcd8  specs_srad                                                          
+1182dcdc  specs_v                                                             
+1182dce0  specs_vrad                                                          
 1180ac00  spi_command                                                         
 1180abc0  spi_data                                                            
 1181d8a0  sprintf                                                             
@@ -1390,10 +1392,10 @@ ffffffff  binit
 118196c0  sqrtf                                                               
 118183e0  sqrtl                                                               
 1181d900  sscanf                                                              
-1182ddd8  startAngle                                                          
+1182dde4  startAngle                                                          
 1180d904  startMcBSP                                                          
 1182db2c  statePos                                                            
-1182dddc  stepSize                                                            
+1182dde8  stepSize                                                            
 1180fd80  strtod                                                              
 118128a0  strtol                                                              
 1180fd80  strtold                                                             
@@ -1401,21 +1403,21 @@ ffffffff  binit
 11813c80  strtoul                                                             
 118114e0  strtoull                                                            
 11800000  swap                                                                
-1182dd28  switchstate                                                         
-1182ddb4  tLADARcenterFt                                                      
-1182ddb0  tLADARleftFt                                                        
-1182ddb8  tLADARrightFt                                                       
-1182dbe8  tc                                                                  
+1182dd34  switchstate                                                         
+1182ddc0  tLADARcenterFt                                                      
+1182ddbc  tLADARleftFt                                                        
+1182ddc4  tLADARrightFt                                                       
+1182dbf4  tc                                                                  
 1182db4c  tempOPTITRACK_theta                                                 
-1182ddf4  tempOff                                                             
-1182ddf0  tempSign                                                            
+1182de00  tempOff                                                             
+1182ddfc  tempSign                                                            
 11828448  temp_3x1                                                            
 118282d0  temp_3x3                                                            
 11825478  temp_equivalency_objects                                            
 1182db48  temp_theta                                                          
 1182db50  temp_trackableID                                                    
-1182de10  testcount                                                           
-1182dc6c  testvar                                                             
+1182de1c  testcount                                                           
+1182dc78  testvar                                                             
 1182d86c  ti_sysbios_BIOS_Module__state__V                                    
 1181ed20  ti_sysbios_BIOS_RtsGateProxy_enter__E                               
 1181ed40  ti_sysbios_BIOS_RtsGateProxy_leave__E                               
@@ -1667,26 +1669,26 @@ ffffffff  binit
 1181b0a0  ti_sysbios_timers_timer64_Timer_startup__E                          
 1181c680  ti_sysbios_timers_timer64_Timer_stop__E                             
 1182ab06  ti_sysbios_timers_timer64_Timer_useTimer64pRegMap__C                
-1182dc60  timecount                                                           
-1182de08  timeint                                                             
+1182dc6c  timecount                                                           
+1182de14  timeint                                                             
 118281a0  toLinuxstring                                                       
-1182dcb8  too_many_objects                                                    
-1182dc98  top                                                                 
+1182dcc4  too_many_objects                                                    
+1182dca4  top                                                                 
 1182db54  trackableID                                                         
 1182db34  trackableIDerror                                                    
 1182dacc  tskcount                                                            
 1182dac8  turn                                                                
-1182dbd8  turn_command_saturation                                             
+1182dbe4  turn_command_saturation                                             
 1182da28  u                                                                   
-1182dd9c  uart1count                                                          
+1182dda8  uart1count                                                          
 1181d1c0  unlink                                                              
-1182dc68  updateLCD                                                           
+1182dc74  updateLCD                                                           
 11808b8c  userProcessColorImageFunc_laser                                     
-1182dbfc  v1_mag                                                              
-1182dbf4  v1_theta                                                            
-1182dbf8  v1_theta360                                                         
-1182dbec  v1_x                                                                
-1182dbf0  v1_y                                                                
+1182dc08  v1_mag                                                              
+1182dc00  v1_theta                                                            
+1182dc04  v1_theta360                                                         
+1182dbf8  v1_x                                                                
+1182dbfc  v1_y                                                                
 1182dac0  value                                                               
 1182dae8  vel1                                                                
 1182daf0  vel1old                                                             
@@ -1695,7 +1697,8 @@ ffffffff  binit
 11809898  vision                                                              
 1182dac4  vref                                                                
 1181e6c0  vsprintf                                                            
-1182dc64  whichled                                                            
+1182db84  weed_timer                                                          
+1182dc70  whichled                                                            
 1181dfc0  write                                                               
 1182da08  x_pred                                                              
 1182aa68  xdc_runtime_Assert_E_assertFailed__C                                
@@ -2581,198 +2584,201 @@ address   name
 1182db70  Npink_local                                                         
 1182db74  real_dist_blue                                                      
 1182db78  real_dist_pink                                                      
-1182db7c  kp_vision                                                           
-1182db80  front_180                                                           
-1182db84  front_120                                                           
-1182db88  front_90                                                            
-1182db8c  front_60                                                            
-1182db90  front_30                                                            
-1182db94  left_30                                                             
-1182db98  left_50                                                             
-1182db9c  left_side                                                           
-1182dba0  left_rear                                                           
-1182dba4  left_forward                                                        
-1182dba8  right_30                                                            
-1182dbac  right_50                                                            
-1182dbb0  right_side                                                          
-1182dbb4  right_rear                                                          
-1182dbb8  right_forward                                                       
-1182dbbc  bf                                                                  
-1182dbc0  obstacle                                                            
-1182dbc4  ref_right_wall                                                      
-1182dbc8  left_turn_Start_threshold                                           
-1182dbcc  left_turn_Stop_threshold                                            
-1182dbd0  Kp_right_wall                                                       
-1182dbd4  Kp_front_wall                                                       
-1182dbd8  turn_command_saturation                                             
-1182dbdc  forward_velocity                                                    
-1182dbe0  pval                                                                
-1182dbe4  ppval                                                               
-1182dbe8  tc                                                                  
-1182dbec  v1_x                                                                
-1182dbf0  v1_y                                                                
-1182dbf4  v1_theta                                                            
-1182dbf8  v1_theta360                                                         
-1182dbfc  v1_mag                                                              
-1182dc00  Ro_theta                                                            
-1182dc04  Ro_theta2                                                           
-1182dc08  mytheta                                                             
-1182dc0c  Lx                                                                  
-1182dc10  Ly                                                                  
-1182dc14  hit_x                                                               
-1182dc18  hit_y                                                               
-1182dc1c  hit_theta                                                           
-1182dc20  hit_Ro_theta                                                        
-1182dc24  hit_mag                                                             
-1182dc28  min_LD_index                                                        
-1182dc2c  min_LD_val                                                          
-1182dc30  min_LD_obj60                                                        
-1182dc34  min_side_ind                                                        
-1182dc38  min_side_val                                                        
-1182dc3c  LeftRight                                                           
-1182dc40  _att                                                                
-1182dc44  _swap_val                                                           
-1182dc48  _ii                                                                 
-1182dc4c  _index                                                              
-1182dc50  _mdpt                                                               
-1182dc54  _offset                                                             
-1182dc58  _rval                                                               
-1182dc5c  _temp_theta                                                         
-1182dc60  timecount                                                           
-1182dc64  whichled                                                            
-1182dc68  updateLCD                                                           
-1182dc6c  testvar                                                             
-1182dc70  noimagefound                                                        
-1182dc74  object_x                                                            
-1182dc78  object_y                                                            
-1182dc7c  new_coordata                                                        
-1182dc80  numpels                                                             
-1182dc84  new_num_found_objects                                               
-1182dc88  new_object_theta                                                    
-1182dc8c  new_C20                                                             
-1182dc90  new_C02                                                             
-1182dc94  k                                                                   
-1182dc98  top                                                                 
-1182dc9c  left                                                                
-1182dca0  num_unique_objects                                                  
-1182dca4  current_object                                                      
-1182dca8  color                                                               
-1182dcac  color2                                                              
-1182dcb0  Cdifference                                                         
-1182dcb4  neighbor_type                                                       
-1182dcb8  too_many_objects                                                    
-1182dcbc  object_detected                                                     
-1182dcc0  print_hue                                                           
-1182dcc1  print_sat                                                           
-1182dcc2  print_val                                                           
-1182dcc3  print_r                                                             
-1182dcc4  print_b                                                             
-1182dcc5  print_g                                                             
-1182dcc8  specs_s                                                             
-1182dccc  specs_srad                                                          
-1182dcd0  specs_v                                                             
-1182dcd4  specs_vrad                                                          
-1182dcd8  specs_h                                                             
-1182dcdc  specs_h2                                                            
-1182dce0  specs_hrad                                                          
-1182dce4  blue_x_obj                                                          
-1182dce8  blue_y_obj                                                          
-1182dcec  Nblue                                                               
-1182dcf0  pink_x_obj                                                          
-1182dcf4  pink_y_obj                                                          
-1182dcf8  Npink                                                               
-1182dcfc  prnt_flag                                                           
-1182dd00  color_togg                                                          
-1182dd04  VPIF_beginning_line                                                 
-1182dd08  equivalency                                                         
-1182dd0c  done                                                                
-1182dd10  f28335RecFirsttime                                                  
-1182dd14  enc1                                                                
-1182dd18  enc2                                                                
-1182dd1c  enc3                                                                
-1182dd20  enc4                                                                
-1182dd24  compass                                                             
-1182dd28  switchstate                                                         
-1182dd2c  adcA0                                                               
-1182dd30  adcB0                                                               
-1182dd34  adcA1                                                               
-1182dd38  adcB1                                                               
-1182dd3c  adcA2                                                               
-1182dd40  adcB2                                                               
-1182dd44  adcA3                                                               
-1182dd48  adcB3                                                               
-1182dd4c  adcA4                                                               
-1182dd50  adcB4                                                               
-1182dd54  adcA5                                                               
-1182dd58  adcB5                                                               
-1182dd5c  adcA6                                                               
-1182dd60  adcA7                                                               
-1182dd64  F28335_Extra1                                                       
-1182dd68  F28335_Extra2                                                       
-1182dd6c  F28335_Extra3                                                       
-1182dd70  F28335_Extra4                                                       
-1182dd74  new_sendtolinux_F28335_Extra                                        
-1182dd78  send_F28335_Extra1                                                  
-1182dd7c  send_F28335_Extra2                                                  
-1182dd80  send_F28335_Extra3                                                  
-1182dd84  send_F28335_Extra4                                                  
-1182dd88  num_EDMA3_0                                                         
-1182dd8c  numofints                                                           
-1182dd90  scalingLadar                                                        
-1182dd94  LADARready                                                          
-1182dd98  LADARprocess                                                        
-1182dd9c  uart1count                                                          
-1182dda0  numReadings                                                         
-1182dda4  errL                                                                
-1182dda8  errC                                                                
-1182ddac  errR                                                                
-1182ddb0  tLADARleftFt                                                        
-1182ddb4  tLADARcenterFt                                                      
-1182ddb8  tLADARrightFt                                                       
-1182ddbc  cPrevLADARdata                                                      
-1182ddbd  cLADARdata                                                          
-1182ddc0  iLADARrcv                                                           
-1182ddc4  cCommandName                                                        
-1182ddc8  LADARleftFt                                                         
-1182ddcc  LADARcenterFt                                                       
-1182ddd0  LADARrightFt                                                        
-1182ddd4  numreadings_lastscan                                                
-1182ddd8  startAngle                                                          
-1182dddc  stepSize                                                            
-1182dde0  newLADARdata                                                        
-1182dde4  robotX                                                              
-1182dde8  robotY                                                              
-1182ddec  robotT                                                              
-1182ddf0  tempSign                                                            
-1182ddf4  tempOff                                                             
-1182ddf8  servosPosted                                                        
-1182ddfc  newServos                                                           
-1182de00  McBSPrecerror                                                       
-1182de04  firsttimeintMCBSPrec                                                
-1182de08  timeint                                                             
-1182de0c  mcbspReset                                                          
-1182de10  testcount                                                           
-1182de14  danindex                                                            
-1182de18  firsttimeLine1                                                      
-1182de1c  firsttimeLine2                                                      
-1182de20  LCDnewMsgLine1                                                      
-1182de24  LCDnewMsgLine2                                                      
-1182de28  bluegain                                                            
-1182de2c  bkgrnd_red                                                          
-1182de2d  bkgrnd_green                                                        
-1182de2e  bkgrnd_blue                                                         
-1182de30  SWI_RobotControl                                                    
-1182de34  CLK_addtime                                                         
-1182de38  CLK_startMcBSP                                                      
-1182de3c  HWI8_EDMA3_0                                                        
-1182de40  SWI_LCD                                                             
-1182de44  SWI_vision                                                          
-1182de48  HWI4_VPIF95                                                         
-1182de4c  HWI7_PRU6                                                           
-1182de50  HWI5_EDMA3_1                                                        
-1182de54  TASK_ComWithLinux                                                   
-1182de58  TASK_LADAR                                                          
-1182de60  __CIOBUF_                                                           
+1182db7c  real_dist_blue_mm                                                   
+1182db80  real_dist_pink_mm                                                   
+1182db84  weed_timer                                                          
+1182db88  kp_vision                                                           
+1182db8c  front_180                                                           
+1182db90  front_120                                                           
+1182db94  front_90                                                            
+1182db98  front_60                                                            
+1182db9c  front_30                                                            
+1182dba0  left_30                                                             
+1182dba4  left_50                                                             
+1182dba8  left_side                                                           
+1182dbac  left_rear                                                           
+1182dbb0  left_forward                                                        
+1182dbb4  right_30                                                            
+1182dbb8  right_50                                                            
+1182dbbc  right_side                                                          
+1182dbc0  right_rear                                                          
+1182dbc4  right_forward                                                       
+1182dbc8  bf                                                                  
+1182dbcc  obstacle                                                            
+1182dbd0  ref_right_wall                                                      
+1182dbd4  left_turn_Start_threshold                                           
+1182dbd8  left_turn_Stop_threshold                                            
+1182dbdc  Kp_right_wall                                                       
+1182dbe0  Kp_front_wall                                                       
+1182dbe4  turn_command_saturation                                             
+1182dbe8  forward_velocity                                                    
+1182dbec  pval                                                                
+1182dbf0  ppval                                                               
+1182dbf4  tc                                                                  
+1182dbf8  v1_x                                                                
+1182dbfc  v1_y                                                                
+1182dc00  v1_theta                                                            
+1182dc04  v1_theta360                                                         
+1182dc08  v1_mag                                                              
+1182dc0c  Ro_theta                                                            
+1182dc10  Ro_theta2                                                           
+1182dc14  mytheta                                                             
+1182dc18  Lx                                                                  
+1182dc1c  Ly                                                                  
+1182dc20  hit_x                                                               
+1182dc24  hit_y                                                               
+1182dc28  hit_theta                                                           
+1182dc2c  hit_Ro_theta                                                        
+1182dc30  hit_mag                                                             
+1182dc34  min_LD_index                                                        
+1182dc38  min_LD_val                                                          
+1182dc3c  min_LD_obj60                                                        
+1182dc40  min_side_ind                                                        
+1182dc44  min_side_val                                                        
+1182dc48  LeftRight                                                           
+1182dc4c  _att                                                                
+1182dc50  _swap_val                                                           
+1182dc54  _ii                                                                 
+1182dc58  _index                                                              
+1182dc5c  _mdpt                                                               
+1182dc60  _offset                                                             
+1182dc64  _rval                                                               
+1182dc68  _temp_theta                                                         
+1182dc6c  timecount                                                           
+1182dc70  whichled                                                            
+1182dc74  updateLCD                                                           
+1182dc78  testvar                                                             
+1182dc7c  noimagefound                                                        
+1182dc80  object_x                                                            
+1182dc84  object_y                                                            
+1182dc88  new_coordata                                                        
+1182dc8c  numpels                                                             
+1182dc90  new_num_found_objects                                               
+1182dc94  new_object_theta                                                    
+1182dc98  new_C20                                                             
+1182dc9c  new_C02                                                             
+1182dca0  k                                                                   
+1182dca4  top                                                                 
+1182dca8  left                                                                
+1182dcac  num_unique_objects                                                  
+1182dcb0  current_object                                                      
+1182dcb4  color                                                               
+1182dcb8  color2                                                              
+1182dcbc  Cdifference                                                         
+1182dcc0  neighbor_type                                                       
+1182dcc4  too_many_objects                                                    
+1182dcc8  object_detected                                                     
+1182dccc  print_hue                                                           
+1182dccd  print_sat                                                           
+1182dcce  print_val                                                           
+1182dccf  print_r                                                             
+1182dcd0  print_b                                                             
+1182dcd1  print_g                                                             
+1182dcd4  specs_s                                                             
+1182dcd8  specs_srad                                                          
+1182dcdc  specs_v                                                             
+1182dce0  specs_vrad                                                          
+1182dce4  specs_h                                                             
+1182dce8  specs_h2                                                            
+1182dcec  specs_hrad                                                          
+1182dcf0  blue_x_obj                                                          
+1182dcf4  blue_y_obj                                                          
+1182dcf8  Nblue                                                               
+1182dcfc  pink_x_obj                                                          
+1182dd00  pink_y_obj                                                          
+1182dd04  Npink                                                               
+1182dd08  prnt_flag                                                           
+1182dd0c  color_togg                                                          
+1182dd10  VPIF_beginning_line                                                 
+1182dd14  equivalency                                                         
+1182dd18  done                                                                
+1182dd1c  f28335RecFirsttime                                                  
+1182dd20  enc1                                                                
+1182dd24  enc2                                                                
+1182dd28  enc3                                                                
+1182dd2c  enc4                                                                
+1182dd30  compass                                                             
+1182dd34  switchstate                                                         
+1182dd38  adcA0                                                               
+1182dd3c  adcB0                                                               
+1182dd40  adcA1                                                               
+1182dd44  adcB1                                                               
+1182dd48  adcA2                                                               
+1182dd4c  adcB2                                                               
+1182dd50  adcA3                                                               
+1182dd54  adcB3                                                               
+1182dd58  adcA4                                                               
+1182dd5c  adcB4                                                               
+1182dd60  adcA5                                                               
+1182dd64  adcB5                                                               
+1182dd68  adcA6                                                               
+1182dd6c  adcA7                                                               
+1182dd70  F28335_Extra1                                                       
+1182dd74  F28335_Extra2                                                       
+1182dd78  F28335_Extra3                                                       
+1182dd7c  F28335_Extra4                                                       
+1182dd80  new_sendtolinux_F28335_Extra                                        
+1182dd84  send_F28335_Extra1                                                  
+1182dd88  send_F28335_Extra2                                                  
+1182dd8c  send_F28335_Extra3                                                  
+1182dd90  send_F28335_Extra4                                                  
+1182dd94  num_EDMA3_0                                                         
+1182dd98  numofints                                                           
+1182dd9c  scalingLadar                                                        
+1182dda0  LADARready                                                          
+1182dda4  LADARprocess                                                        
+1182dda8  uart1count                                                          
+1182ddac  numReadings                                                         
+1182ddb0  errL                                                                
+1182ddb4  errC                                                                
+1182ddb8  errR                                                                
+1182ddbc  tLADARleftFt                                                        
+1182ddc0  tLADARcenterFt                                                      
+1182ddc4  tLADARrightFt                                                       
+1182ddc8  cPrevLADARdata                                                      
+1182ddc9  cLADARdata                                                          
+1182ddcc  iLADARrcv                                                           
+1182ddd0  cCommandName                                                        
+1182ddd4  LADARleftFt                                                         
+1182ddd8  LADARcenterFt                                                       
+1182dddc  LADARrightFt                                                        
+1182dde0  numreadings_lastscan                                                
+1182dde4  startAngle                                                          
+1182dde8  stepSize                                                            
+1182ddec  newLADARdata                                                        
+1182ddf0  robotX                                                              
+1182ddf4  robotY                                                              
+1182ddf8  robotT                                                              
+1182ddfc  tempSign                                                            
+1182de00  tempOff                                                             
+1182de04  servosPosted                                                        
+1182de08  newServos                                                           
+1182de0c  McBSPrecerror                                                       
+1182de10  firsttimeintMCBSPrec                                                
+1182de14  timeint                                                             
+1182de18  mcbspReset                                                          
+1182de1c  testcount                                                           
+1182de20  danindex                                                            
+1182de24  firsttimeLine1                                                      
+1182de28  firsttimeLine2                                                      
+1182de2c  LCDnewMsgLine1                                                      
+1182de30  LCDnewMsgLine2                                                      
+1182de34  bluegain                                                            
+1182de38  bkgrnd_red                                                          
+1182de39  bkgrnd_green                                                        
+1182de3a  bkgrnd_blue                                                         
+1182de3c  SWI_RobotControl                                                    
+1182de40  CLK_addtime                                                         
+1182de44  CLK_startMcBSP                                                      
+1182de48  HWI8_EDMA3_0                                                        
+1182de4c  SWI_LCD                                                             
+1182de50  SWI_vision                                                          
+1182de54  HWI4_VPIF95                                                         
+1182de58  HWI7_PRU6                                                           
+1182de5c  HWI5_EDMA3_1                                                        
+1182de60  TASK_ComWithLinux                                                   
+1182de64  TASK_LADAR                                                          
+1182de68  __CIOBUF_                                                           
 1182e000  ti_sysbios_family_c64p_Hwi0                                         
 1182e000  ti_sysbios_family_c64p_Hwi_int0                                     
 1182e020  ti_sysbios_family_c64p_Hwi_int1                                     
@@ -2805,4 +2811,4 @@ UNDEFED   __TI_INITARRAY_Limit
 UNDEFED   __TI_TLS_INIT_Base                                                  
 UNDEFED   __TI_TLS_INIT_Limit                                                 
 
-[953 symbols]
+[956 symbols]

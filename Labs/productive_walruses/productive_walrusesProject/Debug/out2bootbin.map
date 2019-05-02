@@ -27,5 +27,5 @@ OUTPUT TRANSLATION MAP
                             .text : btad=00000c7c  dest=11800000 size=0001f660
                          .const.1 : btad=000202e4  dest=1181f660 size=00000020
                          .const.2 : btad=0002030c  dest=118284e8 size=00002632
-                        .switch.1 : btad=00022948  dest=1182df80 size=00000074
+                        .switch.1 : btad=00022948  dest=1182df88 size=00000074
                         .switch.2 : btad=000229c4  dest=1182e200 size=00000044

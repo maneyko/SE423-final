@@ -30,6 +30,10 @@ int Npink_local = 0;
 
 float real_dist_blue = 0;
 float real_dist_pink = 0;
+float real_dist_blue_mm = 0;
+float real_dist_pink_mm = 0;
+
+long weed_timer = 0;
 
 float kp_vision = 0.03;
 
