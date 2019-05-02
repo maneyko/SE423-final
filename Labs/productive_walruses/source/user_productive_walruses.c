@@ -214,10 +214,11 @@ void ComWithLinux(void) {
 
                 // Default
                 //                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"1.0 1.0 1.0 1.0");
-                // you would do something like this
-                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",
-                                                   ROBOTps.x, ROBOTps.y, (float)pval, Ro_theta);
 
+
+                // you would do something like this
+//                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",
+//                                                   ROBOTps.x, ROBOTps.y, (float)pval, Ro_theta);
 
                 //                                                Sending 16 variables
                 ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f",
@@ -969,7 +970,7 @@ void RobotControl(void) {
         //==================================================== end wall following/point to point====================
 
         if ( (timecount % 200) == 0 ) {
-            LCDPrintfLine(1,"p:%d,sp:%d,%d", pval, statePos, weed_time);
+            LCDPrintfLine(1,"sp:%d,by:%.1f,py:%.1f", statePos, blue_y_obj_local, pink_y_obj_local);
             LCDPrintfLine(2,"wx:%.1f,wy:%.1f", weed_x, weed_y);
         }
 
