@@ -217,6 +217,18 @@ void ComWithLinux(void) {
                 // you would do something like this
                 ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",
                                                    ROBOTps.x, ROBOTps.y, (float)pval, Ro_theta);
+
+
+                //                                                Sending 16 variables
+                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f",
+                                                   ROBOTps.x, ROBOTps.y, (float)pval, Ro_theta,
+                                                   weed_blueX[0], weed_blueY[0],
+                                                   weed_blueX[1], weed_blueY[1],
+                                                   weed_blueX[2], weed_blueY[2],
+                                                   weed_pinkX[0], weed_pinkY[0],
+                                                   weed_pinkX[1], weed_pinkY[1],
+                                                   weed_pinkX[2], weed_pinkY[2]);
+
                 //ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",var1,var2,var3,var4);
 
                 for (i=0;i<ptrshrdmem->DSPSend_size;i++) {
@@ -411,8 +423,8 @@ Int main()
     robotdest[6].x =  0;     robotdest[6].y = 11;  // Point 5
     robotdest[7].x =  0;     robotdest[7].y = -1;  // Start
 
-    // !!! indeces [14, 16] reserved for blue !!!
-    // !!! indeces [17, 19] reserved for pink !!!
+    // !!! indices [14, 16] reserved for blue !!!
+    // !!! indices [17, 19] reserved for pink !!!
 
     // flag pins
     GPIO_setDir(IMAGE_TO_LINUX_BANK, IMAGE_TO_LINUX_FLAG, GPIO_OUTPUT);
