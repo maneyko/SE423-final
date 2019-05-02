@@ -600,7 +600,6 @@ void RobotControl(void) {
         front_60 = min_LADAR(85, 142);
         front_30 = min_LADAR(100, 128);
 
-
         left_30 = min_LADAR(186, 214);
         left_50 = min_LADAR(176, 223);
         left_side = min_LADAR(114, 224);
@@ -632,7 +631,6 @@ void RobotControl(void) {
         LeftRight = cos(ROBOTps.theta) * (robotdest[statePos].y - ROBOTps.y)
                   - sin(ROBOTps.theta) * (robotdest[statePos].x - ROBOTps.x);
 
-
        if (new_coordata == 1) {
             blue_x_obj_local = blue_x_obj;
             blue_y_obj_local = blue_y_obj;
@@ -647,14 +645,14 @@ void RobotControl(void) {
 
 
         real_dist_blue = 0.0011000349405  * blue_y_obj_local * blue_y_obj_local * blue_y_obj_local
-                + 0.1822854638960  * blue_y_obj_local * blue_y_obj_local
-                + 10.8406447250287 * blue_y_obj_local
-                + 258.6162738196003 + 23.0;  // in CM
+                       + 0.1822854638960  * blue_y_obj_local * blue_y_obj_local
+                       + 10.8406447250287 * blue_y_obj_local
+                       + 258.6162738196003 + 23.0;  // in CM
 
         real_dist_pink = 0.0011000349405  * pink_y_obj_local * pink_y_obj_local * pink_y_obj_local
-                + 0.1822854638960  * pink_y_obj_local * pink_y_obj_local
-                + 10.8406447250287 * pink_y_obj_local
-                + 258.6162738196003 + 23.0;  // in CM
+                       + 0.1822854638960  * pink_y_obj_local * pink_y_obj_local
+                       + 10.8406447250287 * pink_y_obj_local
+                       + 258.6162738196003 + 23.0;  // in CM
 
         real_dist_blue_mm = real_dist_blue / 10.0;  // Convert to MM
         real_dist_pink_mm = real_dist_pink / 10.0;  // Convert to MM
@@ -680,17 +678,6 @@ void RobotControl(void) {
                             robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
             { statePos = (statePos + 1) % robotdestSize; }
 
-
-            // Found a Weed!
-//            if (Nblue_local >= 10) {
-//                pval = 4;
-//                break;
-//            }
-//            if (Npink_local >= 10) {
-//                pval = 5;
-//                break;
-//            }
-
             // Nothing in front or around -> keep moving to destination!
             if (min_LD_obj60 > 400) {
                 pval = 1;
@@ -704,7 +691,6 @@ void RobotControl(void) {
                 else
                     pval = 3;
             }
-
             break;
 
             // Left wall following state
@@ -714,14 +700,6 @@ void RobotControl(void) {
 
             min_side_ind = min_LADAR_i(224, 114);
             min_side_val = LADARdistance[min_side_ind];
-            Ly = LADARdataY[min_side_ind];
-            Lx = fabs(LADARdataX[min_side_ind]);
-
-            if (min_side_val < 400 && (Ly >= 11.5 || Lx >= 5.5)) {
-                // Turn (CW) until nothing is in front
-                pval = 3;
-                break;
-            }
 
             // Get robot perpendicular to wall
             if ( !(185 < min_side_ind && min_side_ind < 215) && min_LADAR(224, 114) < 700) {
@@ -744,19 +722,6 @@ void RobotControl(void) {
                 vref = forward_velocity * 0.7;
             }
 
-            // Found a Weed!
-//            if (Nblue_local >= 10) {
-//                tc = 0;
-//                pval = 4;
-//                break;
-//            }
-//
-//            if (Npink_local >= 10) {
-//                tc = 0;
-//                pval = 5;
-//                break;
-//            }
-
             // Out of bounds
             if (ROBOTps.y < -1.5 || fabs(ROBOTps.x) > 5.75) {
                 pval = 1;
@@ -778,16 +743,8 @@ void RobotControl(void) {
         case 3:
             tc++;
 
-            min_side_ind = min_LADAR_i(224, 114);
+            min_side_ind = min_LADAR_i(4, 113);
             min_side_val = LADARdistance[min_side_ind];
-            Ly = LADARdataY[min_side_ind];
-            Lx = fabs(LADARdataX[min_side_ind]);
-
-            if (min_side_val < 400 && (Ly >= 11.5 || Lx >= 5.5)) {
-                // Turn (CW) until nothing is in front
-                pval = 2;
-                break;
-            }
 
             if ( !(13 < min_side_ind && min_side_ind < 43) && min_LADAR(4, 113) < 700 ) {
                 turn = 0.03 * (28 - min_side_ind);
@@ -797,15 +754,11 @@ void RobotControl(void) {
 
             // Emergency case
             if (min_LADAR(28, 113) < 250) {
-                int index = 0;
-                index  = min_LADAR_i(28, 113);
-                if (LADARdataY[index] < 11.5 && fabs(LADARdataX[index]) < 5.5) {
 
-                    // Turn (CW) until nothing is in front
-                    turn = -1.0;
-                    vref = 0.1;
-                    break;
-                }
+                // Turn (CW) until nothing is in front
+                turn = -1.0;
+                vref = 0.1;
+                break;
             }
 
             // Nothing in front, something on right
@@ -813,19 +766,6 @@ void RobotControl(void) {
                 turn = 0.005 * (-300 + min_LADAR(4, 113));
                 vref = forward_velocity * 0.7;
             }
-
-            // Found a blue weed!
-//            if (Nblue_local >= 10) {
-//                tc = 0;
-//                pval = 4;
-//                break;
-//            }
-//
-//            if (Npink_local >= 10) {
-//                tc = 0;
-//                pval = 5;
-//                break;
-//            }
 
             // Out of bounds
             if (ROBOTps.y < -1.5 || fabs(ROBOTps.x) > 5.75) {
@@ -844,8 +784,7 @@ void RobotControl(void) {
 
 
         case 4:
-            //tc++;
-            weed_timer ++;
+            weed_timer++;
             vref = 0;
             turn = -kp_vision * blue_x_obj_local;
             //            if (blue_x_obj_local < -10) turn = -0.5;
@@ -871,7 +810,6 @@ void RobotControl(void) {
 
 
                 }
-
 
             // About to hit a wall!
             if (front_180 < 170) {
@@ -928,7 +866,7 @@ void RobotControl(void) {
 
         if ( (timecount % 200) == 0 ) {
             LCDPrintfLine(1,"f60:%.1f,pv:%d", front_60, pval);
-            LCDPrintfLine(2,"mi:%.1f,mv:%d", min_LD_index, min_LD_val);
+            LCDPrintfLine(2,"mi:%d,mv:%.1f", min_LD_index, min_LD_val);
         }
 
         SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);
