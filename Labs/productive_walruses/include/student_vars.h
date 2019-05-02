@@ -38,6 +38,7 @@ float weed_y = 0.0;
 float kp_vision = 0.03;
 
 long weed_time = 0;
+long ignore_weed_time = 1000;
 
 int blue_weed_ind = 0;
 float weed_blueX[3] = {20, 20, 20};

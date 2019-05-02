@@ -620,6 +620,8 @@ void RobotControl(void) {
 
         mytheta = bound360(rad2deg(ROBOTps.theta));
 
+        ignore_weed_time++;
+
         Ro_theta = bound180(v1_theta - mytheta);
 
         min_LD_index = min_LADAR_i(4, 223);
@@ -648,6 +650,7 @@ void RobotControl(void) {
 
         // Point to point
         case 1:
+
             tc = 0;
 
             // Emergency -- about to hit a wall!
@@ -662,7 +665,8 @@ void RobotControl(void) {
             // Found a Weed!
             if (Nblue_local >= 10
                     && (-65 <= blue_y_obj_local && blue_y_obj_local <= -35)
-                    && fabsf(blue_y_obj_local) < 65) {
+                    && fabsf(blue_y_obj_local) < 65
+                    && ignore_weed_time > 1000) {
                 pval = 4;
                 break;
             }
@@ -670,7 +674,8 @@ void RobotControl(void) {
 
             if (Npink_local >= 10
                     && (-65 <= pink_y_obj_local && pink_y_obj_local <= -35)
-                    && fabsf(blue_y_obj_local) < 65) {
+                    && fabsf(blue_y_obj_local) < 65
+                    && ignore_weed_time > 1000) {
                 pval = 5;
                 break;
             }
@@ -706,7 +711,8 @@ void RobotControl(void) {
             // Found a Weed!
             if (Nblue_local >= 10
                     && (-65 <= blue_y_obj_local && blue_y_obj_local <= -35)
-                    && fabsf(blue_y_obj_local) < 65) {
+                    && fabsf(blue_y_obj_local) < 65
+                    && ignore_weed_time > 1000) {
                 pval = 4;
                 break;
             }
@@ -854,12 +860,18 @@ void RobotControl(void) {
                     blue_weed_ind++;
                     if (blue_weed_ind >= 3) blue_weed_ind = 0;
                 }
+                // Have already marked the weed
+                else {
+                    ignore_weed_time = 0;
+                    pval = 1;
+                }
             }
 
             break;
 
         case 40:
 
+            // Sitting on weed
             if (v1_mag < 0.25 && weed_time < 2000) {
                 vref = 0;
                 turn = 0;
@@ -867,13 +879,13 @@ void RobotControl(void) {
                 break;
             }
 
+            // Leaving weed sitting -> back to point-to-point
             if (weed_time >= 2000 && v1_mag < 0.25) {
                 statePos = departed_state;
                 pval = 1;
                 weed_time = 0;
                 break;
             }
-
 
             // If moving directly towards robot found target
             if ( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y,
