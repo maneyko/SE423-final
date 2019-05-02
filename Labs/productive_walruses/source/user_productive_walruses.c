@@ -674,7 +674,7 @@ void RobotControl(void) {
 
             if (Npink_local >= 10
                     && (-65 <= pink_y_obj_local && pink_y_obj_local <= -35)
-                    && fabsf(blue_y_obj_local) < 65
+                    && fabsf(pink_y_obj_local) < 65
                     && ignore_weed_time > 1000) {
                 pval = 5;
                 break;
@@ -717,9 +717,10 @@ void RobotControl(void) {
                 break;
             }
 
-
             if (Npink_local >= 10
-                    && (-65 <= pink_y_obj_local && pink_y_obj_local <= -35)) {
+                    && (-65 <= pink_y_obj_local && pink_y_obj_local <= -35)
+                    && fabsf(pink_y_obj_local) < 65
+                    && ignore_weed_time > 1000) {
                 pval = 5;
                 break;
             }
@@ -772,14 +773,16 @@ void RobotControl(void) {
             // Found a Weed!
             if (Nblue_local >= 10
                     && (-65 <= blue_y_obj_local && blue_y_obj_local <= -35)
-                    && fabsf(blue_y_obj_local) < 65) {
+                    && fabsf(blue_y_obj_local) < 65
+                    && ignore_weed_time > 1000) {
                 pval = 4;
                 break;
             }
 
-
             if (Npink_local >= 10
-                    && (-65 <= pink_y_obj_local && pink_y_obj_local <= -35)) {
+                    && (-65 <= pink_y_obj_local && pink_y_obj_local <= -35)
+                    && fabsf(pink_y_obj_local) < 65
+                    && ignore_weed_time > 1000) {
                 pval = 5;
                 break;
             }

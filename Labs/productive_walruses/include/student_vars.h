@@ -246,7 +246,6 @@ float round_to_nearest_half(float num) {
     return round(num * 2.0) / 2.0;
 }
 
-int _size = 0;
 int _j = 0;
 int in_arr1d(float arr[], float val, int size) {
     _j = 0;
@@ -258,49 +257,51 @@ int in_arr1d(float arr[], float val, int size) {
     return 0;
 }
 
-//int _j = 0;
-//float _temp_val = 0.0;
-//float _temp_val2 = 0.0;
-//
-//int insert_arr1d(float arr[], float index, float val, int size) {
-//
-//    _j = 0;
-//    _temp_val = 0.0;
-//
-//    for (_j = index; _j < size; _j++) {
-//        _temp_val = arr[_j];
-//        if (_j == index) {
-//            arr[_j] = val;
-//        }
-//        else {
-//            arr[_j] = _temp_val;
-//            _temp_val2 = arr[_j];
-//        }
-//    }
-//
-//    return 0;
-//}
-//
-//int insert_arr1d(float arr[], float index, float val, int size) {
-//
-//    _j = 0;
-//    _temp_val = 0.0;
-//
-//    for (_j = size-1; _j >= 0; _j--) {
-//        if ((j-1) < 0) continue;
-//
-//        _temp_val = arr[_j];
-//        if (_j == (size-1)) {
-//            arr[_j] = arr[j-1];
-//        }
-//        else {
-//            arr[_j] = _temp_val;
-//            _temp_val2 = arr[_j];
-//        }
-//    }
-//
-//    return 0;
-//}
+float _lifo_prev = 0.0;
+float _lifo_curr = 0.0;
+float push_LIFO(float arr[], float val, int size) {
+    /*
+     * Example:
+     * >> A = [0, 1, 2, 3, 4, 5, 6, 7];
+     * >> push_LIFO(A, 24, 8);
+     * >> A = [24, 0, 1, 2, 3, 4, 5, 6];
+     */
+    _j = 0;
+    for (_j = 0; _j < size; _j++) {
+        _lifo_curr = arr[_j];
+
+        if (_j == 0)
+            arr[_j] = val;
+
+        else if (_j >= 1)
+            arr[_j] = _lifo_prev;
+
+        _lifo_prev = _lifo_curr;
+    }
+    return _lifo_prev;
+}
+
+float insert_arr1d(float arr[], int index, float val, int size) {
+    /*
+     * Example:
+     * >> A = [0, 1, 2, 3, 4, 5, 6, 7];
+     * >> insert_arr1d(A, 3, 24, 8);
+     * >> A = [0, 1, 2, 24, 3, 4, 5, 6];
+     */
+    _j = index;
+    for (_j = index; _j < size; _j++) {
+        _lifo_curr = arr[_j];
+
+        if (_j == index)
+            arr[_j] = val;
+
+        else if (_j >= (index+1))
+            arr[_j] = _lifo_prev;
+
+        _lifo_prev = _lifo_curr;
+    }
+    return _lifo_prev;
+}
 
 
 #endif
