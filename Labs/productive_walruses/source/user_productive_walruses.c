@@ -217,8 +217,8 @@ void ComWithLinux(void) {
 
 
                 // you would do something like this
-//                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",
-//                                                   ROBOTps.x, ROBOTps.y, (float)pval, Ro_theta);
+                //                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",
+                //                                                   ROBOTps.x, ROBOTps.y, (float)pval, Ro_theta);
 
                 //                                                Sending 16 variables
                 ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f",
@@ -644,9 +644,9 @@ void RobotControl(void) {
 
 
         LeftRight = cos(ROBOTps.theta) * (robotdest[statePos].y - ROBOTps.y)
-                  - sin(ROBOTps.theta) * (robotdest[statePos].x - ROBOTps.x);
+                          - sin(ROBOTps.theta) * (robotdest[statePos].x - ROBOTps.x);
 
-       if (new_coordata == 1) {
+        if (new_coordata == 1) {
             blue_x_obj_local = blue_x_obj;
             blue_y_obj_local = blue_y_obj;
             Nblue_local = Nblue;
@@ -849,9 +849,9 @@ void RobotControl(void) {
 
             if (facing_weed) {
                 real_dist_blue = 0.0011000349405  * blue_y_obj_local * blue_y_obj_local * blue_y_obj_local
-                               + 0.1822854638960  * blue_y_obj_local * blue_y_obj_local
-                               + 10.8406447250287 * blue_y_obj_local
-                               + 258.6162738196003 + 23.0;  // in CM
+                        + 0.1822854638960  * blue_y_obj_local * blue_y_obj_local
+                        + 10.8406447250287 * blue_y_obj_local
+                        + 258.6162738196003 + 23.0;  // in CM
 
                 real_dist_blue_mm = real_dist_blue * 10.0;  // Convert to MM
 
@@ -860,7 +860,8 @@ void RobotControl(void) {
                 weed_y = round_to_nearest_half(ROBOTps.y + real_dist_blue_mm / TILE_TO_MM * sin(ROBOTps.theta));
 
                 // Haven't marked this weed
-                if ( !(in_arr1d(weed_blueX, weed_x, 3) && in_arr1d(weed_blueY, weed_y, 3)) ) {
+                if ( !(in_arr1d(weed_blueX, weed_x, 3) && (in_arr1d(weed_blueY, weed_y, 3)))
+                        && ((fabsf(weed_x)<= 5) && (fabsf(weed_y)<= 11 ) )) {
                     weed_blueX[blue_weed_ind] = weed_x;
                     weed_blueY[blue_weed_ind] = weed_y;
 
@@ -913,7 +914,7 @@ void RobotControl(void) {
 
         case 5:
 
-            // Turn towards the blue object
+            // Turn towards the pink object
             if (fabsf(pink_x_obj_local) > 10 && Npink_local >= 10) {
                 facing_weed = 0;
                 vref = 0;
@@ -925,9 +926,9 @@ void RobotControl(void) {
 
             if (facing_weed) {
                 real_dist_pink = 0.0011000349405  * pink_y_obj_local * pink_y_obj_local * pink_y_obj_local
-                               + 0.1822854638960  * pink_y_obj_local * pink_y_obj_local
-                               + 10.8406447250287 * pink_y_obj_local
-                               + 258.6162738196003 + 23.0;  // in CM
+                        + 0.1822854638960  * pink_y_obj_local * pink_y_obj_local
+                        + 10.8406447250287 * pink_y_obj_local
+                        + 258.6162738196003 + 23.0;  // in CM
 
                 real_dist_pink_mm = real_dist_pink * 10.0;  // Convert to MM
 
@@ -936,7 +937,11 @@ void RobotControl(void) {
                 weed_y = round_to_nearest_half(ROBOTps.y + real_dist_pink_mm / TILE_TO_MM * sin(ROBOTps.theta));
 
                 // Haven't marked this weed
-                if ( !(in_arr1d(weed_pinkX, weed_x, 3) && in_arr1d(weed_pinkY, weed_y, 3)) ) {
+
+                if ( !(in_arr1d(weed_pinkX, weed_x, 3) && (in_arr1d(weed_pinkY, weed_y, 3)))
+                        && ((fabsf(weed_x)<= 5) && (fabsf(weed_y)<= 11 ) )) {
+
+
 
                     weed_pinkX[pink_weed_ind] = weed_x;
                     weed_pinkY[pink_weed_ind] = weed_y;
@@ -953,6 +958,11 @@ void RobotControl(void) {
                     pink_weed_ind++;
                     if (pink_weed_ind >= 3) pink_weed_ind = 0;
 
+                }
+                // Have already marked the weed
+                else {
+                    ignore_weed_time = 0;
+                    pval = 1;
                 }
             }
 
