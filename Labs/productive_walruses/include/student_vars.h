@@ -49,11 +49,9 @@ float weed_y = 0.0;
 int found_blue = 0;
 int found_pink = 0;
 
-int blue_weed_ind = 0;
 float weed_blueX[3] = {20, 20, 20};
 float weed_blueY[3] = {20, 20, 20};
 
-int pink_weed_ind = 0;
 float weed_pinkX[3] = {20, 20, 20};
 float weed_pinkY[3] = {20, 20, 20};
 
@@ -63,6 +61,8 @@ int departed_statePos = 0;
 int facing_weed = 0;
 
 int num_sprayed = 0;
+
+float special_states[3] = {2, 3, 5};
 
 // *********************** End Color Vision ***********************
 
@@ -168,6 +168,27 @@ float min_LADAR(int lo, int hi) {
     return arr_min1d(LADARdistance, lo, hi);
 }
 
+int arr_max1d_i(float arr[], int lo, int hi) {
+    if (lo > hi) swap(&lo, &hi);
+    _index = lo;
+    for (_ii = lo; _ii <= hi; _ii++)
+        if (arr[_ii] > arr[_index])
+            _index = _ii;
+    return _index;
+}
+
+float arr_max1d(float arr[], int lo, int hi) {
+    return arr[arr_max1d_i(arr, lo, hi)];
+}
+
+
+int max_LADAR_i(int lo, int hi) {
+    return arr_max1d_i(LADARdistance, lo, hi);
+}
+
+float max_LADAR(int lo, int hi) {
+    return arr_max1d(LADARdistance, lo, hi);
+}
 
 int _mdpt = 0;
 int _offset = 0;
@@ -324,6 +345,7 @@ float insert_arr1d(float arr[], int index, float val, int size) {
 
 int _temp_var = 0;
 int calc_num_sprayed(void) {
+    _temp_var = 0;
     for (_j = 0; _j < 3; _j++) {
         if (weed_blueX[_j] < 20)
             _temp_var++;

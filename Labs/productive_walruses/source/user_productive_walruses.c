@@ -662,23 +662,21 @@ void RobotControl(void) {
 
         num_sprayed = calc_num_sprayed();
 
-        found_blue = Nblue_local >= 10
+        found_blue = (Nblue_local >= 10
                    && num_sprayed < 5
-                   && (-65 <= blue_y_obj_local && blue_y_obj_local <= -35)
-                   && fabsf(blue_y_obj_local) < 65
-                   && ignore_weed_time > 2000;
+                   && -65 <= blue_y_obj_local && blue_y_obj_local <= -35
+                   && ignore_weed_time > 2000);
 
-        found_pink = Npink_local >= 10
+        found_pink = (Npink_local >= 10
                    && num_sprayed < 5
                    && (-65 <= pink_y_obj_local && pink_y_obj_local <= -35)
-                   && fabsf(pink_y_obj_local) < 65
-                   && ignore_weed_time > 2000;
+                   && ignore_weed_time > 2000);
 
-        if (statePos == 9)  // Blue presentation spot
-            pval = 41;
-
-        if (statePos == 11)  // Blue presentation spot
-            pval = 51;
+//        if (statePos == 9)  // Blue presentation spot
+//            pval = 41;
+//
+//        if (statePos == 11)  // Blue presentation spot
+//            pval = 51;
 
         // Wall following case structure
         switch (pval) {
@@ -712,6 +710,9 @@ void RobotControl(void) {
                             robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
             { statePos = (statePos + 1) % robotdestSize; }
 
+            vref *= 1.15;
+            vref = MIN(2.0, vref);
+
             // Nothing in front or around -> keep moving to destination!
             if (min_LD_obj60 > 400) {
                 pval = 1;
@@ -719,7 +720,7 @@ void RobotControl(void) {
             }
 
             // Something around robot -> wall follow it
-            if (front_180 < 300) {
+            if (front_180 < 350) {
                 if (min_LD_index > 113)
                     pval = 2;
                 else
@@ -740,7 +741,7 @@ void RobotControl(void) {
                 pval = 4;
                 break;
             }
-
+            // Found a blue weed!
             if (found_pink) {
                 pval = 5;
                 break;
@@ -749,13 +750,23 @@ void RobotControl(void) {
             // Get robot perpendicular to wall
             if ( !(185 < min_side_ind && min_side_ind < 215)
                     && min_LADAR(224, 114) < 700) {
-                turn = 0.045 * (200 - min_side_ind);
+                turn = 0.05 * (200 - min_side_ind);
                 vref = 0.2;
                 break;
             }
 
-            // Emergency case -- about to hit a wall!
-            if (min_LADAR(114, 200) < 250) {
+            // Emergency Case -- about to leave the course
+            //check if left wall following on right side of gate
+            if ((2 < ROBOTps.x && ROBOTps.x < 4)
+                    && (-1 < ROBOTps.y && ROBOTps.y < 0)
+                    && in_arr1d(special_states, (float)statePos, 3)) {
+                turn = 1.0;
+                pval = 3;
+                break;
+            }
+
+            // Something in front
+            if (front_60 < 320) {
                 // Turn (CW) until nothing is in front
                 turn = 1.0;
                 vref = 0.1;
@@ -763,9 +774,8 @@ void RobotControl(void) {
             }
 
             // Nothing in front, something on left -> wall follow
-            if (front_60 > 400
-                    && min_LADAR(224, 114) < 400) {
-                turn = 0.005 * (300 - min_LADAR(224, 114));
+            if (front_60 > 400) {
+                turn = 0.005 * (300 - min_side_val);
                 vref = forward_velocity * 0.7;
             }
 
@@ -807,14 +817,24 @@ void RobotControl(void) {
 
             if ( !(13 < min_side_ind && min_side_ind < 43)
                     && min_LADAR(4, 113) < 700 ) {
-                turn = 0.045 * (28 - min_side_ind);
+                turn = 0.05 * (28 - min_side_ind);
                 vref = 0.2;
                 break;
             }
 
-            // Emergency case
-            if (min_LADAR(28, 113) < 250) {
 
+            // Emergency Case -- about to leave the course
+            //check if left wall following on right side of gate
+            if ((-4 < ROBOTps.x && ROBOTps.x < -2)
+                    && (-1 < ROBOTps.y && ROBOTps.y < 0)
+                    && in_arr1d(special_states, (float)statePos, 3)) {
+                turn = -1.0;
+                pval = 2;
+                break;
+            }
+
+            // Emergency case
+            if (front_60 < 320) {
                 // Turn (CW) until nothing is in front
                 turn = -1.0;
                 vref = 0.1;
@@ -823,7 +843,7 @@ void RobotControl(void) {
 
             // Nothing in front, something on right
             if (front_60 > 400) {
-                turn = 0.005 * (-300 + min_LADAR(4, 113));
+                turn = 0.005 * (-300 + min_side_val);
                 vref = forward_velocity * 0.7;
             }
 
@@ -852,7 +872,7 @@ void RobotControl(void) {
             if (fabsf(blue_x_obj_local) > 10) {
                 facing_weed = 0;
                 vref = 0;
-                turn = -0.03 * blue_x_obj_local;
+                turn = -0.015 * blue_x_obj_local;
                 break;
             }
 
@@ -877,13 +897,12 @@ void RobotControl(void) {
 
                     push_LIFO(weed_blueX, weed_x, 3);
                     push_LIFO(weed_blueY, weed_y, 3);
-                    for (i = 0; i < 3; i++) {
-                        robotdest[14 + i].x = weed_blueX[i];
-                        robotdest[14 + i].y = weed_blueY[i];
-                    }
+
+                    robotdest[19].x = weed_blueX[i];
+                    robotdest[19].y = weed_blueY[i];
 
                     departed_statePos = statePos;
-                    statePos = 14;  // Just pushed newest value to queue
+                    statePos = 19;  // Just pushed newest value to queue
 
                     weed_time = 0;
                     pval = 40;  // sub-state
@@ -933,7 +952,7 @@ void RobotControl(void) {
             if (fabsf(pink_x_obj_local) > 10) {
                 facing_weed = 0;
                 vref = 0;
-                turn = -0.03 * pink_x_obj_local;
+                turn = -0.015 * pink_x_obj_local;
                 break;
             }
 
@@ -958,13 +977,12 @@ void RobotControl(void) {
 
                     push_LIFO(weed_pinkX, weed_x, 3);
                     push_LIFO(weed_pinkY, weed_y, 3);
-                    for (i = 0; i < 3; i++) {
-                        robotdest[17 + i].x = weed_pinkX[i];
-                        robotdest[17 + i].y = weed_pinkY[i];
-                    }
+
+                    robotdest[19].x = weed_pinkX[i];
+                    robotdest[19].y = weed_pinkY[i];
 
                     departed_statePos = statePos;
-                    statePos = 17;  // Just pushed newest value to queue
+                    statePos = 19;  // Just pushed newest value to queue
 
                     weed_time = 0;
                     pval = 40;  // sub-state
@@ -978,14 +996,21 @@ void RobotControl(void) {
 
             break;
 
+        case 41:
+
+            break;
+
+        case 51:
+
+            break;
 
         }
 
         turn = MIN(turn, 4.0);
         turn = MAX(turn, -4.0);
 
-        vref = MIN(vref, 2.0);
         vref = MAX(vref, 0);
+        vref = MIN(vref, 2.0);
 
         //==================================================== end wall following/point to point====================
 
@@ -993,8 +1018,10 @@ void RobotControl(void) {
             // 20 char limit
 //            LCDPrintfLine(1, "-------20 chars-----");
 
-            LCDPrintfLine(1,"sp:%d,by:%.1f,py:%.1f", statePos, blue_y_obj_local, pink_y_obj_local);
-            LCDPrintfLine(2,"wx:%.1f,wy:%.1f", weed_x, weed_y);
+            // TODO
+
+            LCDPrintfLine(1,"p:%d,sp:%d,mL:%.1f", pval, statePos, max_LADAR(150, 164));
+            LCDPrintfLine(2,"mi:%d,mv:%.1f", min_LD_index, min_LD_val);
         }
 
         SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);
