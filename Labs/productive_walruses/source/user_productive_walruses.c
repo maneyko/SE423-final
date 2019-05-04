@@ -392,7 +392,6 @@ Int main()
     { LADARdistance[i] = LADAR_MAX_READING; } //initialize all readings to max value.
 
     // ROBOTps will be updated by Optitrack during gyro calibration
-    // TODO: specify the starting position of the robot
     ROBOTps.x = 0;          //the estimate in array form (useful for matrix operations)
     ROBOTps.y = 0;
     ROBOTps.theta = 0;  // was -PI: need to flip OT ground plane to fix this
@@ -400,32 +399,32 @@ Int main()
     x_pred[1][0] = ROBOTps.y;
     x_pred[2][0] = ROBOTps.theta;
 
-    // Defined destinations that moves the robot around and outside the course
-    //    robotdest[0].x = -2;  robotdest[0].y = 6;
-    //    robotdest[1].x = -4;  robotdest[1].y = 2;
-    //    //middle of bottom
-    //    robotdest[2].x = 0;       robotdest[2].y = 2;
-    //    //outside the course
-    //    robotdest[3].x = 0;       robotdest[3].y = -3;
-    //    //back to middle
-    //    robotdest[4].x = 0;       robotdest[4].y = 2;
-    //    robotdest[5].x = 4;       robotdest[5].y = 2;
-    //    robotdest[6].x = 4;       robotdest[6].y = 10;
-    //    robotdest[7].x = 0;       robotdest[7].y = 9;
+    // ================================= BEGIN robot waypoints =====================================
 
+    // Points for competition
+    robotdest[0].x =  0;     robotdest[0].y = -1;      // Start
+    robotdest[1].x = -5;     robotdest[1].y = -3;      // Point 1
+    robotdest[2].x =  3;     robotdest[2].y =  7;      // Point 2
+    robotdest[3].x = -3;     robotdest[3].y =  7;      // Point 3
+    robotdest[4].x =  0;     robotdest[4].y = -1;      // Go to (0, -1)
+    robotdest[5].x =  5;     robotdest[5].y = -3;      // Point 4
+    robotdest[6].x =  0;     robotdest[6].y = 11;      // Point 5
+    robotdest[7].x =  0;     robotdest[7].y = -1;      // Start
 
-    // Points for comp
-    robotdest[0].x =  0;     robotdest[0].y = -1;  // Start
-    robotdest[1].x = -5;     robotdest[1].y = -3;  // Point 1
-    robotdest[2].x =  3;     robotdest[2].y =  7;  // Point 2
-    robotdest[3].x = -3;     robotdest[3].y =  7;  // Point 3
-    robotdest[4].x =  0;     robotdest[4].y = -1;  // Go to (0, -1)
-    robotdest[5].x =  5;     robotdest[5].y = -3;  // Point 4
-    robotdest[6].x =  0;     robotdest[6].y = 11;  // Point 5
-    robotdest[7].x =  0;     robotdest[7].y = -1;  // Start
+    // Presentation of results
+    robotdest[8].x  =  0;     robotdest[8].y  = -2.5;  // MC spot
+    robotdest[9].x  = -2;     robotdest[9].y  = -4;    // Blue circle
+    robotdest[10].x =  0;     robotdest[10].y = -2.5;  // MC spot
+    robotdest[11].x =  2;     robotdest[11].y = -4;    // Pink circle
+    robotdest[12].x =  0;     robotdest[12].y = -2.5;
 
     // !!! indices [14, 16] reserved for blue !!!
     // !!! indices [17, 19] reserved for pink !!!
+
+
+    // ================================= END robot waypoints =====================================
+
+
 
     // flag pins
     GPIO_setDir(IMAGE_TO_LINUX_BANK, IMAGE_TO_LINUX_FLAG, GPIO_OUTPUT);
@@ -642,9 +641,8 @@ void RobotControl(void) {
 
         min_LD_obj60 = min_LD_obj(Ro_theta, 60);  // From [-90, 90] of robot x-axis, will return you values
 
-
-        LeftRight = cos(ROBOTps.theta) * (robotdest[statePos].y - ROBOTps.y)
-                          - sin(ROBOTps.theta) * (robotdest[statePos].x - ROBOTps.x);
+        LeftRight = cos(ROBOTps.theta) * v1_y
+                  - sin(ROBOTps.theta) * v1_x;
 
         if (new_coordata == 1) {
             blue_x_obj_local = blue_x_obj;
@@ -675,7 +673,7 @@ void RobotControl(void) {
                 break;
             }
 
-            // Found a Weed!
+            // Found a blue weed!
             if (Nblue_local >= 10
                     && (-65 <= blue_y_obj_local && blue_y_obj_local <= -35)
                     && fabsf(blue_y_obj_local) < 65
@@ -721,7 +719,7 @@ void RobotControl(void) {
             min_side_ind = min_LADAR_i(224, 114);
             min_side_val = LADARdistance[min_side_ind];
 
-            // Found a Weed!
+            // Found a blue weed!
             if (Nblue_local >= 10
                     && (-65 <= blue_y_obj_local && blue_y_obj_local <= -35)
                     && fabsf(blue_y_obj_local) < 65
@@ -739,9 +737,10 @@ void RobotControl(void) {
             }
 
             // Get robot perpendicular to wall
-            if ( !(185 < min_side_ind && min_side_ind < 215) && min_LADAR(224, 114) < 700) {
-                turn = 0.03 * (200 - min_side_ind);
-                vref = 0.0;
+            if ( !(185 < min_side_ind && min_side_ind < 215)
+                    && min_LADAR(224, 114) < 700) {
+                turn = 0.045 * (200 - min_side_ind);
+                vref = 0.2;
                 break;
             }
 
@@ -754,7 +753,8 @@ void RobotControl(void) {
             }
 
             // Nothing in front, something on left -> wall follow
-            if (front_60 > 400 && min_LADAR(224, 114) < 400) {
+            if (front_60 > 400
+                    && min_LADAR(224, 114) < 400) {
                 turn = 0.005 * (300 - min_LADAR(224, 114));
                 vref = forward_velocity * 0.7;
             }
@@ -766,7 +766,8 @@ void RobotControl(void) {
             }
 
             // Object in front 60 and nothing stopping us from going there
-            if ( (fabsf(Ro_theta) < 30) && min_LD_obj60 > 400 )
+            if (fabsf(Ro_theta) < 30
+                    && min_LD_obj60 > 400 )
                 pval = 1;
 
             // Next to objective, go to it
@@ -800,8 +801,9 @@ void RobotControl(void) {
                 break;
             }
 
-            if ( !(13 < min_side_ind && min_side_ind < 43) && min_LADAR(4, 113) < 700 ) {
-                turn = 0.03 * (28 - min_side_ind);
+            if ( !(13 < min_side_ind && min_side_ind < 43)
+                    && min_LADAR(4, 113) < 700 ) {
+                turn = 0.045 * (28 - min_side_ind);
                 vref = 0.2;
                 break;
             }
@@ -828,7 +830,8 @@ void RobotControl(void) {
             }
 
             // Nothing stopping us from going there
-            if (fabsf(Ro_theta) < 30 && min_LD_obj60 > 400 )
+            if (fabsf(Ro_theta) < 30
+                    && min_LD_obj60 > 400)
                 pval = 1;
 
             if (v1_mag < 0.5)
@@ -837,8 +840,12 @@ void RobotControl(void) {
             break;
 
         case 4:
+            if (Nblue_local < 10) {
+                pval = 1;
+                break;
+            }
             // Turn towards the blue object
-            if (fabsf(blue_x_obj_local) > 10 && Nblue_local >= 10) {
+            if (fabsf(blue_x_obj_local) > 10) {
                 facing_weed = 0;
                 vref = 0;
                 turn = -0.03 * blue_x_obj_local;
@@ -849,9 +856,9 @@ void RobotControl(void) {
 
             if (facing_weed) {
                 real_dist_blue = 0.0011000349405  * blue_y_obj_local * blue_y_obj_local * blue_y_obj_local
-                        + 0.1822854638960  * blue_y_obj_local * blue_y_obj_local
-                        + 10.8406447250287 * blue_y_obj_local
-                        + 258.6162738196003 + 23.0;  // in CM
+                               + 0.1822854638960  * blue_y_obj_local * blue_y_obj_local
+                               + 10.8406447250287 * blue_y_obj_local
+                               + 258.6162738196003 + 23.0;  // in CM
 
                 real_dist_blue_mm = real_dist_blue * 10.0;  // Convert to MM
 
@@ -860,28 +867,28 @@ void RobotControl(void) {
                 weed_y = round_to_nearest_half(ROBOTps.y + real_dist_blue_mm / TILE_TO_MM * sin(ROBOTps.theta));
 
                 // Haven't marked this weed
-                if ( !(in_arr1d(weed_blueX, weed_x, 3) && (in_arr1d(weed_blueY, weed_y, 3)))
-                        && ((fabsf(weed_x)<= 5) && (fabsf(weed_y)<= 11 ) )) {
-                    weed_blueX[blue_weed_ind] = weed_x;
-                    weed_blueY[blue_weed_ind] = weed_y;
+                if ( !(in_close_arr1d(weed_blueX, weed_x, 0.5, 3) && in_close_arr1d(weed_blueY, weed_y, 0.5, 3))
+                       && (fabsf(weed_x) <= 5 && weed_y <= 11) ) {
 
-                    robotdest[14+blue_weed_ind].x = weed_x;
-                    robotdest[14+blue_weed_ind].y = weed_y;
+                    push_LIFO(weed_blueX, weed_x, 3);
+                    push_LIFO(weed_blueY, weed_y, 3);
+                    for (i = 0; i < 3; i++) {
+                        robotdest[14 + i].x = weed_blueX[i];
+                        robotdest[14 + i].y = weed_blueY[i];
+                    }
 
-                    departed_state = statePos;
-                    statePos = 14 + blue_weed_ind;
+                    departed_statePos = statePos;
+                    statePos = 14;  // Just pushed newest value to queue
 
                     weed_time = 0;
                     pval = 40;  // sub-state
-
-                    blue_weed_ind++;
-                    if (blue_weed_ind >= 3) blue_weed_ind = 0;
                 }
                 // Have already marked the weed
                 else {
                     ignore_weed_time = 0;
                     pval = 1;
                 }
+
             }
 
             break;
@@ -898,7 +905,7 @@ void RobotControl(void) {
 
             // Leaving weed sitting -> back to point-to-point
             if (weed_time >= 2000 && v1_mag < 0.25) {
-                statePos = departed_state;
+                statePos = departed_statePos;
                 pval = 1;
                 weed_time = 0;
                 break;
@@ -913,9 +920,13 @@ void RobotControl(void) {
             break;
 
         case 5:
+            if (Npink_local < 10) {
+                pval = 1;
+                break;
+            }
 
             // Turn towards the pink object
-            if (fabsf(pink_x_obj_local) > 10 && Npink_local >= 10) {
+            if (fabsf(pink_x_obj_local) > 10) {
                 facing_weed = 0;
                 vref = 0;
                 turn = -0.03 * pink_x_obj_local;
@@ -926,9 +937,9 @@ void RobotControl(void) {
 
             if (facing_weed) {
                 real_dist_pink = 0.0011000349405  * pink_y_obj_local * pink_y_obj_local * pink_y_obj_local
-                        + 0.1822854638960  * pink_y_obj_local * pink_y_obj_local
-                        + 10.8406447250287 * pink_y_obj_local
-                        + 258.6162738196003 + 23.0;  // in CM
+                               + 0.1822854638960  * pink_y_obj_local * pink_y_obj_local
+                               + 10.8406447250287 * pink_y_obj_local
+                               + 258.6162738196003 + 23.0;  // in CM
 
                 real_dist_pink_mm = real_dist_pink * 10.0;  // Convert to MM
 
@@ -937,27 +948,22 @@ void RobotControl(void) {
                 weed_y = round_to_nearest_half(ROBOTps.y + real_dist_pink_mm / TILE_TO_MM * sin(ROBOTps.theta));
 
                 // Haven't marked this weed
+                if ( !(in_close_arr1d(weed_pinkX, weed_x, 0.5, 3)
+                        && in_close_arr1d(weed_pinkY, weed_y, 0.5, 3))
+                       && (fabsf(weed_x) <= 5.75 && weed_y <= 11.75) ) {
 
-                if ( !(in_arr1d(weed_pinkX, weed_x, 3) && (in_arr1d(weed_pinkY, weed_y, 3)))
-                        && ((fabsf(weed_x)<= 5) && (fabsf(weed_y)<= 11 ) )) {
+                    push_LIFO(weed_pinkX, weed_x, 3);
+                    push_LIFO(weed_pinkY, weed_y, 3);
+                    for (i = 0; i < 3; i++) {
+                        robotdest[17 + i].x = weed_pinkX[i];
+                        robotdest[17 + i].y = weed_pinkY[i];
+                    }
 
-
-
-                    weed_pinkX[pink_weed_ind] = weed_x;
-                    weed_pinkY[pink_weed_ind] = weed_y;
-
-                    robotdest[17+pink_weed_ind].x = weed_x;
-                    robotdest[17+pink_weed_ind].y = weed_y;
-
-                    departed_state = statePos;
-                    statePos = 17 + pink_weed_ind;
+                    departed_statePos = statePos;
+                    statePos = 17;  // Just pushed newest value to queue
 
                     weed_time = 0;
                     pval = 40;  // sub-state
-
-                    pink_weed_ind++;
-                    if (pink_weed_ind >= 3) pink_weed_ind = 0;
-
                 }
                 // Have already marked the weed
                 else {
@@ -980,6 +986,9 @@ void RobotControl(void) {
         //==================================================== end wall following/point to point====================
 
         if ( (timecount % 200) == 0 ) {
+            // 20 char limit
+//            LCDPrintfLine(1, "-------20 chars-----");
+
             LCDPrintfLine(1,"sp:%d,by:%.1f,py:%.1f", statePos, blue_y_obj_local, pink_y_obj_local);
             LCDPrintfLine(2,"wx:%.1f,wy:%.1f", weed_x, weed_y);
         }

@@ -50,7 +50,7 @@ float weed_pinkY[3] = {20, 20, 20};
 
 extern int prnt_flag;
 
-int departed_state = 0;
+int departed_statePos = 0;
 int facing_weed = 0;
 
 // *********************** End Color Vision ***********************
@@ -94,12 +94,8 @@ float v1_theta360 = 0.0;
 float v1_mag = 0.0;
 
 float Ro_theta = 0.0;
-float Ro_theta2 = 0.0;
 
 float mytheta = 0.0;
-
-float Lx = 0.0;
-float Ly = 0.0;
 
 float hit_x = 0.0;
 float hit_y = 0.0;
@@ -247,15 +243,29 @@ float round_to_nearest_half(float num) {
 }
 
 int _j = 0;
-int in_arr1d(float arr[], float val, int size) {
-    _j = 0;
-    for (_j = 0; _j < size; _j++) {
-        if (arr[_j] == val)
+int in_close_arr1d(float arr[], float val, float bound, int size) {
+    /*
+     * Example:
+     * >> A = [0.1, 1.7, 2.3, 3.1, 4.5, 5.4, 7.4, 9.0];
+     * >> in_close_arr1d(A, 1.85, 0.2, 8)
+     * >> 1
+     * >> in_close_arr1d(A, 2.0, 0.2, 8)
+     * >> 0
+     */
+    for (_j = 0; _j < size; _j++)
+        if (fabsf(arr[_j] - val) <= bound)
             return 1;
-    }
-
     return 0;
 }
+
+int in_arr1d(float arr[], float val, int size) {
+    _j = 0;
+    for (_j = 0; _j < size; _j++)
+        if (arr[_j] == val)
+            return 1;
+    return 0;
+}
+
 
 float _lifo_prev = 0.0;
 float _lifo_curr = 0.0;
@@ -263,8 +273,10 @@ float push_LIFO(float arr[], float val, int size) {
     /*
      * Example:
      * >> A = [0, 1, 2, 3, 4, 5, 6, 7];
-     * >> push_LIFO(A, 24, 8);
-     * >> A = [24, 0, 1, 2, 3, 4, 5, 6];
+     * >> push_LIFO(A, 24, 8)
+     * 7
+     * >> A
+     * [24, 0, 1, 2, 3, 4, 5, 6]
      */
     _j = 0;
     for (_j = 0; _j < size; _j++) {
@@ -285,8 +297,10 @@ float insert_arr1d(float arr[], int index, float val, int size) {
     /*
      * Example:
      * >> A = [0, 1, 2, 3, 4, 5, 6, 7];
-     * >> insert_arr1d(A, 3, 24, 8);
-     * >> A = [0, 1, 2, 24, 3, 4, 5, 6];
+     * >> insert_arr1d(A, 3, 24, 8)
+     * 7
+     * >> A
+     * [0, 1, 2, 24, 3, 4, 5, 6]
      */
     _j = index;
     for (_j = index; _j < size; _j++) {
