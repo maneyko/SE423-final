@@ -6,6 +6,17 @@
  *
  */
 
+
+#define TILE_TO_MM 304.0
+
+// Timecheckers
+long tc = 0;  // Personal timechecking variable.
+long weed_time = 0;
+long ignore_weed_time = 2000;
+
+
+float forward_velocity = 1.5;
+
 // ****************** Color Vision Variables ************************
 
 extern float blue_x_obj;
@@ -35,10 +46,8 @@ float real_dist_pink_mm = 0.0;
 float weed_x = 0.0;
 float weed_y = 0.0;
 
-float kp_vision = 0.03;
-
-long weed_time = 0;
-long ignore_weed_time = 1000;
+int found_blue = 0;
+int found_pink = 0;
 
 int blue_weed_ind = 0;
 float weed_blueX[3] = {20, 20, 20};
@@ -53,9 +62,13 @@ extern int prnt_flag;
 int departed_statePos = 0;
 int facing_weed = 0;
 
+int num_sprayed = 0;
+
 // *********************** End Color Vision ***********************
 
-#define TILE_TO_MM 304.0
+
+float left_turn_Start_threshold = 300;
+float ref_right_wall = 250;
 
 float front_180 = 10000.0;
 float front_120 = 10000.0;
@@ -75,17 +88,8 @@ float right_side = 10000.0;
 float right_rear = 10000.0;
 float right_forward = 10000.0;
 
-float ref_right_wall = 250;
-float left_turn_Start_threshold = 275;
-float left_turn_Stop_threshold = 250;
-float Kp_right_wall = -0.005;
-float Kp_front_wall = -0.003;
-float turn_command_saturation = 4.0;
-float forward_velocity = 1.5;
-
 int pval = 1;  // Initial state
 int ppval = 1;
-long tc = 0;  // Personal timechecking variable.
 
 float v1_x = 0.0;
 float v1_y = 0.0;
@@ -315,6 +319,18 @@ float insert_arr1d(float arr[], int index, float val, int size) {
         _lifo_prev = _lifo_curr;
     }
     return _lifo_prev;
+}
+
+
+int _temp_var = 0;
+int calc_num_sprayed(void) {
+    for (_j = 0; _j < 3; _j++) {
+        if (weed_blueX[_j] < 20)
+            _temp_var++;
+        if (weed_pinkX[_j] < 20)
+            _temp_var++;
+    }
+    return _temp_var;
 }
 
 

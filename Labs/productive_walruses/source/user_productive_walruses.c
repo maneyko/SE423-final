@@ -221,7 +221,8 @@ void ComWithLinux(void) {
                 //                                                   ROBOTps.x, ROBOTps.y, (float)pval, Ro_theta);
 
                 //                                                Sending 16 variables
-                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f",
+                ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,
+                    "%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f",
                                                    ROBOTps.x, ROBOTps.y, (float)pval, Ro_theta,
                                                    weed_blueX[0], weed_blueY[0],
                                                    weed_blueX[1], weed_blueY[1],
@@ -400,6 +401,8 @@ Int main()
     x_pred[2][0] = ROBOTps.theta;
 
     // ================================= BEGIN robot waypoints =====================================
+
+    // TODO
 
     // Points for competition
     robotdest[0].x =  0;     robotdest[0].y = -1;      // Start
@@ -605,6 +608,7 @@ void RobotControl(void) {
 
         // ================================================= BEGIN Student Code ====================================================================
 
+        // TODO
         // Centered about 0deg -> 114
 
         front_180 = min_LADAR(28, 200);
@@ -656,6 +660,26 @@ void RobotControl(void) {
             new_coordata = 0;
         }
 
+        num_sprayed = calc_num_sprayed();
+
+        found_blue = Nblue_local >= 10
+                   && num_sprayed < 5
+                   && (-65 <= blue_y_obj_local && blue_y_obj_local <= -35)
+                   && fabsf(blue_y_obj_local) < 65
+                   && ignore_weed_time > 2000;
+
+        found_pink = Npink_local >= 10
+                   && num_sprayed < 5
+                   && (-65 <= pink_y_obj_local && pink_y_obj_local <= -35)
+                   && fabsf(pink_y_obj_local) < 65
+                   && ignore_weed_time > 2000;
+
+        if (statePos == 9)  // Blue presentation spot
+            pval = 41;
+
+        if (statePos == 11)  // Blue presentation spot
+            pval = 51;
+
         // Wall following case structure
         switch (pval) {
 
@@ -673,20 +697,12 @@ void RobotControl(void) {
                 break;
             }
 
-            // Found a blue weed!
-            if (Nblue_local >= 10
-                    && (-65 <= blue_y_obj_local && blue_y_obj_local <= -35)
-                    && fabsf(blue_y_obj_local) < 65
-                    && ignore_weed_time > 1000) {
+            if (found_blue) {
                 pval = 4;
                 break;
             }
 
-
-            if (Npink_local >= 10
-                    && (-65 <= pink_y_obj_local && pink_y_obj_local <= -35)
-                    && fabsf(pink_y_obj_local) < 65
-                    && ignore_weed_time > 1000) {
+            if (found_pink) {
                 pval = 5;
                 break;
             }
@@ -720,18 +736,12 @@ void RobotControl(void) {
             min_side_val = LADARdistance[min_side_ind];
 
             // Found a blue weed!
-            if (Nblue_local >= 10
-                    && (-65 <= blue_y_obj_local && blue_y_obj_local <= -35)
-                    && fabsf(blue_y_obj_local) < 65
-                    && ignore_weed_time > 1000) {
+            if (found_blue) {
                 pval = 4;
                 break;
             }
 
-            if (Npink_local >= 10
-                    && (-65 <= pink_y_obj_local && pink_y_obj_local <= -35)
-                    && fabsf(pink_y_obj_local) < 65
-                    && ignore_weed_time > 1000) {
+            if (found_pink) {
                 pval = 5;
                 break;
             }
@@ -785,18 +795,12 @@ void RobotControl(void) {
             min_side_val = LADARdistance[min_side_ind];
 
             // Found a Weed!
-            if (Nblue_local >= 10
-                    && (-65 <= blue_y_obj_local && blue_y_obj_local <= -35)
-                    && fabsf(blue_y_obj_local) < 65
-                    && ignore_weed_time > 1000) {
+            if (found_blue) {
                 pval = 4;
                 break;
             }
 
-            if (Npink_local >= 10
-                    && (-65 <= pink_y_obj_local && pink_y_obj_local <= -35)
-                    && fabsf(pink_y_obj_local) < 65
-                    && ignore_weed_time > 1000) {
+            if (found_pink) {
                 pval = 5;
                 break;
             }
@@ -867,8 +871,9 @@ void RobotControl(void) {
                 weed_y = round_to_nearest_half(ROBOTps.y + real_dist_blue_mm / TILE_TO_MM * sin(ROBOTps.theta));
 
                 // Haven't marked this weed
-                if ( !(in_close_arr1d(weed_blueX, weed_x, 0.5, 3) && in_close_arr1d(weed_blueY, weed_y, 0.5, 3))
-                       && (fabsf(weed_x) <= 5 && weed_y <= 11) ) {
+                if ( !(in_close_arr1d(weed_blueX, weed_x, 0.5, 3)
+                        && in_close_arr1d(weed_blueY, weed_y, 0.5, 3))
+                       && (fabsf(weed_x) <= 5.75 && weed_y <= 11.75) ) {
 
                     push_LIFO(weed_blueX, weed_x, 3);
                     push_LIFO(weed_blueY, weed_y, 3);
@@ -915,7 +920,6 @@ void RobotControl(void) {
             if ( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y,
                             robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
             { break; }
-
 
             break;
 
