@@ -11,6 +11,7 @@
 
 // Timecheckers
 long tc = 0;  // Personal timechecking variable.
+long tc19 = 0;
 long weed_time = 0;
 long ignore_weed_time = 2000;
 

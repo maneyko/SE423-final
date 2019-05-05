@@ -691,8 +691,30 @@ void RobotControl(void) {
                    && pval != 43  // Driving towards spot
                    && ignore_weed_time > 2000);
 
+
+        // Emergency Case -- about to leave the course
+        if ((2 < ROBOTps.x && ROBOTps.x < 4)
+                && (-1 < ROBOTps.y && ROBOTps.y < 0)
+                && in_arr1d(special_states, (float)statePos, 3)
+                && pval == 2) {
+            turn = 1.0;
+            pval = 3;
+        }
+
+
+        // Emergency Case -- about to leave the course
+        if ((-4 < ROBOTps.x && ROBOTps.x < -2)
+                && (-1 < ROBOTps.y && ROBOTps.y < 0)
+                && in_arr1d(special_states, (float)statePos, 3)
+                && pval == 3) {
+            turn = -1.0;
+            pval = 2;
+        }
+
         // Out of bounds
-        if (ROBOTps.y < -1 || ROBOTps.x > 6)
+        if (ROBOTps.y < -1 || ROBOTps.x > 6
+                && statePos != 9
+                && statePos != 11)
             pval = 1;
 
         if (found_blue) {
@@ -715,14 +737,15 @@ void RobotControl(void) {
             pval = 40;
         }
 
-        if (v1_mag < 0.25 && statePos == 19)
-            pval = 43;
 
-        if (v1_mag < 0.5 && statePos == 9)
-            pval = 51;
-
-        if (v1_mag < 0.5 && statePos == 11)
-            pval = 52;
+//        if (v1_mag < 0.25 && statePos == 19)
+//            pval = 43;
+//
+//        if (v1_mag < 0.5 && statePos == 9)
+//            pval = 51;
+//
+//        if (v1_mag < 0.5 && statePos == 11)
+//            pval = 52;
 
         /*
          * States and descriptions:
@@ -786,8 +809,6 @@ void RobotControl(void) {
 
         // Left wall following
         case 2:
-
-
             // ============================= BEGIN left wall-follow logic ==================================
 
             min_side_ind = min_LADAR_i(224, 114);
@@ -803,7 +824,7 @@ void RobotControl(void) {
             }
 
             // Get robot perpendicular to wall
-            if (fabs(min_side_ind - 200) > 15) {
+            if (fabs(min_side_ind - 200) > 10) {
                 turn = 0.05 * (200 - min_side_ind);
                 vref = 0.2;
                 break;
@@ -820,6 +841,9 @@ void RobotControl(void) {
             if (v1_mag < 1)
                 pval = 1;
 
+            if (min_LD_index < 114)
+                pval = 3;
+
             // Nothing stopping us from going to waypoint
             if (fabsf(Ro_theta) < 30
                     && min_LD_obj60 > 400)
@@ -830,7 +854,6 @@ void RobotControl(void) {
 
         // Right wall following state
         case 3:
-
             // ============================= BEGIN right wall-follow logic ==================================
 
             min_side_ind = min_LADAR_i(4, 113);
@@ -846,7 +869,7 @@ void RobotControl(void) {
             }
 
             // Get robot perpendicular to wall
-            if (fabs(min_side_ind - 28) > 15) {
+            if (fabs(min_side_ind - 28) > 10) {
                 turn = 0.05 * (28 - min_side_ind);
                 vref = 0.2;
                 break;
@@ -862,6 +885,9 @@ void RobotControl(void) {
 
             if (v1_mag < 1)
                 pval = 1;
+
+            if (min_LD_index > 113)
+                pval = 2;
 
             // Nothing stopping us from going to waypoint
             if (fabsf(Ro_theta) < 30
@@ -898,21 +924,20 @@ void RobotControl(void) {
                 // Haven't marked this weed
                 if ( !(in_close_arr1d(weedX, weed_x, 0.5, 3)
                         && in_close_arr1d(weedY, weed_y, 0.5, 3))
-                       && (fabsf(weed_x) <= 6)
-                       && (0 < weed_y && weed_y <= 12) ) {
+                       && (fabsf(weed_x) <= 5)
+                       && (0 <= weed_y && weed_y <= 11) ) {
 
                     push_LIFO(weedX, weed_x, 3);
                     push_LIFO(weedY, weed_y, 3);
 
-                    robotdest[19].x = weedX[i];
-                    robotdest[19].y = weedY[i];
+                    robotdest[19].x = weedX[0];
+                    robotdest[19].y = weedY[0];
 
                     departed_statePos = statePos;
                     statePos = 19;
 
                     weed_time = 0;
-                    pval = 43;  // sub-state
-//                    pval = 1;  // Back to point-to-point
+                    pval = 1;  // Back to point-to-point
                 }
                 // Have already marked the weed
                 else {
@@ -920,28 +945,30 @@ void RobotControl(void) {
                     pval = 1;
                 }
 
-            }  // if(facing_weed)
+            }  //  if (facing_weed)
 
             break;
 
         // Move to the weed and sit on it for 2s
         case 43:
             if (v1_mag >= 0.25) {
+                weed_time = 0;
                 pval = 1;
                 break;
             }
             else {
                 // Sit on weed for 2s
-                if (tc < 2000) {
+                if (weed_time < 2000) {
                     vref = 0;
                     turn = 0;
-                    tc++;
+                    weed_time++;
                 }
                 // Done sitting
                 else {
                     analyzing_blue = 0;
                     analyzing_pink = 0;
                     statePos = departed_statePos;
+                    weed_time = 0;
                     pval = 1;
                 }
             }
@@ -949,16 +976,13 @@ void RobotControl(void) {
             break;
 
         case 51:  // Blue presentation
-            ppval = 2;
 
             if (fabsf(mytheta-90) > 10) {
-                ppval = 3;
                 tc++;
                 turn = 1.0;
                 vref = 0;
             }
             else {
-                ppval = 4;
                 statePos = 10;
                 pval = 1;
             }
@@ -967,14 +991,11 @@ void RobotControl(void) {
 
         case 52:  // Pink presentation
 
-            if (fabsf(mytheta-90) > 10) {  // Still on the waypoint
-                tc++;
-                ppval = 3;
+            if (fabsf(mytheta-90) > 10) {
                 turn = -1.0;
                 vref = 0;
             }
             else {
-                ppval = 4;
                 statePos = 12;
                 pval = 1;
             }
@@ -997,7 +1018,7 @@ void RobotControl(void) {
 
             // TODO
 
-            LCDPrintfLine(1,"p:%d,f60:%.1f,s45:%.1f", pval, front_60, side_45);
+            LCDPrintfLine(1,"p:%d,wt:%d", pval, weed_time);
             LCDPrintfLine(2,"sP:%d,x:%.1f,y:%.1f", statePos, robotdest[statePos].x, robotdest[statePos].y);
         }
 
