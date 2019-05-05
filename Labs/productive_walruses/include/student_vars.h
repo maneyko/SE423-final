@@ -97,6 +97,8 @@ float right_side = 10000.0;
 float right_rear = 10000.0;
 float right_forward = 10000.0;
 
+float side_45 = 0.0;
+
 int pval = 1;  // Initial state
 int ppval = 1;
 
@@ -350,7 +352,6 @@ int calc_num_pink(void) {
             _temp_var++;
     return _temp_var;
 }
-
 
 
 #endif

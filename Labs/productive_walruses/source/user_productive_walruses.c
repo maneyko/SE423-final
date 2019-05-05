@@ -607,6 +607,7 @@ void RobotControl(void) {
         }
 
         // ================================================= BEGIN Student Code ====================================================================
+        // TODO
         if (new_coordata == 1) {
             blue_x_obj_local = blue_x_obj;
             blue_y_obj_local = blue_y_obj;
@@ -672,7 +673,7 @@ void RobotControl(void) {
         found_blue = (Nblue_local >= 10
                    && (-65 <= blue_y_obj_local && blue_y_obj_local <= -35)
                    && (-6 <= ROBOTps.x && ROBOTps.x <= 6)
-                   && (-0.5 <= ROBOTps.y && ROBOTps.y <= 12)
+                   && (0 <= ROBOTps.y && ROBOTps.y <= 12)
                    && num_sprayed < 5
                    && statePos != 19
                    && pval != 40  // Calculating distance to a spot
@@ -683,7 +684,7 @@ void RobotControl(void) {
                    // Bound X here too?
                    && (-65 <= pink_y_obj_local && pink_y_obj_local <= -35)
                    && (-6 <= ROBOTps.x && ROBOTps.x <= 6)
-                   && (-0.5 <= ROBOTps.y && ROBOTps.y <= 12)
+                   && (0 <= ROBOTps.y && ROBOTps.y <= 12)
                    && num_sprayed < 5
                    && statePos != 19
                    && pval != 40  // Calculating distance to a spot
@@ -691,7 +692,7 @@ void RobotControl(void) {
                    && ignore_weed_time > 2000);
 
         // Out of bounds
-        if (ROBOTps.y < -1.5 || ROBOTps.x > 6)
+        if (ROBOTps.y < -1 || ROBOTps.x > 6)
             pval = 1;
 
         if (found_blue) {
@@ -714,13 +715,14 @@ void RobotControl(void) {
             pval = 40;
         }
 
-        // Nothing stopping us from going to waypoint
-        if (fabsf(Ro_theta) < 30
-                && min_LD_obj60 > 400)
-            pval = 1;
-
         if (v1_mag < 0.25 && statePos == 19)
             pval = 43;
+
+        if (v1_mag < 0.5 && statePos == 9)
+            pval = 51;
+
+        if (v1_mag < 0.5 && statePos == 11)
+            pval = 52;
 
         /*
          * States and descriptions:
@@ -785,11 +787,15 @@ void RobotControl(void) {
         // Left wall following
         case 2:
 
+
+            // ============================= BEGIN left wall-follow logic ==================================
+
             min_side_ind = min_LADAR_i(224, 114);
             min_side_val = LADARdistance[min_side_ind];
+            side_45 = max_LADAR(152, 162);
 
             // Something in front
-            if (front_60 < 300 && max_LADAR(152, 162)) {
+            if (front_60 < 350 && side_45 < 550) {
                 // Turn (CW) until nothing is in front
                 turn = 1.0;
                 vref = 0.1;
@@ -809,7 +815,14 @@ void RobotControl(void) {
                 vref = forward_velocity * 0.7;
             }
 
+            // ============================= END left wall-follow logic ==================================
+
             if (v1_mag < 1)
+                pval = 1;
+
+            // Nothing stopping us from going to waypoint
+            if (fabsf(Ro_theta) < 30
+                    && min_LD_obj60 > 400)
                 pval = 1;
 
             break;
@@ -818,11 +831,14 @@ void RobotControl(void) {
         // Right wall following state
         case 3:
 
+            // ============================= BEGIN right wall-follow logic ==================================
+
             min_side_ind = min_LADAR_i(4, 113);
             min_side_val = LADARdistance[min_side_ind];
+            side_45 = max_LADAR(65, 75);
 
             // Something in front
-            if (front_60 < 300 && max_LADAR(65, 75) < 500) {
+            if (front_60 < 350 && side_45 < 550) {
                 // Turn (CW) until nothing is in front
                 turn = -1.0;
                 vref = 0.1;
@@ -842,7 +858,14 @@ void RobotControl(void) {
                 vref = forward_velocity * 0.7;
             }
 
+            // ============================= END right wall-follow logic ==================================
+
             if (v1_mag < 1)
+                pval = 1;
+
+            // Nothing stopping us from going to waypoint
+            if (fabsf(Ro_theta) < 30
+                    && min_LD_obj60 > 400)
                 pval = 1;
 
             break;
@@ -851,7 +874,7 @@ void RobotControl(void) {
         // Add X, Y to robotdest -> change state
         case 40:
 
-            if (fabsf(x_obj_local) > 10) {
+            if (fabsf(x_obj_local) > 5) {
                 facing_weed = 0;
                 vref = 0;
                 turn = -0.015 * x_obj_local;
@@ -889,6 +912,7 @@ void RobotControl(void) {
 
                     weed_time = 0;
                     pval = 43;  // sub-state
+//                    pval = 1;  // Back to point-to-point
                 }
                 // Have already marked the weed
                 else {
@@ -896,34 +920,28 @@ void RobotControl(void) {
                     pval = 1;
                 }
 
-            }
+            }  // if(facing_weed)
 
             break;
 
         // Move to the weed and sit on it for 2s
         case 43:
-            ppval = 2;
             if (v1_mag >= 0.25) {
-                ppval = 3;
                 pval = 1;
                 break;
             }
             else {
-                ppval = 4;
                 // Sit on weed for 2s
-                if (weed_time < 2000) {
-                    ppval = 5;
+                if (tc < 2000) {
                     vref = 0;
                     turn = 0;
-                    weed_time++;
+                    tc++;
                 }
                 // Done sitting
                 else {
-                    ppval = 6;
                     analyzing_blue = 0;
                     analyzing_pink = 0;
                     statePos = departed_statePos;
-                    weed_time = 0;
                     pval = 1;
                 }
             }
@@ -931,31 +949,34 @@ void RobotControl(void) {
             break;
 
         case 51:  // Blue presentation
+            ppval = 2;
 
-            if (v1_mag < 0.5 && tc < 5000) {
+            if (fabsf(mytheta-90) > 10) {
+                ppval = 3;
                 tc++;
-                turn = 0.2;
-                break;
+                turn = 1.0;
+                vref = 0;
             }
             else {
-                tc = 0;
-                pval = 1;
+                ppval = 4;
                 statePos = 10;
+                pval = 1;
             }
 
             break;
 
         case 52:  // Pink presentation
-            tc++;
 
-            if (v1_mag < 0.5 && tc < 5000) {  // Still on the waypoint
-                turn = -0.2;
-                break;
+            if (fabsf(mytheta-90) > 10) {  // Still on the waypoint
+                tc++;
+                ppval = 3;
+                turn = -1.0;
+                vref = 0;
             }
             else {
-                tc = 0;
-                pval = 1;
+                ppval = 4;
                 statePos = 12;
+                pval = 1;
             }
 
             break;
@@ -976,8 +997,8 @@ void RobotControl(void) {
 
             // TODO
 
-            LCDPrintfLine(1,"p:%d,f60:%.1f,sP:%d", pval, front_60, statePos);
-            LCDPrintfLine(2,"v1m:%.2f,wt:%d,pp:%d", v1_mag, weed_time, ppval);
+            LCDPrintfLine(1,"p:%d,f60:%.1f,s45:%.1f", pval, front_60, side_45);
+            LCDPrintfLine(2,"sP:%d,x:%.1f,y:%.1f", statePos, robotdest[statePos].x, robotdest[statePos].y);
         }
 
         SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);
