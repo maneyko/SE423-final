@@ -222,14 +222,18 @@ void ComWithLinux(void) {
 
                 //                                                Sending 16 variables
                 ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,
-                    "%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f",
+//    "%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f",
+    "%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f",
                                                    ROBOTps.x, ROBOTps.y, (float)pval, Ro_theta,
                                                    weed_blueX[0], weed_blueY[0],
                                                    weed_blueX[1], weed_blueY[1],
                                                    weed_blueX[2], weed_blueY[2],
                                                    weed_pinkX[0], weed_pinkY[0],
                                                    weed_pinkX[1], weed_pinkY[1],
-                                                   weed_pinkX[2], weed_pinkY[2]);
+                                                   weed_pinkX[2], weed_pinkY[2]
+//                                                   front_60, (float)ppval,
+//                                                   (float)min_LD_index, min_LD_val
+                                                   );
 
                 //ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",var1,var2,var3,var4);
 
@@ -415,14 +419,13 @@ Int main()
     robotdest[7].x =  0;     robotdest[7].y = -1;      // Start
 
     // Presentation of results
-    robotdest[8].x  =  0;     robotdest[8].y  = -2.5;  // MC spot
+    robotdest[8].x  =  0;     robotdest[8].y  = -2;    // MC spot
     robotdest[9].x  = -2;     robotdest[9].y  = -4;    // Blue circle
-    robotdest[10].x =  0;     robotdest[10].y = -2.5;  // MC spot
+    robotdest[10].x =  0;     robotdest[10].y = -2;    // MC spot
     robotdest[11].x =  2;     robotdest[11].y = -4;    // Pink circle
-    robotdest[12].x =  0;     robotdest[12].y = -2.5;
+    robotdest[12].x =  0;     robotdest[12].y = -2;    // MC spot
 
-    // !!! indices [14, 16] reserved for blue !!!
-    // !!! indices [17, 19] reserved for pink !!!
+    // !!! index [19] reserved for blue/pink !!!
 
 
     // ================================= END robot waypoints =====================================
@@ -693,7 +696,7 @@ void RobotControl(void) {
 
 
         // Emergency Case -- about to leave the course
-        if ((2 < ROBOTps.x && ROBOTps.x < 4)
+        if ((1 < ROBOTps.x && ROBOTps.x < 4)
                 && (-1 < ROBOTps.y && ROBOTps.y < 0)
                 && in_arr1d(special_states, (float)statePos, 3)
                 && pval == 2) {
@@ -703,7 +706,7 @@ void RobotControl(void) {
 
 
         // Emergency Case -- about to leave the course
-        if ((-4 < ROBOTps.x && ROBOTps.x < -2)
+        if ((-4 < ROBOTps.x && ROBOTps.x < -1)
                 && (-1 < ROBOTps.y && ROBOTps.y < 0)
                 && in_arr1d(special_states, (float)statePos, 3)
                 && pval == 3) {
@@ -712,9 +715,11 @@ void RobotControl(void) {
         }
 
         // Out of bounds
-        if (ROBOTps.y < -1 || ROBOTps.x > 6
+        if (ROBOTps.y < -1 || fabsf(ROBOTps.x) > 6
                 && statePos != 9
-                && statePos != 11)
+                && statePos != 10
+                && statePos != 11
+                && statePos != 12)
             pval = 1;
 
         if (found_blue) {
@@ -737,15 +742,14 @@ void RobotControl(void) {
             pval = 40;
         }
 
+        if (v1_mag < 0.25 && statePos == 19)
+            pval = 43;
 
-//        if (v1_mag < 0.25 && statePos == 19)
-//            pval = 43;
-//
-//        if (v1_mag < 0.5 && statePos == 9)
-//            pval = 51;
-//
-//        if (v1_mag < 0.5 && statePos == 11)
-//            pval = 52;
+        if (v1_mag < 0.5 && statePos == 9)
+            pval = 51;
+
+        if (v1_mag < 0.5 && statePos == 11)
+            pval = 52;
 
         /*
          * States and descriptions:
@@ -759,6 +763,7 @@ void RobotControl(void) {
          *
          */
         switch (pval) {
+        // TODO
 
         // Point to point
         case 1:
@@ -796,6 +801,15 @@ void RobotControl(void) {
 
             vref *= 1.15;
             vref = MIN(2.0, vref);
+
+
+            // Nothing stopping us from going to waypoint
+            if (fabsf(Ro_theta) < 30
+                    && min_LD_obj60 > 400) {
+                pval = 1;
+                break;
+            }
+
 
             // Something around robot -> wall follow it
             if (front_180 < 350) {
@@ -838,11 +852,11 @@ void RobotControl(void) {
 
             // ============================= END left wall-follow logic ==================================
 
-            if (v1_mag < 1)
-                pval = 1;
-
             if (min_LD_index < 114)
                 pval = 3;
+
+            if (v1_mag < 1)
+                pval = 1;
 
             // Nothing stopping us from going to waypoint
             if (fabsf(Ro_theta) < 30
@@ -976,13 +990,15 @@ void RobotControl(void) {
             break;
 
         case 51:  // Blue presentation
+            ppval = 2;
 
             if (fabsf(mytheta-90) > 10) {
-                tc++;
+                ppval = 3;
                 turn = 1.0;
                 vref = 0;
             }
             else {
+                ppval = 4;
                 statePos = 10;
                 pval = 1;
             }
@@ -1018,7 +1034,7 @@ void RobotControl(void) {
 
             // TODO
 
-            LCDPrintfLine(1,"p:%d,wt:%d", pval, weed_time);
+            LCDPrintfLine(1,"p:%d,pp:%d,wt:%d", pval, ppval, weed_time);
             LCDPrintfLine(2,"sP:%d,x:%.1f,y:%.1f", statePos, robotdest[statePos].x, robotdest[statePos].y);
         }
 
