@@ -38,10 +38,11 @@ float pink_x_obj_local = 0.0;
 float pink_y_obj_local = 0.0;
 int Npink_local = 0;
 
-float real_dist_blue = 0.0;
-float real_dist_pink = 0.0;
-float real_dist_blue_mm = 0.0;
-float real_dist_pink_mm = 0.0;
+float x_obj_local = 0.0;
+float y_obj_local = 0.0;
+
+float real_dist_cm = 0.0;
+float real_dist_mm = 0.0;
 
 float weed_x = 0.0;
 float weed_y = 0.0;
@@ -49,17 +50,25 @@ float weed_y = 0.0;
 int found_blue = 0;
 int found_pink = 0;
 
+int analyzing_blue = 0;
+int analyzing_pink = 0;
+
 float weed_blueX[3] = {20, 20, 20};
 float weed_blueY[3] = {20, 20, 20};
 
 float weed_pinkX[3] = {20, 20, 20};
 float weed_pinkY[3] = {20, 20, 20};
 
+float *weedX = &weed_blueX;
+float *weedY = &weed_blueY;
+
 extern int prnt_flag;
 
 int departed_statePos = 0;
 int facing_weed = 0;
 
+int n_pink = 0;
+int n_blue = 0;
 int num_sprayed = 0;
 
 float special_states[3] = {2, 3, 5};
@@ -144,11 +153,11 @@ void swap(int *a, int *b) {
     *a = *b;
     *b = _swap_val;
 }
-
 int _ii = 0;
 int _index = 0;
 int arr_min1d_i(float arr[], int lo, int hi) {
     if (lo > hi) swap(&lo, &hi);
+    if (lo < 0) lo = 0;
     _index = lo;
     for (_ii = lo; _ii <= hi; _ii++)
         if (arr[_ii] < arr[_index])
@@ -161,11 +170,14 @@ float arr_min1d(float arr[], int lo, int hi) {
 }
 
 int min_LADAR_i(int lo, int hi) {
+    if (lo > hi) swap(&lo, &hi);
+    if (lo < 0) lo = 3;
+    if (hi > 227) hi = 224;
     return arr_min1d_i(LADARdistance, lo, hi);
 }
 
 float min_LADAR(int lo, int hi) {
-    return arr_min1d(LADARdistance, lo, hi);
+    return LADARdistance[min_LADAR_i(lo, hi)];
 }
 
 int arr_max1d_i(float arr[], int lo, int hi) {
@@ -181,13 +193,15 @@ float arr_max1d(float arr[], int lo, int hi) {
     return arr[arr_max1d_i(arr, lo, hi)];
 }
 
-
 int max_LADAR_i(int lo, int hi) {
+    if (lo > hi) swap(&lo, &hi);
+    if (lo < 0) lo = 3;
+    if (hi > 227) hi = 224;
     return arr_max1d_i(LADARdistance, lo, hi);
 }
 
 float max_LADAR(int lo, int hi) {
-    return arr_max1d(LADARdistance, lo, hi);
+    return LADARdistance[max_LADAR_i(lo, hi)];
 }
 
 int _mdpt = 0;
@@ -238,29 +252,6 @@ float bound180(float angle) {
     while (angle > 180)
         angle -= 360;
     return angle;
-}
-
-float _temp_theta = 0.0;
-float get_adjustment_angle(void) {
-    // Takes global variables:
-    // v1_x, v1_y, mytheta
-    _temp_theta = rad2deg((float)atanf(v1_y / v1_x));
-
-    if (v1_x >= 0 && v1_y >= 0)
-        _temp_theta = _temp_theta;
-    else if ((v1_x < 0 && v1_y >= 0)
-            || (v1_x < 0 && v1_y < 0))
-        _temp_theta += 180;
-    else if (v1_x >= 0 && v1_y < 0)
-        _temp_theta += 360;
-
-    _temp_theta -= mytheta;
-
-    if (_temp_theta > 180)
-        _temp_theta -= 360.0;
-    if (_temp_theta < -180)
-        _temp_theta += 360;
-    return _temp_theta;
 }
 
 float round_to_nearest_half(float num) {
@@ -344,16 +335,22 @@ float insert_arr1d(float arr[], int index, float val, int size) {
 
 
 int _temp_var = 0;
-int calc_num_sprayed(void) {
+int calc_num_blue(void) {
     _temp_var = 0;
-    for (_j = 0; _j < 3; _j++) {
+    for (_j = 0; _j < 3; _j++)
         if (weed_blueX[_j] < 20)
             _temp_var++;
-        if (weed_pinkX[_j] < 20)
-            _temp_var++;
-    }
     return _temp_var;
 }
+
+int calc_num_pink(void) {
+    _temp_var = 0;
+    for (_j = 0; _j < 3; _j++)
+        if (weed_pinkX[_j] < 20)
+            _temp_var++;
+    return _temp_var;
+}
+
 
 
 #endif

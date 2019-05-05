@@ -607,9 +607,26 @@ void RobotControl(void) {
         }
 
         // ================================================= BEGIN Student Code ====================================================================
+        if (new_coordata == 1) {
+            blue_x_obj_local = blue_x_obj;
+            blue_y_obj_local = blue_y_obj;
+            Nblue_local = Nblue;
 
-        // TODO
-        // Centered about 0deg -> 114
+            pink_x_obj_local = pink_x_obj;
+            pink_y_obj_local = pink_y_obj;
+            Npink_local = Npink;
+
+            new_coordata = 0;
+        }
+
+        if (analyzing_blue) {
+            x_obj_local = blue_x_obj_local;
+            y_obj_local = blue_y_obj_local;
+        }
+        else if (analyzing_pink) {
+            x_obj_local = pink_x_obj_local;
+            y_obj_local = pink_y_obj_local;
+        }
 
         front_180 = min_LADAR(28, 200);
         front_120 = min_LADAR(56, 171);
@@ -648,76 +665,112 @@ void RobotControl(void) {
         LeftRight = cos(ROBOTps.theta) * v1_y
                   - sin(ROBOTps.theta) * v1_x;
 
-        if (new_coordata == 1) {
-            blue_x_obj_local = blue_x_obj;
-            blue_y_obj_local = blue_y_obj;
-            Nblue_local = Nblue;
-
-            pink_x_obj_local = pink_x_obj;
-            pink_y_obj_local = pink_y_obj;
-            Npink_local = Npink;
-
-            new_coordata = 0;
-        }
-
-        num_sprayed = calc_num_sprayed();
+        n_pink = calc_num_pink();
+        n_blue = calc_num_blue();
+        num_sprayed = n_pink + n_blue;
 
         found_blue = (Nblue_local >= 10
+                   && (-65 <= blue_y_obj_local && blue_y_obj_local <= -35)
+                   && (-6 <= ROBOTps.x && ROBOTps.x <= 6)
+                   && (-0.5 <= ROBOTps.y && ROBOTps.y <= 12)
                    && num_sprayed < 5
-                   && -65 <= blue_y_obj_local && blue_y_obj_local <= -35
+                   && statePos != 19
+                   && pval != 40  // Calculating distance to a spot
+                   && pval != 43  // Driving towards spot
                    && ignore_weed_time > 2000);
 
         found_pink = (Npink_local >= 10
-                   && num_sprayed < 5
+                   // Bound X here too?
                    && (-65 <= pink_y_obj_local && pink_y_obj_local <= -35)
+                   && (-6 <= ROBOTps.x && ROBOTps.x <= 6)
+                   && (-0.5 <= ROBOTps.y && ROBOTps.y <= 12)
+                   && num_sprayed < 5
+                   && statePos != 19
+                   && pval != 40  // Calculating distance to a spot
+                   && pval != 43  // Driving towards spot
                    && ignore_weed_time > 2000);
 
-//        if (statePos == 9)  // Blue presentation spot
-//            pval = 41;
-//
-//        if (statePos == 11)  // Blue presentation spot
-//            pval = 51;
+        // Out of bounds
+        if (ROBOTps.y < -1.5 || ROBOTps.x > 6)
+            pval = 1;
 
-        // Wall following case structure
+        if (found_blue) {
+            analyzing_blue = 1;
+            analyzing_pink = 0;
+            x_obj_local = blue_x_obj_local;
+            y_obj_local = blue_y_obj_local;
+            weedX = weed_blueX;
+            weedY = weed_blueY;
+            pval = 40;
+        }
+
+        else if (found_pink) {
+            analyzing_blue = 0;
+            analyzing_pink = 1;
+            x_obj_local = pink_x_obj_local;
+            y_obj_local = pink_y_obj_local;
+            weedX = weed_pinkX;
+            weedY = weed_pinkY;
+            pval = 40;
+        }
+
+        // Nothing stopping us from going to waypoint
+        if (fabsf(Ro_theta) < 30
+                && min_LD_obj60 > 400)
+            pval = 1;
+
+        if (v1_mag < 0.25 && statePos == 19)
+            pval = 43;
+
+        /*
+         * States and descriptions:
+         *  1: Point-to-point
+         *  2: Left wall-following
+         *  3: Right wall-following
+         * 40: Center weed and calculate its X, Y position
+         * 43: Sit on weed for 2s
+         * 51: Blue weed presentation
+         * 52: Pink weed presentation
+         *
+         */
         switch (pval) {
 
         // Point to point
         case 1:
-
             tc = 0;
 
-            // Emergency -- about to hit a wall!
-            if (front_180 < 170) {
-                if (min_LD_index > 113)
-                    pval = 2;
-                else
-                    pval = 3;
-                break;
-            }
-
-            if (found_blue) {
-                pval = 4;
-                break;
-            }
-
-            if (found_pink) {
-                pval = 5;
-                break;
-            }
-
-            // If moving directly towards robot found target
+            // Move directly to waypoint
             if ( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y,
                             robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
-            { statePos = (statePos + 1) % robotdestSize; }
+            {
+                // Have reached waypoint, decide what to do next
+                switch (statePos) {
+
+                    // On a weed
+                    case 19:
+                        pval = 43;
+                        break;
+
+                    // Blue presentation
+                    case 9:
+                        pval = 51;
+                        break;
+
+                    // Pink presentation
+                    case 11:
+                        pval = 52;
+                        break;
+
+                    // Go to next waypoint
+                    default:
+                        statePos = (statePos + 1) % robotdestSize;
+                        break;
+                }
+                break;
+            }
 
             vref *= 1.15;
             vref = MIN(2.0, vref);
-
-            // Nothing in front or around -> keep moving to destination!
-            if (min_LD_obj60 > 400) {
-                pval = 1;
-                break;
-            }
 
             // Something around robot -> wall follow it
             if (front_180 < 350) {
@@ -726,288 +779,191 @@ void RobotControl(void) {
                 else
                     pval = 3;
             }
+
             break;
 
-            // Left wall following state
-            // Break out when objective is on left of robot
+        // Left wall following
         case 2:
-            tc++;
 
             min_side_ind = min_LADAR_i(224, 114);
             min_side_val = LADARdistance[min_side_ind];
 
-            // Found a blue weed!
-            if (found_blue) {
-                pval = 4;
-                break;
-            }
-            // Found a blue weed!
-            if (found_pink) {
-                pval = 5;
+            // Something in front
+            if (front_60 < 300 && max_LADAR(152, 162)) {
+                // Turn (CW) until nothing is in front
+                turn = 1.0;
+                vref = 0.1;
                 break;
             }
 
             // Get robot perpendicular to wall
-            if ( !(185 < min_side_ind && min_side_ind < 215)
-                    && min_LADAR(224, 114) < 700) {
+            if (fabs(min_side_ind - 200) > 15) {
                 turn = 0.05 * (200 - min_side_ind);
                 vref = 0.2;
                 break;
             }
 
-            // Emergency Case -- about to leave the course
-            //check if left wall following on right side of gate
-            if ((2 < ROBOTps.x && ROBOTps.x < 4)
-                    && (-1 < ROBOTps.y && ROBOTps.y < 0)
-                    && in_arr1d(special_states, (float)statePos, 3)) {
-                turn = 1.0;
-                pval = 3;
-                break;
-            }
-
-            // Something in front
-            if (front_60 < 320) {
-                // Turn (CW) until nothing is in front
-                turn = 1.0;
-                vref = 0.1;
-                break;
-            }
-
             // Nothing in front, something on left -> wall follow
-            if (front_60 > 400) {
-                turn = 0.005 * (300 - min_side_val);
+            if (front_60 > 350) {
+                turn = 0.005 * (280 - min_side_val);
                 vref = forward_velocity * 0.7;
             }
 
-            // Out of bounds
-            if (ROBOTps.y < -1.5 || fabs(ROBOTps.x) > 5.75) {
-                pval = 1;
-                break;
-            }
-
-            // Object in front 60 and nothing stopping us from going there
-            if (fabsf(Ro_theta) < 30
-                    && min_LD_obj60 > 400 )
-                pval = 1;
-
-            // Next to objective, go to it
-            if (v1_mag < 0.5)
+            if (v1_mag < 1)
                 pval = 1;
 
             break;
 
-            // Right wall following state
-            // Break out when objective is on right of robot
+
+        // Right wall following state
         case 3:
-            tc++;
 
             min_side_ind = min_LADAR_i(4, 113);
             min_side_val = LADARdistance[min_side_ind];
 
-            // Found a Weed!
-            if (found_blue) {
-                pval = 4;
+            // Something in front
+            if (front_60 < 300 && max_LADAR(65, 75) < 500) {
+                // Turn (CW) until nothing is in front
+                turn = -1.0;
+                vref = 0.1;
                 break;
             }
 
-            if (found_pink) {
-                pval = 5;
-                break;
-            }
-
-            if ( !(13 < min_side_ind && min_side_ind < 43)
-                    && min_LADAR(4, 113) < 700 ) {
+            // Get robot perpendicular to wall
+            if (fabs(min_side_ind - 28) > 15) {
                 turn = 0.05 * (28 - min_side_ind);
                 vref = 0.2;
                 break;
             }
 
-
-            // Emergency Case -- about to leave the course
-            //check if left wall following on right side of gate
-            if ((-4 < ROBOTps.x && ROBOTps.x < -2)
-                    && (-1 < ROBOTps.y && ROBOTps.y < 0)
-                    && in_arr1d(special_states, (float)statePos, 3)) {
-                turn = -1.0;
-                pval = 2;
-                break;
-            }
-
-            // Emergency case
-            if (front_60 < 320) {
-                // Turn (CW) until nothing is in front
-                turn = -1.0;
-                vref = 0.1;
-                break;
-            }
-
             // Nothing in front, something on right
-            if (front_60 > 400) {
-                turn = 0.005 * (-300 + min_side_val);
+            if (front_60 > 350) {
+                turn = 0.005 * (-280 + min_side_val);
                 vref = forward_velocity * 0.7;
             }
 
-            // Out of bounds
-            if (ROBOTps.y < -1.5 || fabs(ROBOTps.x) > 5.75) {
-                pval = 1;
-                break;
-            }
-
-            // Nothing stopping us from going there
-            if (fabsf(Ro_theta) < 30
-                    && min_LD_obj60 > 400)
-                pval = 1;
-
-            if (v1_mag < 0.5)
+            if (v1_mag < 1)
                 pval = 1;
 
             break;
 
-        case 4:
-            if (Nblue_local < 10) {
-                pval = 1;
-                break;
-            }
-            // Turn towards the blue object
-            if (fabsf(blue_x_obj_local) > 10) {
-                facing_weed = 0;
-                vref = 0;
-                turn = -0.015 * blue_x_obj_local;
-                break;
-            }
-
-            facing_weed = 1;
-
-            if (facing_weed) {
-                real_dist_blue = 0.0011000349405  * blue_y_obj_local * blue_y_obj_local * blue_y_obj_local
-                               + 0.1822854638960  * blue_y_obj_local * blue_y_obj_local
-                               + 10.8406447250287 * blue_y_obj_local
-                               + 258.6162738196003 + 23.0;  // in CM
-
-                real_dist_blue_mm = real_dist_blue * 10.0;  // Convert to MM
-
-                // Finding x and y for weed
-                weed_x = round_to_nearest_half(ROBOTps.x + real_dist_blue_mm / TILE_TO_MM * cos(ROBOTps.theta));
-                weed_y = round_to_nearest_half(ROBOTps.y + real_dist_blue_mm / TILE_TO_MM * sin(ROBOTps.theta));
-
-                // Haven't marked this weed
-                if ( !(in_close_arr1d(weed_blueX, weed_x, 0.5, 3)
-                        && in_close_arr1d(weed_blueY, weed_y, 0.5, 3))
-                       && (fabsf(weed_x) <= 5.75 && weed_y <= 11.75) ) {
-
-                    push_LIFO(weed_blueX, weed_x, 3);
-                    push_LIFO(weed_blueY, weed_y, 3);
-
-                    robotdest[19].x = weed_blueX[i];
-                    robotdest[19].y = weed_blueY[i];
-
-                    departed_statePos = statePos;
-                    statePos = 19;  // Just pushed newest value to queue
-
-                    weed_time = 0;
-                    pval = 40;  // sub-state
-                }
-                // Have already marked the weed
-                else {
-                    ignore_weed_time = 0;
-                    pval = 1;
-                }
-
-            }
-
-            break;
-
+        // Turn towards the object then calculate its distance
+        // Add X, Y to robotdest -> change state
         case 40:
 
-            // Sitting on weed
-            if (v1_mag < 0.25 && weed_time < 2000) {
-                vref = 0;
-                turn = 0;
-                weed_time++;
-                break;
-            }
-
-            // Leaving weed sitting -> back to point-to-point
-            if (weed_time >= 2000 && v1_mag < 0.25) {
-                statePos = departed_statePos;
-                pval = 1;
-                weed_time = 0;
-                break;
-            }
-
-            // If moving directly towards robot found target
-            if ( xy_control(&vref, &turn, 1.0, ROBOTps.x, ROBOTps.y,
-                            robotdest[statePos].x, robotdest[statePos].y, ROBOTps.theta, 0.25, 0.5) )
-            { break; }
-
-            break;
-
-        case 5:
-            if (Npink_local < 10) {
-                pval = 1;
-                break;
-            }
-
-            // Turn towards the pink object
-            if (fabsf(pink_x_obj_local) > 10) {
+            if (fabsf(x_obj_local) > 10) {
                 facing_weed = 0;
                 vref = 0;
-                turn = -0.015 * pink_x_obj_local;
+                turn = -0.015 * x_obj_local;
                 break;
             }
 
             facing_weed = 1;
 
             if (facing_weed) {
-                real_dist_pink = 0.0011000349405  * pink_y_obj_local * pink_y_obj_local * pink_y_obj_local
-                               + 0.1822854638960  * pink_y_obj_local * pink_y_obj_local
-                               + 10.8406447250287 * pink_y_obj_local
-                               + 258.6162738196003 + 23.0;  // in CM
+                real_dist_cm = 0.0011000349405  * y_obj_local * y_obj_local * y_obj_local
+                             + 0.1822854638960  * y_obj_local * y_obj_local
+                             + 10.8406447250287 * y_obj_local
+                             + 258.6162738196003 + 23.0;  // in CM
 
-                real_dist_pink_mm = real_dist_pink * 10.0;  // Convert to MM
+                real_dist_mm = real_dist_cm * 10.0;  // Convert to MM
 
                 // Finding x and y for weed
-                weed_x = round_to_nearest_half(ROBOTps.x + real_dist_pink_mm / TILE_TO_MM * cos(ROBOTps.theta));
-                weed_y = round_to_nearest_half(ROBOTps.y + real_dist_pink_mm / TILE_TO_MM * sin(ROBOTps.theta));
+                weed_x = round_to_nearest_half(ROBOTps.x + real_dist_mm / TILE_TO_MM * cos(ROBOTps.theta));
+                weed_y = round_to_nearest_half(ROBOTps.y + real_dist_mm / TILE_TO_MM * sin(ROBOTps.theta));
 
                 // Haven't marked this weed
-                if ( !(in_close_arr1d(weed_pinkX, weed_x, 0.5, 3)
-                        && in_close_arr1d(weed_pinkY, weed_y, 0.5, 3))
-                       && (fabsf(weed_x) <= 5.75 && weed_y <= 11.75) ) {
+                if ( !(in_close_arr1d(weedX, weed_x, 0.5, 3)
+                        && in_close_arr1d(weedY, weed_y, 0.5, 3))
+                       && (fabsf(weed_x) <= 6)
+                       && (0 < weed_y && weed_y <= 12) ) {
 
-                    push_LIFO(weed_pinkX, weed_x, 3);
-                    push_LIFO(weed_pinkY, weed_y, 3);
+                    push_LIFO(weedX, weed_x, 3);
+                    push_LIFO(weedY, weed_y, 3);
 
-                    robotdest[19].x = weed_pinkX[i];
-                    robotdest[19].y = weed_pinkY[i];
+                    robotdest[19].x = weedX[i];
+                    robotdest[19].y = weedY[i];
 
                     departed_statePos = statePos;
-                    statePos = 19;  // Just pushed newest value to queue
+                    statePos = 19;
 
                     weed_time = 0;
-                    pval = 40;  // sub-state
+                    pval = 43;  // sub-state
                 }
                 // Have already marked the weed
                 else {
                     ignore_weed_time = 0;
                     pval = 1;
                 }
+
             }
 
             break;
 
-        case 41:
+        // Move to the weed and sit on it for 2s
+        case 43:
+            ppval = 2;
+            if (v1_mag >= 0.25) {
+                ppval = 3;
+                pval = 1;
+                break;
+            }
+            else {
+                ppval = 4;
+                // Sit on weed for 2s
+                if (weed_time < 2000) {
+                    ppval = 5;
+                    vref = 0;
+                    turn = 0;
+                    weed_time++;
+                }
+                // Done sitting
+                else {
+                    ppval = 6;
+                    analyzing_blue = 0;
+                    analyzing_pink = 0;
+                    statePos = departed_statePos;
+                    weed_time = 0;
+                    pval = 1;
+                }
+            }
 
             break;
 
-        case 51:
+        case 51:  // Blue presentation
+
+            if (v1_mag < 0.5 && tc < 5000) {
+                tc++;
+                turn = 0.2;
+                break;
+            }
+            else {
+                tc = 0;
+                pval = 1;
+                statePos = 10;
+            }
+
+            break;
+
+        case 52:  // Pink presentation
+            tc++;
+
+            if (v1_mag < 0.5 && tc < 5000) {  // Still on the waypoint
+                turn = -0.2;
+                break;
+            }
+            else {
+                tc = 0;
+                pval = 1;
+                statePos = 12;
+            }
 
             break;
 
         }
 
-        turn = MIN(turn, 4.0);
         turn = MAX(turn, -4.0);
+        turn = MIN(turn, 4.0);
 
         vref = MAX(vref, 0);
         vref = MIN(vref, 2.0);
@@ -1020,8 +976,8 @@ void RobotControl(void) {
 
             // TODO
 
-            LCDPrintfLine(1,"p:%d,sp:%d,mL:%.1f", pval, statePos, max_LADAR(150, 164));
-            LCDPrintfLine(2,"mi:%d,mv:%.1f", min_LD_index, min_LD_val);
+            LCDPrintfLine(1,"p:%d,f60:%.1f,sP:%d", pval, front_60, statePos);
+            LCDPrintfLine(2,"v1m:%.2f,wt:%d,pp:%d", v1_mag, weed_time, ppval);
         }
 
         SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);
