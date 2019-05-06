@@ -13,6 +13,7 @@
 long tc = 0;  // Personal timechecking variable.
 long tc19 = 0;
 long weed_time = 0;
+long display_time = 0;
 long ignore_weed_time = 2000;
 
 
@@ -71,6 +72,9 @@ int facing_weed = 0;
 int n_pink = 0;
 int n_blue = 0;
 int num_sprayed = 0;
+
+float blue_PWM = 0.0;
+float pink_PWM = 0.0;
 
 float special_states[3] = {2, 3, 5};
 

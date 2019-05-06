@@ -222,17 +222,15 @@ void ComWithLinux(void) {
 
                 //                                                Sending 16 variables
                 ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,
-//    "%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f",
-    "%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f",
-                                                   ROBOTps.x, ROBOTps.y, (float)pval, Ro_theta,
+    "%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f",
+                                                   ROBOTps.x, ROBOTps.y, (float)pval, (float)statePos,
                                                    weed_blueX[0], weed_blueY[0],
                                                    weed_blueX[1], weed_blueY[1],
                                                    weed_blueX[2], weed_blueY[2],
                                                    weed_pinkX[0], weed_pinkY[0],
                                                    weed_pinkX[1], weed_pinkY[1],
-                                                   weed_pinkX[2], weed_pinkY[2]
-//                                                   front_60, (float)ppval,
-//                                                   (float)min_LD_index, min_LD_val
+                                                   weed_pinkX[2], weed_pinkY[2],
+                                                   front_60, right_30
                                                    );
 
                 //ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",var1,var2,var3,var4);
@@ -715,7 +713,7 @@ void RobotControl(void) {
         }
 
         // Out of bounds
-        if (ROBOTps.y < -1 || fabsf(ROBOTps.x) > 6
+        if (ROBOTps.y < -1.2 || fabsf(ROBOTps.x) > 6
                 && statePos != 9
                 && statePos != 10
                 && statePos != 11
@@ -750,6 +748,9 @@ void RobotControl(void) {
 
         if (v1_mag < 0.5 && statePos == 11)
             pval = 52;
+
+        if (v1_mag < 0.5 && statePos == 12)
+            pval = 53;
 
         /*
          * States and descriptions:
@@ -790,6 +791,12 @@ void RobotControl(void) {
                     case 11:
                         pval = 52;
                         break;
+
+                    // Completed course
+                    case 12:
+                        pval = 53;
+                        break;
+
 
                     // Go to next waypoint
                     default:
@@ -852,7 +859,7 @@ void RobotControl(void) {
 
             // ============================= END left wall-follow logic ==================================
 
-            if (min_LD_index < 114)
+            if ((min_LADAR(114, 224) - min_LADAR(3, 113)) > 50)
                 pval = 3;
 
             if (v1_mag < 1)
@@ -897,6 +904,9 @@ void RobotControl(void) {
 
             // ============================= END right wall-follow logic ==================================
 
+            if ((min_LADAR(3, 113) - min_LADAR(114, 224)) > 50)
+                pval = 2;
+
             if (v1_mag < 1)
                 pval = 1;
 
@@ -914,7 +924,7 @@ void RobotControl(void) {
         // Add X, Y to robotdest -> change state
         case 40:
 
-            if (fabsf(x_obj_local) > 5) {
+            if (fabsf(x_obj_local) > 3) {
                 facing_weed = 0;
                 vref = 0;
                 turn = -0.015 * x_obj_local;
@@ -989,35 +999,87 @@ void RobotControl(void) {
 
             break;
 
-        case 51:  // Blue presentation
-            ppval = 2;
+        // Blue presentation
+        case 51:
 
             if (fabsf(mytheta-90) > 10) {
-                ppval = 3;
                 turn = 1.0;
                 vref = 0;
+                display_time = 0;
+                break;
+            }
+
+            turn = 0;
+            vref = 0;
+
+            if (display_time < 5000) {
+
+                display_time++;
+
+                if (n_blue == 0)
+                    blue_PWM = 0;
+                if (n_blue == 1)
+                    blue_PWM = 0.8;
+                if (n_blue == 2)
+                    blue_PWM = 3.4;
+                if (n_blue == 3)
+                    blue_PWM = 6.2;
             }
             else {
-                ppval = 4;
+                display_time = 0;
                 statePos = 10;
                 pval = 1;
             }
 
             break;
 
-        case 52:  // Pink presentation
+        // Pink presentation
+        case 52:
 
             if (fabsf(mytheta-90) > 10) {
                 turn = -1.0;
                 vref = 0;
+                display_time = 0;
+                break;
+            }
+
+            turn = 0;
+            vref = 0;
+
+            if (display_time < 5000) {
+                display_time++;
+
+                if (n_pink == 0)
+                    pink_PWM = 0;
+                if (n_pink == 1)
+                    pink_PWM = 0.8;
+                if (n_pink == 2)
+                    pink_PWM = 3.4;
+                if (n_pink == 3)
+                    pink_PWM = 6.2;
+
             }
             else {
+                display_time = 0;
                 statePos = 12;
                 pval = 1;
             }
 
             break;
 
+
+            // Look forward at course
+            case 53:
+
+                if (fabsf(mytheta-90) > 10) {
+                    turn = -1.0;
+                    vref = 0;
+                    break;
+                }
+                vref = 0;
+                turn = 0;
+                pval = 53;
+                break;
         }
 
         turn = MAX(turn, -4.0);
@@ -1025,7 +1087,6 @@ void RobotControl(void) {
 
         vref = MAX(vref, 0);
         vref = MIN(vref, 2.0);
-
         //==================================================== end wall following/point to point====================
 
         if ( (timecount % 200) == 0 ) {
@@ -1038,7 +1099,7 @@ void RobotControl(void) {
             LCDPrintfLine(2,"sP:%d,x:%.1f,y:%.1f", statePos, robotdest[statePos].x, robotdest[statePos].y);
         }
 
-        SetRobotOutputs(vref,turn,0,0,0,0,0,0,0,0);
+        SetRobotOutputs(vref,turn,6+blue_PWM,6+pink_PWM,0,0,0,0,0,0);
 
         timecount++;
     }
