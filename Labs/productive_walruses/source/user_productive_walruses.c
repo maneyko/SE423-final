@@ -713,7 +713,7 @@ void RobotControl(void) {
         }
 
         // Out of bounds
-        if (ROBOTps.y < -1.2 || fabsf(ROBOTps.x) > 6
+        if ((ROBOTps.y < -1.2 || fabsf(ROBOTps.x) > 6)
                 && statePos != 9
                 && statePos != 10
                 && statePos != 11
@@ -910,7 +910,7 @@ void RobotControl(void) {
             if (v1_mag < 1)
                 pval = 1;
 
-            if (min_LD_index > 113)
+            if (min_LD_index > 113) // rethink...
                 pval = 2;
 
             // Nothing stopping us from going to waypoint
@@ -924,10 +924,10 @@ void RobotControl(void) {
         // Add X, Y to robotdest -> change state
         case 40:
 
-            if (fabsf(x_obj_local) > 3) {
+            if (fabsf(x_obj_local) >= 3) {
                 facing_weed = 0;
                 vref = 0;
-                turn = -0.015 * x_obj_local;
+                turn = -0.02 * x_obj_local;
                 break;
             }
 
@@ -982,7 +982,7 @@ void RobotControl(void) {
             }
             else {
                 // Sit on weed for 2s
-                if (weed_time < 2000) {
+                if (weed_time < 1000) {
                     vref = 0;
                     turn = 0;
                     weed_time++;
@@ -1003,7 +1003,7 @@ void RobotControl(void) {
         case 51:
 
             if (fabsf(mytheta-90) > 10) {
-                turn = 1.0;
+                turn = 2;
                 vref = 0;
                 display_time = 0;
                 break;
@@ -1012,18 +1012,18 @@ void RobotControl(void) {
             turn = 0;
             vref = 0;
 
-            if (display_time < 5000) {
+            if (display_time < 2000) {
 
                 display_time++;
 
                 if (n_blue == 0)
-                    blue_PWM = 0;
+                    blue_PWM = 3.6;
                 if (n_blue == 1)
-                    blue_PWM = 0.8;
+                    blue_PWM = 6.9;
                 if (n_blue == 2)
-                    blue_PWM = 3.4;
+                    blue_PWM = 9.5;
                 if (n_blue == 3)
-                    blue_PWM = 6.2;
+                    blue_PWM = 12.9;
             }
             else {
                 display_time = 0;
@@ -1037,7 +1037,7 @@ void RobotControl(void) {
         case 52:
 
             if (fabsf(mytheta-90) > 10) {
-                turn = -1.0;
+                turn = -2;
                 vref = 0;
                 display_time = 0;
                 break;
@@ -1046,17 +1046,17 @@ void RobotControl(void) {
             turn = 0;
             vref = 0;
 
-            if (display_time < 5000) {
+            if (display_time < 2000) {
                 display_time++;
 
                 if (n_pink == 0)
-                    pink_PWM = 0;
+                    pink_PWM = 3.6;        // 0
                 if (n_pink == 1)
-                    pink_PWM = 0.8;
+                    pink_PWM = 6.9;      // 0.8
                 if (n_pink == 2)
-                    pink_PWM = 3.4;
+                    pink_PWM = 9.5;      // 3.4
                 if (n_pink == 3)
-                    pink_PWM = 6.2;
+                    pink_PWM = 12.9;      // 6.2
 
             }
             else {
@@ -1072,7 +1072,7 @@ void RobotControl(void) {
             case 53:
 
                 if (fabsf(mytheta-90) > 10) {
-                    turn = -1.0;
+                    turn = -2.0;
                     vref = 0;
                     break;
                 }
@@ -1099,7 +1099,7 @@ void RobotControl(void) {
             LCDPrintfLine(2,"sP:%d,x:%.1f,y:%.1f", statePos, robotdest[statePos].x, robotdest[statePos].y);
         }
 
-        SetRobotOutputs(vref,turn,6+blue_PWM,6+pink_PWM,0,0,0,0,0,0);
+        SetRobotOutputs(vref,turn,blue_PWM,pink_PWM,0,0,0,0,0,0);
 
         timecount++;
     }
