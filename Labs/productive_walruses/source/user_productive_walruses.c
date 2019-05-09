@@ -740,17 +740,17 @@ void RobotControl(void) {
             pval = 40;
         }
 
-        if (v1_mag < 0.25 && statePos == 19)
-            pval = 43;
-
-        if (v1_mag < 0.5 && statePos == 9)
-            pval = 51;
-
-        if (v1_mag < 0.5 && statePos == 11)
-            pval = 52;
-
-        if (v1_mag < 0.5 && statePos == 12)
-            pval = 53;
+//        if (v1_mag < 0.25 && statePos == 19)
+//            pval = 43;
+//
+//        if (v1_mag < 0.5 && statePos == 9)
+//            pval = 51;
+//
+//        if (v1_mag < 0.5 && statePos == 11)
+//            pval = 52;
+//
+//        if (v1_mag < 0.5 && statePos == 12)
+//            pval = 53;
 
         /*
          * States and descriptions:
@@ -806,7 +806,7 @@ void RobotControl(void) {
                 break;
             }
 
-            vref *= 1.15;
+            vref *= 1.50;
             vref = MIN(2.0, vref);
 
 
@@ -834,7 +834,7 @@ void RobotControl(void) {
 
             min_side_ind = min_LADAR_i(224, 114);
             min_side_val = LADARdistance[min_side_ind];
-            side_45 = max_LADAR(152, 162);
+            side_45 = max_LADAR(147, 162);
 
             // Something in front
             if (front_60 < 350 && side_45 < 550) {
@@ -879,7 +879,7 @@ void RobotControl(void) {
 
             min_side_ind = min_LADAR_i(4, 113);
             min_side_val = LADARdistance[min_side_ind];
-            side_45 = max_LADAR(65, 75);
+            side_45 = max_LADAR(60, 75); // changed from (65, 75)
 
             // Something in front
             if (front_60 < 350 && side_45 < 550) {
@@ -910,8 +910,7 @@ void RobotControl(void) {
             if (v1_mag < 1)
                 pval = 1;
 
-            if (min_LD_index > 113) // rethink...
-                pval = 2;
+
 
             // Nothing stopping us from going to waypoint
             if (fabsf(Ro_theta) < 30

@@ -73,8 +73,8 @@ int n_pink = 0;
 int n_blue = 0;
 int num_sprayed = 0;
 
-float blue_PWM = 0.0;
-float pink_PWM = 0.0;
+float blue_PWM = 2.2;
+float pink_PWM = 2.2;
 
 float special_states[3] = {2, 3, 5};
 
@@ -243,11 +243,30 @@ float min_LD_obj(float angle, int degfan) {
         return -1.0;
 }
 
+//float bound360(float angle) {
+//    /* `angle`: must be in degrees */
+//    while (angle < 0)
+//        angle += 360;
+//    while (angle > 360)
+//        angle -= 360;
+//    return angle;
+//}
+//
+//float bound180(float angle) {
+//    /* `angle`: must be in degrees */
+//    while (angle < -180)
+//        angle += 360;
+//    while (angle > 180)
+//        angle -= 360;
+//    return angle;
+//}
+
+
 float bound360(float angle) {
     /* `angle`: must be in degrees */
     while (angle < 0)
         angle += 360;
-    while (angle > 360)
+    while (angle >= 360)
         angle -= 360;
     return angle;
 }
@@ -258,8 +277,12 @@ float bound180(float angle) {
         angle += 360;
     while (angle > 180)
         angle -= 360;
+    if (angle == 180 || angle == -180)
+        angle = 180;
     return angle;
 }
+
+
 
 float round_to_nearest_half(float num) {
     return round(num * 2.0) / 2.0;
