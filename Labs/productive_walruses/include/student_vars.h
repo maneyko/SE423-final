@@ -46,8 +46,8 @@ float y_obj_local = 0.0;
 float real_dist_cm = 0.0;
 float real_dist_mm = 0.0;
 
-float LV_weedX = 0.0;       // For labview weed dist calc
-float LV_weedY = 0.0;       // For Labview weed dist calc
+float LV_weed_x = 0.0;       // For labview weed dist calc
+float LV_weed_y = 0.0;       // For Labview weed dist calc
 
 float weed_x = 0.0;
 float weed_y = 0.0;
@@ -58,23 +58,20 @@ int found_pink = 0;
 int analyzing_blue = 0;
 int analyzing_pink = 0;
 
-float LV_blue_weedX[3] = {20, 20, 20};       // Initialize blue array to send unrounded coordinates to labview
-float LV_blue_weedY[3] = {20, 20, 20};       // Initialize blue array to send unrounded coordinates to labview
-
-float LV_pink_weedX[3] = {20, 20, 20};       // Initialize pink array to send unrounded coordinates to labview
-float LV_pink_weedY[3] = {20, 20, 20};       // Initialize blue array to send unrounded coordinates to labview
-
-float *LVweedX = &LV_blue_weedX;            //For labview pointer??
-float *LVweedY = &LV_blue_weedY;            //For Labview pointer??
-
 float weed_blueX[3] = {20, 20, 20};
 float weed_blueY[3] = {20, 20, 20};
-
 float weed_pinkX[3] = {20, 20, 20};
 float weed_pinkY[3] = {20, 20, 20};
 
+float LV_blue_weedX[3] = {20, 20, 20};       // Initialize blue array to send unrounded coordinates to labview
+float LV_blue_weedY[3] = {20, 20, 20};       // Initialize blue array to send unrounded coordinates to labview
+float LV_pink_weedX[3] = {20, 20, 20};       // Initialize pink array to send unrounded coordinates to labview
+float LV_pink_weedY[3] = {20, 20, 20};       // Initialize blue array to send unrounded coordinates to labview
+
 float *weedX = &weed_blueX;
 float *weedY = &weed_blueY;
+float *LV_weedX = &LV_blue_weedX;            // For labview pointer??
+float *LV_weedY = &LV_blue_weedY;            // For Labview pointer??
 
 extern int prnt_flag;
 
