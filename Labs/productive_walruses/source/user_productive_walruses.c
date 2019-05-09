@@ -633,6 +633,7 @@ void RobotControl(void) {
         ignore_weed_time++;
 
         front_180 = min_LADAR(28, 200);
+        front_60 = min_LADAR(85, 142);
         front_30 = min_LADAR(100, 128);
         left_30 = min_LADAR(186, 214);
         right_30 = min_LADAR(14, 42);
@@ -696,8 +697,8 @@ void RobotControl(void) {
             y_obj_local = pink_y_obj_local;
             weedX = weed_pinkX;
             weedY = weed_pinkY;
-            LV_weedX = LV_pink_weedX;       // For Labview reporting
-            LV_weedY = LV_pink_weedY;       // For Labview reporting
+            LV_weedX = LV_pink_weedX;  // For Labview reporting
+            LV_weedY = LV_pink_weedY;  // For Labview reporting
             pval = 40;
         }
 
@@ -705,18 +706,24 @@ void RobotControl(void) {
         if (pval == 2
                 && (2 < ROBOTps.x && ROBOTps.x < 4)
                 && ROBOTps.y < 0
-                && in_arr1d(special_states, (float)statePos, 4))
+                && (statePos == 2
+                        || statePos == 3
+                        || statePos == 5
+                        || statePos == 6))
             pval = 3;
 
         // Right wall-following out of course
         if (pval == 3
                 && (-4 < ROBOTps.x && ROBOTps.x < -2)
                 && ROBOTps.y < 0
-                && in_arr1d(special_states, (float)statePos, 4))
+                && (statePos == 2
+                        || statePos == 3
+                        || statePos == 5
+                        || statePos == 6))
             pval = 2;
 
         // Out of bounds
-        if ((ROBOTps.y < -1.2 || fabsf(ROBOTps.x) > 6)
+        if ((ROBOTps.y < -1.5 || fabsf(ROBOTps.x) > 6)
                 && statePos <= 8)
             pval = 1;
 
@@ -769,7 +776,6 @@ void RobotControl(void) {
                         pval = 53;
                         break;
 
-
                     // Go to next waypoint
                     default:
                         statePos = (statePos + 1) % robotdestSize;
@@ -780,7 +786,6 @@ void RobotControl(void) {
 
             vref *= 1.50;
             vref = MIN(2.0, vref);
-
 
             // Nothing stopping us from going to waypoint
             if (fabsf(Ro_theta) < 30
@@ -842,7 +847,6 @@ void RobotControl(void) {
                 pval = 1;
 
             break;
-
 
         // Right wall following state
         case 3:
@@ -950,17 +954,20 @@ void RobotControl(void) {
 
         // Move to the weed and sit on it for 2s
         case 43:
+
             if (v1_mag >= 0.25) {
                 weed_time = 0;
                 pval = 1;
                 break;
             }
+
             // Sit on weed for 2s
             if (weed_time < 1000) {
                 vref = 0;
                 turn = 0;
                 weed_time++;
             }
+
             // Done sitting
             else {
                 analyzing_blue = 0;
@@ -1023,14 +1030,13 @@ void RobotControl(void) {
                 display_time++;
 
                 if (n_pink == 0)
-                    pink_PWM = 3.6;        // 0
+                    pink_PWM = 3.6;
                 if (n_pink == 1)
-                    pink_PWM = 6.9;      // 0.8
+                    pink_PWM = 6.9;
                 if (n_pink == 2)
-                    pink_PWM = 9.5;      // 3.4
+                    pink_PWM = 9.5;
                 if (n_pink == 3)
-                    pink_PWM = 12.9;      // 6.2
-
+                    pink_PWM = 12.9;
             }
             else {
                 display_time = 0;
@@ -1048,9 +1054,9 @@ void RobotControl(void) {
                     vref = 0;
                     break;
                 }
+
                 vref = 0;
                 turn = 0;
-                pval = 53;
                 break;
         }
 
@@ -1067,8 +1073,8 @@ void RobotControl(void) {
 
             // TODO
 
-            LCDPrintfLine(1,"p:%d,pp:%d,wt:%d", pval, ppval, weed_time);
-            LCDPrintfLine(2,"sP:%d,x:%.1f,y:%.1f", statePos, robotdest[statePos].x, robotdest[statePos].y);
+            LCDPrintfLine(1,"p:%d,wt:%d", pval, weed_time);
+            LCDPrintfLine(2,"sP:%d,mi:%d,mv:%.1f", statePos, min_LD_index, min_LD_val);
         }
 
         SetRobotOutputs(vref,turn,blue_PWM,pink_PWM,0,0,0,0,0,0);
