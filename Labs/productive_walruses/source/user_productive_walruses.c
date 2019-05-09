@@ -230,7 +230,7 @@ void ComWithLinux(void) {
                                                    LV_pink_weedX[0], LV_pink_weedY[0],
                                                    LV_pink_weedX[1], LV_pink_weedY[1],
                                                    LV_pink_weedX[2], LV_pink_weedY[2],
-                                                   (float)min_LD_index, min_LD_val
+                                                   front_60, right_30
                                                    );
 
                 //ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,"%.1f %.1f %.1f %.1f",var1,var2,var3,var4);
@@ -411,8 +411,8 @@ Int main()
     robotdest[1].x = -5;     robotdest[1].y = -3;      // Point 1
     robotdest[2].x =  3;     robotdest[2].y =  7;      // Point 2
     robotdest[3].x = -3;     robotdest[3].y =  7;      // Point 3
+    robotdest[4].x =  0;     robotdest[4].y = -1;      // Go to (0, -1)
 //    robotdest[4].x =  0;     robotdest[4].y = -1;      // Go to (0, -1)
-    robotdest[4].x =  5;     robotdest[4].y = -3;      // Go to (0, -1)
     robotdest[5].x =  5;     robotdest[5].y = -3;      // Point 4
     robotdest[6].x =  0;     robotdest[6].y = 11;      // Point 5
     robotdest[7].x =  0;     robotdest[7].y = -1;      // Start
@@ -631,13 +631,23 @@ void RobotControl(void) {
             y_obj_local = pink_y_obj_local;
         }
 
-        ignore_weed_time++;
-
         front_180 = min_LADAR(28, 200);
+        front_120 = min_LADAR(56, 171);
+        front_90 = min_LADAR(71, 157);
         front_60 = min_LADAR(85, 142);
         front_30 = min_LADAR(100, 128);
+
         left_30 = min_LADAR(186, 214);
+        left_50 = min_LADAR(176, 223);
+        left_side = min_LADAR(114, 224);
+        left_rear = min_LADAR(208,224);
+        left_forward = min_LADAR(114, 200);
+
         right_30 = min_LADAR(14, 42);
+        right_50 = min_LADAR(4, 51);
+        right_side = min_LADAR(4, 113);
+        right_rear = min_LADAR(4, 20);
+        right_forward = min_LADAR(28, 114);
 
         v1_x = robotdest[statePos].x - ROBOTps.x;
         v1_y = robotdest[statePos].y - ROBOTps.y;
@@ -645,13 +655,15 @@ void RobotControl(void) {
         v1_theta = atan360(v1_x, v1_y);
 
         mytheta = bound360(rad2deg(ROBOTps.theta));
+
+        ignore_weed_time++;
+
         Ro_theta = bound180(v1_theta - mytheta);
 
         min_LD_index = min_LADAR_i(4, 223);
         min_LD_val = LADARdistance[min_LD_index];
 
-        min_LD_obj60 = min_LD_obj(Ro_theta, 30);  // From [-90, 90] of robot x-axis, will return you values
-//        min_LD_obj60 = min_LD_obj(Ro_theta, 60);  // From [-90, 90] of robot x-axis, will return you values
+        min_LD_obj60 = min_LD_obj(Ro_theta, 60);  // From [-90, 90] of robot x-axis, will return you values
 
         LeftRight = cos(ROBOTps.theta) * v1_y
                   - sin(ROBOTps.theta) * v1_x;
@@ -680,31 +692,6 @@ void RobotControl(void) {
                    && ( 0 <= ROBOTps.y && ROBOTps.y <= 12)
                    && (-65 <= pink_y_obj_local && pink_y_obj_local <= -35));
 
-        if (found_blue) {
-            analyzing_blue = 1;
-            analyzing_pink = 0;
-            x_obj_local = blue_x_obj_local;
-            y_obj_local = blue_y_obj_local;
-            weedX = weed_blueX;
-            weedY = weed_blueY;
-            LV_weedX = LV_blue_weedX;
-            LV_weedY = LV_blue_weedY;
-            departed_pval = pval;
-            pval = 40;
-        }
-
-        else if (found_pink) {
-            analyzing_blue = 0;
-            analyzing_pink = 1;
-            x_obj_local = pink_x_obj_local;
-            y_obj_local = pink_y_obj_local;
-            weedX = weed_pinkX;
-            weedY = weed_pinkY;
-            LV_weedX = LV_pink_weedX;  // For Labview reporting
-            LV_weedY = LV_pink_weedY;  // For Labview reporting
-            departed_pval = pval;
-            pval = 40;
-        }
 
         // Left wall-following out of course
         if (pval == 2
@@ -721,9 +708,38 @@ void RobotControl(void) {
             pval = 2;
 
         // Out of bounds
-        if ((ROBOTps.y < -1.5 || fabsf(ROBOTps.x) > 6)
-                && statePos <= 8)
+        if ((ROBOTps.y < -1.2 || fabsf(ROBOTps.x) > 6)
+                && statePos != 9
+                && statePos != 10
+                && statePos != 11
+                && statePos != 12)
             pval = 1;
+
+        if (found_blue) {
+            analyzing_blue = 1;
+            analyzing_pink = 0;
+            x_obj_local = blue_x_obj_local;
+            y_obj_local = blue_y_obj_local;
+            weedX = weed_blueX;
+            weedY = weed_blueY;
+            LVweedX = LV_blue_weedX;
+            LVweedY = LV_blue_weedY;
+            departed_pval = pval;
+            pval = 40;
+        }
+
+        else if (found_pink) {
+            analyzing_blue = 0;
+            analyzing_pink = 1;
+            x_obj_local = pink_x_obj_local;
+            y_obj_local = pink_y_obj_local;
+            weedX = weed_pinkX;
+            weedY = weed_pinkY;
+            LVweedX = LV_pink_weedX;       // For Labview reporting
+            LVweedY = LV_pink_weedY;       // For Labview reporting
+            departed_pval = pval;
+            pval = 40;
+        }
 
         // So the robot doesn't follow your hand at the beginning
         if (statePos <= 1)
@@ -738,6 +754,7 @@ void RobotControl(void) {
          * 43: Sit on weed for 2s
          * 51: Blue weed presentation
          * 52: Pink weed presentation
+         *
          */
         switch (pval) {
         // TODO
@@ -755,7 +772,6 @@ void RobotControl(void) {
 
                     // On a weed
                     case 19:
-                        weed_time = 0;
                         pval = 43;
                         break;
 
@@ -774,6 +790,7 @@ void RobotControl(void) {
                         pval = 53;
                         break;
 
+
                     // Go to next waypoint
                     default:
                         statePos = (statePos + 1) % robotdestSize;
@@ -782,13 +799,9 @@ void RobotControl(void) {
                 break;
             }
 
-            // Out of bounds
-            if (ROBOTps.y < -1.5 || fabsf(ROBOTps.x) > 6)
-                vref *= 2.50;
-            else
-                vref *= 1.20;
+            vref *= 1.50;
+            vref = MIN(2.0, vref);
 
-            vref = MIN(3.0, vref);
 
             // Nothing stopping us from going to waypoint
             if (fabsf(Ro_theta) < 30
@@ -796,6 +809,7 @@ void RobotControl(void) {
                 pval = 1;
                 break;
             }
+
 
             // Something around robot -> wall follow it
             if (front_180 < 350) {
@@ -815,15 +829,8 @@ void RobotControl(void) {
             min_side_val = LADARdistance[min_side_ind];
             side_45 = max_LADAR(147, 162);
 
-            // Got too close to wall -> turn off of it
-            if (min_side_val < 180) {
-                turn = 0.05 * (200 - min_side_ind);
-                vref = 0.2;
-                break;
-            }
-
             // Something in front
-            if (front_60 < 400 && side_45 < 550) {
+            if (front_60 < 350 && side_45 < 550) {
                 // Turn (CW) until nothing is in front
                 turn = 1.0;
                 vref = 0.1;
@@ -838,7 +845,7 @@ void RobotControl(void) {
             }
 
             // Nothing in front, something on left -> wall follow
-            if (front_60 > 400) {
+            if (front_60 > 350) {
                 turn = 0.005 * (280 - min_side_val);
                 vref = forward_velocity * 0.7;
             }
@@ -858,6 +865,7 @@ void RobotControl(void) {
 
             break;
 
+
         // Right wall following state
         case 3:
             // ============================= BEGIN right wall-follow logic ==================================
@@ -866,16 +874,9 @@ void RobotControl(void) {
             min_side_val = LADARdistance[min_side_ind];
             side_45 = max_LADAR(60, 75); // changed from (65, 75)
 
-            // Got too close to wall -> turn off of it
-            if (min_side_val < 180) {
-                turn = 0.05 * (-200 + min_side_ind);
-                vref = 0.2;
-                break;
-            }
-
             // Something in front
-            if (front_60 < 400 && side_45 < 550) {
-                // Turn (CCW) until nothing is in front
+            if (front_60 < 350 && side_45 < 550) {
+                // Turn (CW) until nothing is in front
                 turn = -1.0;
                 vref = 0.1;
                 break;
@@ -889,7 +890,7 @@ void RobotControl(void) {
             }
 
             // Nothing in front, something on right
-            if (front_60 > 400) {
+            if (front_60 > 350) {
                 turn = 0.005 * (-280 + min_side_val);
                 vref = forward_velocity * 0.7;
             }
@@ -901,6 +902,8 @@ void RobotControl(void) {
 
             if (v1_mag < 1)
                 pval = 1;
+
+
 
             // Nothing stopping us from going to waypoint
             if (fabsf(Ro_theta) < 30
@@ -914,79 +917,85 @@ void RobotControl(void) {
         case 40:
 
             if (fabsf(x_obj_local) >= 3) {
+                facing_weed = 0;
                 vref = 0;
                 turn = -0.02 * x_obj_local;
                 break;
             }
 
-            real_dist_cm = 0.0011000349405  * y_obj_local * y_obj_local * y_obj_local
-                         + 0.1822854638960  * y_obj_local * y_obj_local
-                         + 10.8406447250287 * y_obj_local
-                         + 258.6162738196003 + 23.0;  // in CM
+            facing_weed = 1;
 
-            real_dist_mm = real_dist_cm * 10.0;  // Convert to MM
+            if (facing_weed) {
+                real_dist_cm = 0.0011000349405  * y_obj_local * y_obj_local * y_obj_local
+                             + 0.1822854638960  * y_obj_local * y_obj_local
+                             + 10.8406447250287 * y_obj_local
+                             + 258.6162738196003 + 23.0;  // in CM
 
-            // Finding x and y for weed
-            weed_x = round_to_nearest_half(ROBOTps.x + real_dist_mm / TILE_TO_MM * cos(ROBOTps.theta));
-            weed_y = round_to_nearest_half(ROBOTps.y + real_dist_mm / TILE_TO_MM * sin(ROBOTps.theta));
+                real_dist_mm = real_dist_cm * 10.0;  // Convert to MM
+                // TODO
 
-            // Finding x and y for weed to report to Labview
-            LV_weed_x = ROBOTps.x + real_dist_mm / TILE_TO_MM * cos(ROBOTps.theta);
-            LV_weed_y = ROBOTps.y + real_dist_mm / TILE_TO_MM * sin(ROBOTps.theta);
+                // FInding x and y for weed to report to labview
+                LV_weedX = ROBOTps.x + real_dist_mm / TILE_TO_MM * cos(ROBOTps.theta);
+                LV_weedY = ROBOTps.y + real_dist_mm / TILE_TO_MM * sin(ROBOTps.theta);
 
-            // Haven't marked this weed
-            if ( !(in_close_arr1d(weedX, weed_x, 0.75, 3)
-                    && in_close_arr1d(weedY, weed_y, 0.75, 3))
-                    && (fabsf(weed_x) <= 5)
-                    && (0 <= weed_y && weed_y <= 11) ) {
 
-                push_LIFO(LV_weedX, LV_weed_x, 3);
-                push_LIFO(LV_weedY, LV_weed_y, 3);
+                // Finding x and y for weed
+                weed_x = round_to_nearest_half(ROBOTps.x + real_dist_mm / TILE_TO_MM * cos(ROBOTps.theta));
+                weed_y = round_to_nearest_half(ROBOTps.y + real_dist_mm / TILE_TO_MM * sin(ROBOTps.theta));
 
-                push_LIFO(weedX, weed_x, 3);
-                push_LIFO(weedY, weed_y, 3);
+                // Haven't marked this weed
+                if ( !(in_close_arr1d(weedX, weed_x, 0.5, 3)
+                        && in_close_arr1d(weedY, weed_y, 0.5, 3))
+                       && (fabsf(weed_x) <= 5)
+                       && (0 <= weed_y && weed_y <= 11) ) {
 
-                robotdest[19].x = weedX[0];
-                robotdest[19].y = weedY[0];
+                    push_LIFO(LVweedX, LV_weedX, 3); // IS THIS HOW THIS FUNCTION WORKS
+                    push_LIFO(LVweedY, LV_weedY, 3); // IS THIS HOW THIS FUNCTION WORKS
 
-                departed_statePos = statePos;
-                statePos = 19;
+                    push_LIFO(weedX, weed_x, 3);
+                    push_LIFO(weedY, weed_y, 3);
 
-                weed_time = 0;
-                pval = departed_pval;  // Back to whatever you were doing
-            }
-            // Have already marked the weed
-            else {
-                ignore_weed_time = 0;
-                pval = 1;
-            }
+                    robotdest[19].x = weedX[0];
+                    robotdest[19].y = weedY[0];
 
+                    departed_statePos = statePos;
+                    statePos = 19;
+
+                    weed_time = 0;
+                    pval = 1;  // Back to point-to-point
+                }
+                // Have already marked the weed
+                else {
+                    ignore_weed_time = 0;
+                    pval = departed_pval;  // Back to whatever you were doing
+                }
+
+            }  //  if (facing_weed)
 
             break;
 
         // Move to the weed and sit on it for 2s
         case 43:
-
             if (v1_mag >= 0.25) {
                 weed_time = 0;
                 pval = 1;
                 break;
             }
-
-            // Sit on weed for 2s
-            if (weed_time < 1000) {
-                weed_time++;
-                vref = 0;
-                turn = 0;
-            }
-
-            // Done sitting
             else {
-                analyzing_blue = 0;
-                analyzing_pink = 0;
-                statePos = departed_statePos;
-                weed_time = 0;
-                pval = 1;
+                // Sit on weed for 2s
+                if (weed_time < 1000) {
+                    vref = 0;
+                    turn = 0;
+                    weed_time++;
+                }
+                // Done sitting
+                else {
+                    analyzing_blue = 0;
+                    analyzing_pink = 0;
+                    statePos = departed_statePos;
+                    weed_time = 0;
+                    pval = 1;
+                }
             }
 
             break;
@@ -995,7 +1004,7 @@ void RobotControl(void) {
         case 51:
 
             if (fabsf(mytheta-90) > 10) {
-                turn = 3;
+                turn = 2;
                 vref = 0;
                 display_time = 0;
                 break;
@@ -1029,7 +1038,7 @@ void RobotControl(void) {
         case 52:
 
             if (fabsf(mytheta-90) > 10) {
-                turn = -3;
+                turn = -2;
                 vref = 0;
                 display_time = 0;
                 break;
@@ -1042,13 +1051,14 @@ void RobotControl(void) {
                 display_time++;
 
                 if (n_pink == 0)
-                    pink_PWM = 3.6;
+                    pink_PWM = 3.6;        // 0
                 if (n_pink == 1)
-                    pink_PWM = 6.9;
+                    pink_PWM = 6.9;      // 0.8
                 if (n_pink == 2)
-                    pink_PWM = 9.5;
+                    pink_PWM = 9.5;      // 3.4
                 if (n_pink == 3)
-                    pink_PWM = 12.9;
+                    pink_PWM = 12.9;      // 6.2
+
             }
             else {
                 display_time = 0;
@@ -1058,17 +1068,18 @@ void RobotControl(void) {
 
             break;
 
+
             // Look forward at course
             case 53:
 
                 if (fabsf(mytheta-90) > 10) {
-                    turn = -3.0;
+                    turn = -2.0;
                     vref = 0;
                     break;
                 }
-
                 vref = 0;
                 turn = 0;
+                pval = 53;
                 break;
         }
 
@@ -1085,8 +1096,8 @@ void RobotControl(void) {
 
             // TODO
 
-            LCDPrintfLine(1,"p:%d,wt:%d,x:%.1f,y:.1f", pval, weed_time, robotdest[statePos].x, robotdest[statePos].y);
-            LCDPrintfLine(2,"sP:%d,mi:%d,mv:%.1f", statePos, min_LD_index, min_LD_val);
+            LCDPrintfLine(1,"p:%d,pp:%d,wt:%d", pval, ppval, weed_time);
+            LCDPrintfLine(2,"sP:%d,x:%.1f,y:%.1f", statePos, robotdest[statePos].x, robotdest[statePos].y);
         }
 
         SetRobotOutputs(vref,turn,blue_PWM,pink_PWM,0,0,0,0,0,0);

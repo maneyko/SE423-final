@@ -11,10 +11,10 @@
 
 // Timecheckers
 long tc = 0;  // Personal timechecking variable.
+long tc19 = 0;
 long weed_time = 0;
-long p40_timeout = 0;
 long display_time = 0;
-long ignore_weed_time = 3000;
+long ignore_weed_time = 2000;
 
 
 float forward_velocity = 1.5;
@@ -29,8 +29,8 @@ extern float pink_x_obj;
 extern float pink_y_obj;
 extern int Npink;
 
+
 extern int new_coordata;
-extern int prnt_flag;
 
 float blue_x_obj_local = 0.0;
 float blue_y_obj_local = 0.0;
@@ -46,8 +46,8 @@ float y_obj_local = 0.0;
 float real_dist_cm = 0.0;
 float real_dist_mm = 0.0;
 
-float LV_weed_x = 0.0;  // For labview weed dist calc
-float LV_weed_y = 0.0;  // For Labview weed dist calc
+float LV_weedX = 0.0;       // For labview weed dist calc
+float LV_weedY = 0.0;       // For Labview weed dist calc
 
 float weed_x = 0.0;
 float weed_y = 0.0;
@@ -58,23 +58,29 @@ int found_pink = 0;
 int analyzing_blue = 0;
 int analyzing_pink = 0;
 
+float LV_blue_weedX[3] = {20, 20, 20};       // Initialize blue array to send unrounded coordinates to labview
+float LV_blue_weedY[3] = {20, 20, 20};       // Initialize blue array to send unrounded coordinates to labview
+
+float LV_pink_weedX[3] = {20, 20, 20};       // Initialize pink array to send unrounded coordinates to labview
+float LV_pink_weedY[3] = {20, 20, 20};       // Initialize blue array to send unrounded coordinates to labview
+
+float *LVweedX = &LV_blue_weedX;            //For labview pointer??
+float *LVweedY = &LV_blue_weedY;            //For Labview pointer??
+
 float weed_blueX[3] = {20, 20, 20};
 float weed_blueY[3] = {20, 20, 20};
+
 float weed_pinkX[3] = {20, 20, 20};
 float weed_pinkY[3] = {20, 20, 20};
 
-float LV_blue_weedX[3] = {20, 20, 20};  // Initialize blue array to send unrounded coordinates to Labview
-float LV_blue_weedY[3] = {20, 20, 20};  // Initialize blue array to send unrounded coordinates to Labview
-float LV_pink_weedX[3] = {20, 20, 20};  // Initialize pink array to send unrounded coordinates to Labview
-float LV_pink_weedY[3] = {20, 20, 20};  // Initialize pink array to send unrounded coordinates to Labview
-
 float *weedX = &weed_blueX;
 float *weedY = &weed_blueY;
-float *LV_weedX = &LV_blue_weedX;
-float *LV_weedY = &LV_blue_weedY;
+
+extern int prnt_flag;
 
 int departed_statePos = 0;
 int departed_pval = 0;
+int facing_weed = 0;
 
 int n_pink = 0;
 int n_blue = 0;
@@ -83,7 +89,7 @@ int num_sprayed = 0;
 float blue_PWM = 2.5;
 float pink_PWM = 2.5;
 
-float special_states[4] = {2, 3, 5, 6};
+float special_states[4] = {2, 3, 5, 6}; // Added 6 to the list. Pretty sure thats what we meant by 5 from the start
 
 // *********************** End Color Vision ***********************
 
@@ -92,10 +98,22 @@ float left_turn_Start_threshold = 300;
 float ref_right_wall = 250;
 
 float front_180 = 10000.0;
+float front_120 = 10000.0;
+float front_90 = 10000.0;
 float front_60 = 10000.0;
 float front_30 = 10000.0;
+
 float left_30 = 10000.0;
+float left_50 = 10000.0;
+float left_side = 10000.0;
+float left_rear = 10000.0;
+float left_forward = 10000.0;
+
 float right_30 = 10000.0;
+float right_50 = 10000.0;
+float right_side = 10000.0;
+float right_rear = 10000.0;
+float right_forward = 10000.0;
 
 float side_45 = 0.0;
 
@@ -238,6 +256,25 @@ float min_LD_obj(float angle, int degfan) {
         return -1.0;
 }
 
+//float bound360(float angle) {
+//    /* `angle`: must be in degrees */
+//    while (angle < 0)
+//        angle += 360;
+//    while (angle > 360)
+//        angle -= 360;
+//    return angle;
+//}
+//
+//float bound180(float angle) {
+//    /* `angle`: must be in degrees */
+//    while (angle < -180)
+//        angle += 360;
+//    while (angle > 180)
+//        angle -= 360;
+//    return angle;
+//}
+
+
 float bound360(float angle) {
     /* `angle`: must be in degrees */
     while (angle < 0)
@@ -257,6 +294,8 @@ float bound180(float angle) {
         angle = 180;
     return angle;
 }
+
+
 
 float round_to_nearest_half(float num) {
     return round(num * 2.0) / 2.0;
@@ -336,6 +375,7 @@ float insert_arr1d(float arr[], int index, float val, int size) {
     }
     return _lifo_prev;
 }
+
 
 int _temp_var = 0;
 int calc_num_blue(void) {

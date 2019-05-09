@@ -12,7 +12,7 @@ PHYSICAL MEMORY PARAMETERS
 
 BOOT LOADER PARAMETERS
    Table Address: 0x0000, PAGE 0
-   Entry Point  : 0x1181d020
+   Entry Point  : 0x1181d080
 
 
 OUTPUT TRANSLATION MAP
@@ -21,12 +21,11 @@ OUTPUT TRANSLATION MAP
 --------------------------------------------------------------------------------
    OUTPUT FILES: productive_walruses.hex [b0..b7]
 
-   CONTENTS: 00000000..00023a5b   BOOT TABLE
+   CONTENTS: 00000000..00023ad3   BOOT TABLE
                             .vecs : btad=00000000  dest=1182f000 size=00000200
-                           .cinit : btad=0000020c  dest=1182f340 size=00000ac0
-                            .text : btad=00000cd4  dest=11800000 size=000205a0
-                         .const.1 : btad=0002127c  dest=118205a0 size=00000060
-                         .const.2 : btad=000212e4  dest=11829478 size=00000008
-                         .const.3 : btad=000212f4  dest=118294e8 size=00002642
-                        .switch.1 : btad=00023940  dest=1182ef10 size=000000e8
-                        .switch.2 : btad=00023a30  dest=1182f320 size=00000020
+                           .cinit : btad=0000020c  dest=1182f3c8 size=00000ae8
+                            .text : btad=00000cfc  dest=11800000 size=00020600
+                         .const.1 : btad=00021304  dest=11829478 size=00000008
+                         .const.2 : btad=00021314  dest=118294e8 size=0000269a
+                        .switch.1 : btad=000239b8  dest=1182ef94 size=00000064
+                        .switch.2 : btad=00023a24  dest=1182f320 size=000000a4
