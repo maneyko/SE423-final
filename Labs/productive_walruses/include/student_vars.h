@@ -12,8 +12,9 @@
 // Timecheckers
 long tc = 0;  // Personal timechecking variable.
 long weed_time = 0;
+long p40_timeout = 0;
 long display_time = 0;
-long ignore_weed_time = 2000;
+long ignore_weed_time = 3000;
 
 
 float forward_velocity = 1.5;
@@ -73,7 +74,7 @@ float *LV_weedX = &LV_blue_weedX;
 float *LV_weedY = &LV_blue_weedY;
 
 int departed_statePos = 0;
-int facing_weed = 0;
+int departed_pval = 0;
 
 int n_pink = 0;
 int n_blue = 0;
