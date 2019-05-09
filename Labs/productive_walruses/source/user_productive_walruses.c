@@ -224,12 +224,12 @@ void ComWithLinux(void) {
                 ptrshrdmem->DSPSend_size = sprintf(toLinuxstring,
     "%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f",
                                                    ROBOTps.x, ROBOTps.y, (float)pval, (float)statePos,
-                                                   weed_blueX[0], weed_blueY[0],
-                                                   weed_blueX[1], weed_blueY[1],
-                                                   weed_blueX[2], weed_blueY[2],
-                                                   weed_pinkX[0], weed_pinkY[0],
-                                                   weed_pinkX[1], weed_pinkY[1],
-                                                   weed_pinkX[2], weed_pinkY[2],
+                                                   LV_blue_weedX[0], LV_blue_weedY[0],
+                                                   LV_blue_weedX[1], LV_blue_weedY[1],
+                                                   LV_blue_weedX[2], LV_blue_weedY[2],
+                                                   LV_pink_weedX[0], LV_pink_weedY[0],
+                                                   LV_pink_weedX[1], LV_pink_weedY[1],
+                                                   LV_pink_weedX[2], LV_pink_weedY[2],
                                                    front_60, right_30
                                                    );
 
@@ -693,20 +693,20 @@ void RobotControl(void) {
                    && ignore_weed_time > 2000);
 
 
-        // Emergency Case -- about to leave the course
+        // Emergency Case -- about to leave the course switch from left to right wall
         if ((1 < ROBOTps.x && ROBOTps.x < 4)
                 && (-1 < ROBOTps.y && ROBOTps.y < 0)
-                && in_arr1d(special_states, (float)statePos, 3)
+                && in_arr1d(special_states, (float)statePos, 4)
                 && pval == 2) {
             turn = 1.0;
             pval = 3;
         }
 
 
-        // Emergency Case -- about to leave the course
+        // Emergency Case -- about to leave the course switch from right to left wall
         if ((-4 < ROBOTps.x && ROBOTps.x < -1)
                 && (-1 < ROBOTps.y && ROBOTps.y < 0)
-                && in_arr1d(special_states, (float)statePos, 3)
+                && in_arr1d(special_states, (float)statePos, 4)
                 && pval == 3) {
             turn = -1.0;
             pval = 2;
@@ -727,6 +727,8 @@ void RobotControl(void) {
             y_obj_local = blue_y_obj_local;
             weedX = weed_blueX;
             weedY = weed_blueY;
+            LVweedX = LV_blue_weedX;
+            LVweedY = LV_blue_weedY;
             pval = 40;
         }
 
@@ -737,6 +739,8 @@ void RobotControl(void) {
             y_obj_local = pink_y_obj_local;
             weedX = weed_pinkX;
             weedY = weed_pinkY;
+            LVweedX = LV_pink_weedX;       // For Labview reporting
+            LVweedY = LV_pink_weedY;       // For Labview reporting
             pval = 40;
         }
 
@@ -939,6 +943,13 @@ void RobotControl(void) {
                              + 258.6162738196003 + 23.0;  // in CM
 
                 real_dist_mm = real_dist_cm * 10.0;  // Convert to MM
+//TODO
+               //SEE ADDED LABVIEW REPORTING CODE
+
+                // FInding x and y for weed to report to labview
+                LV_weedX = ROBOTps.x + real_dist_mm / TILE_TO_MM * cos(ROBOTps.theta);
+                LV_weedY = ROBOTps.y + real_dist_mm / TILE_TO_MM * sin(ROBOTps.theta);
+
 
                 // Finding x and y for weed
                 weed_x = round_to_nearest_half(ROBOTps.x + real_dist_mm / TILE_TO_MM * cos(ROBOTps.theta));
@@ -949,6 +960,9 @@ void RobotControl(void) {
                         && in_close_arr1d(weedY, weed_y, 0.5, 3))
                        && (fabsf(weed_x) <= 5)
                        && (0 <= weed_y && weed_y <= 11) ) {
+
+                    push_LIFO(LVweedX, LV_weedX, 3); // IS THIS HOW THIS FUNCTION WORKS
+                    push_LIFO(LVweedY, LV_weedY, 3); // IS THIS HOW THIS FUNCTION WORKS
 
                     push_LIFO(weedX, weed_x, 3);
                     push_LIFO(weedY, weed_y, 3);

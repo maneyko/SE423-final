@@ -46,6 +46,9 @@ float y_obj_local = 0.0;
 float real_dist_cm = 0.0;
 float real_dist_mm = 0.0;
 
+float LV_weedX = 0.0;       // For labview weed dist calc
+float LV_weedY = 0.0;       // For Labview weed dist calc
+
 float weed_x = 0.0;
 float weed_y = 0.0;
 
@@ -54,6 +57,15 @@ int found_pink = 0;
 
 int analyzing_blue = 0;
 int analyzing_pink = 0;
+
+float LV_blue_weedX[3] = {20, 20, 20};       // Initialize blue array to send unrounded coordinates to labview
+float LV_blue_weedY[3] = {20, 20, 20};       // Initialize blue array to send unrounded coordinates to labview
+
+float LV_pink_weedX[3] = {20, 20, 20};       // Initialize pink array to send unrounded coordinates to labview
+float LV_pink_weedY[3] = {20, 20, 20};       // Initialize blue array to send unrounded coordinates to labview
+
+float *LVweedX = &LV_blue_weedX;            //For labview pointer??
+float *LVweedY = &LV_blue_weedY;            //For Labview pointer??
 
 float weed_blueX[3] = {20, 20, 20};
 float weed_blueY[3] = {20, 20, 20};
@@ -73,10 +85,10 @@ int n_pink = 0;
 int n_blue = 0;
 int num_sprayed = 0;
 
-float blue_PWM = 2.2;
-float pink_PWM = 2.2;
+float blue_PWM = 2.5;
+float pink_PWM = 2.5;
 
-float special_states[3] = {2, 3, 5};
+float special_states[4] = {2, 3, 5, 6}; // Added 6 to the list. Pretty sure thats what we meant by 5 from the start
 
 // *********************** End Color Vision ***********************
 
