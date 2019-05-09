@@ -411,7 +411,8 @@ Int main()
     robotdest[1].x = -5;     robotdest[1].y = -3;      // Point 1
     robotdest[2].x =  3;     robotdest[2].y =  7;      // Point 2
     robotdest[3].x = -3;     robotdest[3].y =  7;      // Point 3
-    robotdest[4].x =  0;     robotdest[4].y = -1;      // Go to (0, -1)
+//    robotdest[4].x =  0;     robotdest[4].y = -1;      // Go to (0, -1)
+    robotdest[4].x =  5;     robotdest[4].y = -3;      // Go to (0, -1)
     robotdest[5].x =  5;     robotdest[5].y = -3;      // Point 4
     robotdest[6].x =  0;     robotdest[6].y = 11;      // Point 5
     robotdest[7].x =  0;     robotdest[7].y = -1;      // Start
@@ -649,7 +650,8 @@ void RobotControl(void) {
         min_LD_index = min_LADAR_i(4, 223);
         min_LD_val = LADARdistance[min_LD_index];
 
-        min_LD_obj60 = min_LD_obj(Ro_theta, 60);  // From [-90, 90] of robot x-axis, will return you values
+        min_LD_obj60 = min_LD_obj(Ro_theta, 30);  // From [-90, 90] of robot x-axis, will return you values
+//        min_LD_obj60 = min_LD_obj(Ro_theta, 60);  // From [-90, 90] of robot x-axis, will return you values
 
         LeftRight = cos(ROBOTps.theta) * v1_y
                   - sin(ROBOTps.theta) * v1_x;
@@ -706,14 +708,14 @@ void RobotControl(void) {
 
         // Left wall-following out of course
         if (pval == 2
-                && (2 < ROBOTps.x && ROBOTps.x < 4)
+                && ROBOTps.x > 2
                 && ROBOTps.y < 0
                 && statePos <= 8)
             pval = 3;
 
         // Right wall-following out of course
         if (pval == 3
-                && (-4 < ROBOTps.x && ROBOTps.x < -2)
+                && ROBOTps.x < -2
                 && ROBOTps.y < 0
                 && statePos <= 8)
             pval = 2;
@@ -753,7 +755,9 @@ void RobotControl(void) {
                 switch (statePos) {
 
                     // On a weed
+
                     case 19:
+                        weed_time = 0;
                         pval = 43;
                         break;
 
@@ -785,7 +789,7 @@ void RobotControl(void) {
                 vref *= 2.50;
             }
             else {
-                vref *= 1.50;
+                vref *= 1.20;
             }
 
             vref = MIN(3.0, vref);
@@ -814,6 +818,12 @@ void RobotControl(void) {
             min_side_ind = min_LADAR_i(224, 114);
             min_side_val = LADARdistance[min_side_ind];
             side_45 = max_LADAR(147, 162);
+
+            if (min_side_val < 180) {
+                turn = 0.05 * (200 - min_side_ind);
+                vref = 0.2;
+                break;
+            }
 
             // Something in front
             if (front_60 < 400 && side_45 < 550) {
@@ -858,6 +868,12 @@ void RobotControl(void) {
             min_side_ind = min_LADAR_i(4, 113);
             min_side_val = LADARdistance[min_side_ind];
             side_45 = max_LADAR(60, 75); // changed from (65, 75)
+
+            if (min_side_val < 180) {
+                turn = 0.05 * (-200 + min_side_ind);
+                vref = 0.2;
+                break;
+            }
 
             // Something in front
             if (front_60 < 400 && side_45 < 550) {
@@ -921,8 +937,8 @@ void RobotControl(void) {
             LV_weed_y = ROBOTps.y + real_dist_mm / TILE_TO_MM * sin(ROBOTps.theta);
 
             // Haven't marked this weed
-            if ( !(in_close_arr1d(weedX, weed_x, 0.5, 3)
-                    && in_close_arr1d(weedY, weed_y, 0.5, 3))
+            if ( !(in_close_arr1d(weedX, weed_x, 0.75, 3)
+                    && in_close_arr1d(weedY, weed_y, 0.75, 3))
                     && (fabsf(weed_x) <= 5)
                     && (0 <= weed_y && weed_y <= 11) ) {
 
@@ -961,9 +977,9 @@ void RobotControl(void) {
 
             // Sit on weed for 2s
             if (weed_time < 1000) {
+                weed_time++;
                 vref = 0;
                 turn = 0;
-                weed_time++;
             }
 
             // Done sitting
