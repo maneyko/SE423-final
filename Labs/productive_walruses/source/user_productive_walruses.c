@@ -738,7 +738,6 @@ void RobotControl(void) {
          * 43: Sit on weed for 2s
          * 51: Blue weed presentation
          * 52: Pink weed presentation
-         *
          */
         switch (pval) {
         // TODO
@@ -755,7 +754,6 @@ void RobotControl(void) {
                 switch (statePos) {
 
                     // On a weed
-
                     case 19:
                         weed_time = 0;
                         pval = 43;
@@ -785,12 +783,10 @@ void RobotControl(void) {
             }
 
             // Out of bounds
-            if (ROBOTps.y < -1.5 || fabsf(ROBOTps.x) > 6) {
+            if (ROBOTps.y < -1.5 || fabsf(ROBOTps.x) > 6)
                 vref *= 2.50;
-            }
-            else {
+            else
                 vref *= 1.20;
-            }
 
             vref = MIN(3.0, vref);
 
@@ -819,6 +815,7 @@ void RobotControl(void) {
             min_side_val = LADARdistance[min_side_ind];
             side_45 = max_LADAR(147, 162);
 
+            // Got too close to wall -> turn off of it
             if (min_side_val < 180) {
                 turn = 0.05 * (200 - min_side_ind);
                 vref = 0.2;
@@ -869,6 +866,7 @@ void RobotControl(void) {
             min_side_val = LADARdistance[min_side_ind];
             side_45 = max_LADAR(60, 75); // changed from (65, 75)
 
+            // Got too close to wall -> turn off of it
             if (min_side_val < 180) {
                 turn = 0.05 * (-200 + min_side_ind);
                 vref = 0.2;
@@ -877,7 +875,7 @@ void RobotControl(void) {
 
             // Something in front
             if (front_60 < 400 && side_45 < 550) {
-                // Turn (CW) until nothing is in front
+                // Turn (CCW) until nothing is in front
                 turn = -1.0;
                 vref = 0.1;
                 break;
@@ -922,9 +920,9 @@ void RobotControl(void) {
             }
 
             real_dist_cm = 0.0011000349405  * y_obj_local * y_obj_local * y_obj_local
-                    + 0.1822854638960  * y_obj_local * y_obj_local
-                    + 10.8406447250287 * y_obj_local
-                    + 258.6162738196003 + 23.0;  // in CM
+                         + 0.1822854638960  * y_obj_local * y_obj_local
+                         + 10.8406447250287 * y_obj_local
+                         + 258.6162738196003 + 23.0;  // in CM
 
             real_dist_mm = real_dist_cm * 10.0;  // Convert to MM
 
