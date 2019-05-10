@@ -829,6 +829,12 @@ void RobotControl(void) {
             min_side_val = LADARdistance[min_side_ind];
             side_45 = max_LADAR(147, 162);
 
+            if (min_side_val < 200) {
+                turn = 0.05 * (200 - min_side_ind);
+                vref = 0.2;
+                break;
+            }
+
             // Something in front
             if (front_60 < 350 && side_45 < 550) {
                 // Turn (CW) until nothing is in front
@@ -873,6 +879,12 @@ void RobotControl(void) {
             min_side_ind = min_LADAR_i(4, 113);
             min_side_val = LADARdistance[min_side_ind];
             side_45 = max_LADAR(60, 75); // changed from (65, 75)
+
+            if (min_side_val < 200) {
+                turn = 0.05 * (28 - min_side_ind);
+                vref = 0.2;
+                break;
+            }
 
             // Something in front
             if (front_60 < 350 && side_45 < 550) {
